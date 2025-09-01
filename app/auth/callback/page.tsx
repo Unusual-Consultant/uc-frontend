@@ -14,7 +14,8 @@ function AuthCallbackContent() {
       const code = searchParams.get("code")
 
       if (!code) {
-        router.push("/")
+        // If no code is present, redirect to Google login
+        window.location.href = api.auth.google.login()
         return
       }
 
@@ -33,7 +34,6 @@ function AuthCallbackContent() {
         if (data.token) {
           localStorage.setItem("auth_token", data.token)
           localStorage.setItem("user_info", JSON.stringify(data.user_info))
-
           router.push("/dashboard")
         } else {
           throw new Error("No token received from server")
