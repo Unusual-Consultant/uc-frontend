@@ -101,59 +101,65 @@ const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderProps> = ({ c
     return response;
   }, [router]);
 
-  const processOAuthCallback = useCallback(async (code: string) => {
-    console.log("Processing OAuth callback with code:", code);
-    try {
-      if (!isAuthenticated) {
-        const callbackUrl = api.auth.google.callback(code);
-        console.log("Calling callback URL:", callbackUrl);
+const processOAuthCallback = useCallback(async (code: string) => {
+  console.log("Processing OAuth callback with code:", code);
+  try {
+    if (!isAuthenticated) {
+      const callbackUrl = api.auth.google.callback(code);
+      console.log("Calling callback URL:", callbackUrl);
 
-        const response = await fetch(callbackUrl);
-        if (!response.ok) {
-          let errorMessage = `HTTP error! status: ${response.status}`;
-          try {
-            const errorData = await response.json();
-            errorMessage = errorData.detail || errorMessage;
-          } catch {
-            errorMessage = response.statusText || errorMessage;
-          }
-          throw new Error(errorMessage);
+      const response = await fetch(callbackUrl);
+      if (!response.ok) {
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          errorMessage = response.statusText || errorMessage;
         }
-
-        const data = await response.json();
-        console.log("Callback response data:", data);
-
-        if (data.token) {
-          localStorage.setItem("auth_token", data.token);
-          localStorage.setItem("user_info", JSON.stringify(data.user_info));
-
-          setToken(data.token);
-          setUser(data.user_info);
-          setIsAuthenticated(true);
-
-          console.log("Authentication successful, redirecting to dashboard...");
-          router.push("/dashboard"); // ✅ always dashboard
-        } else {
-          throw new Error("No token received from server");
-        }
-      }
-    } catch (error) {
-      console.error("Error handling Google callback:", error);
-
-      lastProcessedCode.current = null;
-      globallyBlockOAuth.current = false;
-      if (typeof window !== "undefined" && window.__oauthProcessing) {
-        window.__oauthProcessing.blocked = false;
-        window.__oauthProcessing.lastCode = null;
+        throw new Error(errorMessage);
       }
 
-      const errorMessage = error instanceof Error ? error.message : "Authentication failed";
-      alert(`Login failed: ${errorMessage}. Please try again.`);
-      router.push("/");
-    } finally {
-      isProcessing.current = false;
+      const data = await response.json();
+      console.log("Callback response data:", data);
+
+      if (data.token && data.user_info) {
+        // ✅ merge token into user object
+        const userWithToken = { ...data.user_info, token: data.token };
+
+        // ✅ save both in localStorage
+        localStorage.setItem("auth_token", data.token);
+        localStorage.setItem("user_info", JSON.stringify(userWithToken));
+
+        // ✅ update state
+        setToken(data.token);
+        setUser(userWithToken);
+        setIsAuthenticated(true);
+
+        console.log("Authentication successful, redirecting to dashboard...");
+        router.push("/dashboard");
+      } else {
+        throw new Error("No token received from server");
+      }
     }
-  }, [router, isAuthenticated]);
+  } catch (error) {
+    console.error("Error handling Google callback:", error);
+
+    lastProcessedCode.current = null;
+    globallyBlockOAuth.current = false;
+    if (typeof window !== "undefined" && window.__oauthProcessing) {
+      window.__oauthProcessing.blocked = false;
+      window.__oauthProcessing.lastCode = null;
+    }
+
+    const errorMessage = error instanceof Error ? error.message : "Authentication failed";
+    alert(`Login failed: ${errorMessage}. Please try again.`);
+    router.push("/");
+  } finally {
+    isProcessing.current = false;
+  }
+}, [router, isAuthenticated]);
+
 
   const logout = useCallback(() => {
     localStorage.removeItem("auth_token");

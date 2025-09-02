@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -13,23 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Menu, User, Settings, LogOut, LayoutDashboard } from "lucide-react"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userType, setUserType] = useState<"mentee" | "mentor">("mentee")
+  const { user, isAuthenticated, logout } = useAuthenticatedUser()
   const router = useRouter()
-  const userName = "Apoorv"
-
-  useEffect(() => {
-    // Check if user is logged in from localStorage or auth context
-    const authState = localStorage.getItem("userAuth")
-    if (authState) {
-      const { isLoggedIn: loggedIn, userType: type } = JSON.parse(authState)
-      setIsLoggedIn(loggedIn)
-      setUserType(type)
-    }
-  }, [])
 
   const quickLinks = [
     { name: "Find Mentors", href: "/mentors" },
@@ -40,14 +27,7 @@ export function Header() {
     { name: "Blogs", href: "/blogs" },
   ]
 
-  const handleSignOut = () => {
-    // Clear authentication state
-    localStorage.removeItem("userAuth")
-    setIsLoggedIn(false)
-    setUserType("mentee")
-    // Redirect to home page
-    router.push("/")
-  }
+  const displayName = user?.firstName || user?.name || "User"
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -62,7 +42,11 @@ export function Header() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
           {quickLinks.map((link) => (
-            <Link key={link.name} href={link.href} className="text-sm font-medium transition-colors hover:text-primary">
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium transition-colors hover:text-primary"
+            >
               {link.name}
             </Link>
           ))}
@@ -70,21 +54,23 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          {isLoggedIn ? (
+          {isAuthenticated && user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center space-x-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">{userName.charAt(0)}</span>
+                    <span className="text-white text-sm font-medium">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  <span className="font-medium">{userName}</span>
+                  <span className="font-medium">{displayName}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link href={`/${userType}/dashboard`} className="flex items-center">
+                  <Link href="/dashboard" className="flex items-center">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                    🧑‍🎓 {userType === "mentee" ? "Mentee" : "Mentor"} Dashboard
+                    Dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -100,7 +86,10 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleSignOut}>
+                <DropdownMenuItem
+                  className="text-red-600 cursor-pointer"
+                  onClick={() => logout()}
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>
@@ -119,7 +108,7 @@ export function Header() {
         </div>
 
         {/* Mobile Navigation */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet>
           <SheetTrigger asChild className="md:hidden">
             <Button variant="ghost" size="sm">
               <Menu className="h-5 w-5" />
@@ -127,26 +116,18 @@ export function Header() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <nav className="flex flex-col space-y-4">
-              {isLoggedIn && (
-                <>
-                  <div className="flex items-center space-x-3 pb-4 border-b">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
-                      <span className="text-white font-medium">{userName.charAt(0)}</span>
-                    </div>
-                    <div>
-                      <div className="font-medium">{userName}</div>
-                      <div className="text-sm text-gray-600 capitalize">{userType}</div>
-                    </div>
+              {isAuthenticated && user && (
+                <div className="flex items-center space-x-3 pb-4 border-b">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {displayName.charAt(0).toUpperCase()}
+                    </span>
                   </div>
-                  <Link
-                    href={`/${userType}/dashboard`}
-                    className="text-sm font-medium transition-colors hover:text-blue-600 flex items-center"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    🧑‍🎓 Dashboard
-                  </Link>
-                </>
+                  <div>
+                    <div className="font-medium">{displayName}</div>
+                    <div className="text-sm text-gray-600">Logged in</div>
+                  </div>
+                </div>
               )}
 
               {quickLinks.map((link) => (
@@ -154,14 +135,13 @@ export function Header() {
                   key={link.name}
                   href={link.href}
                   className="text-sm font-medium transition-colors hover:text-blue-600"
-                  onClick={() => setIsOpen(false)}
                 >
                   {link.name}
                 </Link>
               ))}
 
               <div className="border-t pt-4 space-y-2">
-                {isLoggedIn ? (
+                {isAuthenticated && user ? (
                   <>
                     <Button variant="outline" className="w-full bg-transparent" asChild>
                       <Link href="/profile">Profile</Link>
@@ -169,7 +149,7 @@ export function Header() {
                     <Button
                       variant="outline"
                       className="w-full bg-transparent text-red-600 border-red-200"
-                      onClick={handleSignOut}
+                      onClick={() => logout()}
                     >
                       Sign Out
                     </Button>
