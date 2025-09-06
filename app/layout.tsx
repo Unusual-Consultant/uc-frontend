@@ -17,7 +17,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className} suppressHydrationWarning>
+      <body
+       className={`${inter.className} min-h-screen bg-gradient-to-t from-[#B7DFFF] to-white`}
+       suppressHydrationWarning
+         >
         <AuthenticatedUserProvider>
           <Header />
           <main className="min-h-screen">{children}</main>

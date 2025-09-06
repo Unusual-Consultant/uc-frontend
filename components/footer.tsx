@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "lucide-react"
 
+
 export function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
@@ -9,7 +10,7 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600" />
+              <img src="/unusual-consultant-logo.jpg" alt="Unusual Consultant Logo" className="h-8 w-8" />
               <span className="font-bold text-xl">Unusual Consultant</span>
             </div>
             <p className="text-gray-300 text-sm">
