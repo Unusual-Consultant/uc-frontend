@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Link from "next/link"
 import { User, GraduationCap } from "lucide-react"
+import { api } from "@/lib/api"
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("mentee")
@@ -30,7 +31,11 @@ export default function LoginPage() {
   }
 
   const handleSocialLogin = (provider: string, userType: "mentee" | "mentor") => {
-    // Handle social login logic here
+    if (provider === "google") {
+      window.location.href = api.auth.google.login()
+      return
+    }
+    // Add logic for other providers (e.g., LinkedIn) here if needed
     handleLogin(userType)
   }
 
