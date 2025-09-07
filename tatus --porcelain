@@ -1,0 +1,293 @@
+warning: in the working copy of 'components/hero-section.tsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/components/hero-section.tsx b/components/hero-section.tsx[m
+[1mindex 6ebd5b1..5b09154 100644[m
+[1m--- a/components/hero-section.tsx[m
+[1m+++ b/components/hero-section.tsx[m
+[36m@@ -17,16 +17,15 @@[m [mexport function HeroSection() {[m
+   const [searchQuery, setSearchQuery] = useState("")[m
+   const [currentMentor, setCurrentMentor] = useState(0)[m
+   const [currentTestimonial, setCurrentTestimonial] = useState(0)[m
+[31m-  const [isAnimating, setIsAnimating] = useState(false)[m
+   const [isClient, setIsClient] = useState(false) // SSG optimization[m
+   const [autoRotateInterval, setAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)[m
+   const [testimonialAutoRotateInterval, setTestimonialAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)[m
+ [m
+   const handleSearch = useCallback(() => {[m
+     try {[m
+[31m-      if (searchQuery.trim()) {[m
+[32m+[m[32m    if (searchQuery.trim()) {[m
+         router.push(`/mentors?search=${encodeURIComponent(searchQuery)}`)[m
+[31m-      } else {[m
+[32m+[m[32m    } else {[m
+         router.push("/mentors")[m
+       }[m
+     } catch (error) {[m
+[36m@@ -35,11 +34,17 @@[m [mexport function HeroSection() {[m
+   }, [searchQuery, router])[m
+ [m
+   const nextMentor = useCallback(() => {[m
+[31m-    if (isAnimating) return[m
+[32m+[m[32m    console.log('nextMentor called', { isClient })[m
+[32m+[m[32m    if (!isClient) {[m
+[32m+[m[32m      console.log('nextMentor blocked - not client side')[m
+[32m+[m[32m      return[m
+[32m+[m[32m    }[m
+     try {[m
+[31m-      setIsAnimating(true)[m
+[31m-      setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)[m
+[31m-      setTimeout(() => setIsAnimating(false), 800)[m
+[32m+[m[32m      setCurrentMentor((prev) => {[m
+[32m+[m[32m        const newIndex = (prev + 1) % featuredMentors.length[m
+[32m+[m[32m        console.log('nextMentor: changing from', prev, 'to', newIndex)[m
+[32m+[m[32m        return newIndex[m
+[32m+[m[32m      })[m
+       // Reset auto-rotation timer[m
+       if (autoRotateInterval) {[m
+         clearInterval(autoRotateInterval)[m
+[36m@@ -51,16 +56,21 @@[m [mexport function HeroSection() {[m
+       setAutoRotateInterval(newInterval)[m
+     } catch (error) {[m
+       console.error('Error in nextMentor:', error)[m
+[31m-      setIsAnimating(false)[m
+     }[m
+[31m-  }, [isAnimating, autoRotateInterval])[m
+[32m+[m[32m  }, [autoRotateInterval, isClient])[m
+ [m
+   const prevMentor = useCallback(() => {[m
+[31m-    if (isAnimating) return[m
+[32m+[m[32m    console.log('prevMentor called', { isClient })[m
+[32m+[m[32m    if (!isClient) {[m
+[32m+[m[32m      console.log('prevMentor blocked - not client side')[m
+[32m+[m[32m      return[m
+[32m+[m[32m    }[m
+     try {[m
+[31m-      setIsAnimating(true)[m
+[31m-      setCurrentMentor((prev) => (prev - 1 + featuredMentors.length) % featuredMentors.length)[m
+[31m-      setTimeout(() => setIsAnimating(false), 800)[m
+[32m+[m[32m      setCurrentMentor((prev) => {[m
+[32m+[m[32m        const newIndex = (prev - 1 + featuredMentors.length) % featuredMentors.length[m
+[32m+[m[32m        console.log('prevMentor: changing from', prev, 'to', newIndex)[m
+[32m+[m[32m        return newIndex[m
+[32m+[m[32m      })[m
+       // Reset auto-rotation timer[m
+       if (autoRotateInterval) {[m
+         clearInterval(autoRotateInterval)[m
+[36m@@ -72,9 +82,8 @@[m [mexport function HeroSection() {[m
+       setAutoRotateInterval(newInterval)[m
+     } catch (error) {[m
+       console.error('Error in prevMentor:', error)[m
+[31m-      setIsAnimating(false)[m
+     }[m
+[31m-  }, [isAnimating, autoRotateInterval])[m
+[32m+[m[32m  }, [autoRotateInterval, isClient])[m
+ [m
+   const nextTestimonial = useCallback(() => {[m
+     try {[m
+[36m@@ -85,17 +94,17 @@[m [mexport function HeroSection() {[m
+       }[m
+       // Restart auto-rotation[m
+       const newInterval = setInterval(() => {[m
+[31m-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)[m
+[32m+[m[32m    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)[m
+       }, 6000)[m
+       setTestimonialAutoRotateInterval(newInterval)[m
+     } catch (error) {[m
+       console.error('Error in nextTestimonial:', error)[m
+[31m-    }[m
+[32m+[m[32m  }[m
+   }, [testimonialAutoRotateInterval])[m
+ [m
+   const prevTestimonial = useCallback(() => {[m
+     try {[m
+[31m-      setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)[m
+[32m+[m[32m    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length)[m
+       // Reset auto-rotation timer[m
+       if (testimonialAutoRotateInterval) {[m
+         clearInterval(testimonialAutoRotateInterval)[m
+[36m@@ -237,7 +246,7 @@[m [mexport function HeroSection() {[m
+                     variant="outline"[m
+                     size="sm"[m
+                     onClick={prevMentor}[m
+[31m-                    disabled={isAnimating}[m
+[32m+[m[32m                    disabled={!isClient}[m
+                     className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"[m
+                     aria-label="Previous mentor"[m
+                   >[m
+[36m@@ -247,7 +256,7 @@[m [mexport function HeroSection() {[m
+                     variant="outline"[m
+                     size="sm"[m
+                     onClick={nextMentor}[m
+[31m-                    disabled={isAnimating}[m
+[32m+[m[32m                    disabled={!isClient}[m
+                     className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"[m
+                     aria-label="Next mentor"[m
+                   >[m
+[36m@@ -267,69 +276,69 @@[m [mexport function HeroSection() {[m
+                 >[m
+                   {featuredMentors.map((mentor, index) => ([m
+                     <div key={mentor.id} className="w-full flex-shrink-0">[m
+[31m-                      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">[m
+[31m-                        <CardContent className="p-6">[m
+[31m-                          <div className="flex items-start space-x-4">[m
+[31m-                            <div className="relative">[m
+[31m-                              <Avatar className="w-16 h-16">[m
+[31m-                                <AvatarImage[m
+[32m+[m[32m              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">[m
+[32m+[m[32m                <CardContent className="p-6">[m
+[32m+[m[32m                  <div className="flex items-start space-x-4">[m
+[32m+[m[32m                    <div className="relative">[m
+[32m+[m[32m                      <Avatar className="w-16 h-16">[m
+[32m+[m[32m                        <AvatarImage[m
+                                   src={mentor.image || "/placeholder.svg"}[m
+                                   alt={mentor.name}[m
+[31m-                                />[m
+[31m-                                <AvatarFallback>[m
+[32m+[m[32m                        />[m
+[32m+[m[32m                        <AvatarFallback>[m
+                                   {mentor.name[m
+[31m-                                    .split(" ")[m
+[31m-                                    .map((n) => n[0])[m
+[31m-                                    .join("")}[m
+[31m-                                </AvatarFallback>[m
+[31m-                              </Avatar>[m
+[32m+[m[32m                            .split(" ")[m
+[32m+[m[32m                            .map((n) => n[0])[m
+[32m+[m[32m                            .join("")}[m
+[32m+[m[32m                        </AvatarFallback>[m
+[32m+[m[32m                      </Avatar>[m
+                               {mentor.available && ([m
+[31m-                                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />[m
+[31m-                              )}[m
+[31m-                            </div>[m
+[32m+[m[32m                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />[m
+[32m+[m[32m                      )}[m
+[32m+[m[32m                    </div>[m
+ [m
+[31m-                            <div className="flex-1">[m
+[31m-                              <div className="flex items-center gap-2 mb-1">[m
+[32m+[m[32m                    <div className="flex-1">[m
+[32m+[m[32m                      <div className="flex items-center gap-2 mb-1">[m
+                                 <h4 className="font-bold text-lg text-gray-900">{mentor.name}</h4>[m
+[31m-                                <Verified className="h-4 w-4 text-blue-500" />[m
+[31m-                              </div>[m
+[32m+[m[32m                        <Verified className="h-4 w-4 text-blue-500" />[m
+[32m+[m[32m                      </div>[m
+                               <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>[m
+                               <p className="text-sm font-medium text-blue-600 mb-3">{mentor.company}</p>[m
+ [m
+[31m-                              <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">[m
+[31m-                                <div className="flex items-center space-x-1">[m
+[31m-                                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />[m
+[32m+[m[32m                      <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">[m
+[32m+[m[32m                        <div className="flex items-center space-x-1">[m
+[32m+[m[32m                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />[m
+                                   <span>{mentor.rating}</span>[m
+                                   <span>({mentor.sessions})</span>[m
+[31m-                                </div>[m
+[31m-                                <div className="flex items-center space-x-1">[m
+[31m-                                  <MapPin className="h-4 w-4" />[m
+[32m+[m[32m                        </div>[m
+[32m+[m[32m                        <div className="flex items-center space-x-1">[m
+[32m+[m[32m                          <MapPin className="h-4 w-4" />[m
+                                   <span>{mentor.location}</span>[m
+[31m-                                </div>[m
+[31m-                              </div>[m
+[32m+[m[32m                        </div>[m
+[32m+[m[32m                      </div>[m
+ [m
+[31m-                              <div className="flex flex-wrap gap-1 mb-3">[m
+[32m+[m[32m                      <div className="flex flex-wrap gap-1 mb-3">[m
+                                 {mentor.skills.map((skill) => ([m
+[31m-                                  <Badge key={skill} variant="secondary" className="text-xs">[m
+[31m-                                    {skill}[m
+[31m-                                  </Badge>[m
+[31m-                                ))}[m
+[31m-                              </div>[m
+[32m+[m[32m                          <Badge key={skill} variant="secondary" className="text-xs">[m
+[32m+[m[32m                            {skill}[m
+[32m+[m[32m                          </Badge>[m
+[32m+[m[32m                        ))}[m
+[32m+[m[32m                      </div>[m
+ [m
+[31m-                              <div className="flex items-center justify-between">[m
+[32m+[m[32m                      <div className="flex items-center justify-between">[m
+                                 <div className="font-bold text-xl">${mentor.price}/hr</div>[m
+[31m-                                <Button[m
+[31m-                                  size="sm"[m
+[32m+[m[32m                        <Button[m
+[32m+[m[32m                          size="sm"[m
+                                   disabled={!mentor.available}[m
+[31m-                                  className="disabled:opacity-50"[m
+[31m-                                >[m
+[32m+[m[32m                          className="disabled:opacity-50"[m
+[32m+[m[32m                        >[m
+                                   {mentor.available ? "Book Now" : "Unavailable"}[m
+[31m-                                </Button>[m
+[31m-                              </div>[m
+[31m-                            </div>[m
+[31m-                          </div>[m
+[31m-                        </CardContent>[m
+[31m-                      </Card>[m
+[32m+[m[32m                        </Button>[m
+[32m+[m[32m                      </div>[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                  </div>[m
+[32m+[m[32m                </CardContent>[m
+[32m+[m[32m              </Card>[m
+                     </div>[m
+                   ))}[m
+                 </div>[m
+[36m@@ -406,41 +415,41 @@[m [mexport function HeroSection() {[m
+                 >[m
+                   {testimonials.map((testimonial, index) => ([m
+                     <div key={index} className="w-full flex-shrink-0">[m
+[31m-                      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">[m
+[31m-                        <CardContent className="p-6">[m
+[31m-                          <div className="flex items-start space-x-4">[m
+[31m-                            <Avatar className="w-12 h-12">[m
+[31m-                              <AvatarImage[m
+[32m+[m[32m              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">[m
+[32m+[m[32m                <CardContent className="p-6">[m
+[32m+[m[32m                  <div className="flex items-start space-x-4">[m
+[32m+[m[32m                    <Avatar className="w-12 h-12">[m
+[32m+[m[32m                      <AvatarImage[m
+                                 src={testimonial.image || "/placeholder.svg"}[m
+                                 alt={testimonial.name}[m
+[31m-                              />[m
+[31m-                              <AvatarFallback>[m
+[32m+[m[32m                      />[m
+[32m+[m[32m                      <AvatarFallback>[m
+                                 {testimonial.name[m
+[31m-                                  .split(" ")[m
+[31m-                                  .map((n) => n[0])[m
+[31m-                                  .join("")}[m
+[31m-                              </AvatarFallback>[m
+[31m-                            </Avatar>[m
+[32m+[m[32m                          .split(" ")[m
+[32m+[m[32m                          .map((n) => n[0])[m
+[32m+[m[32m                          .join("")}[m
+[32m+[m[32m                      </AvatarFallback>[m
+[32m+[m[32m                    </Avatar>[m
+ [m
+[31m-                            <div className="flex-1">[m
+[31m-                              <div className="flex items-center space-x-1 mb-2">[m
+[32m+[m[32m                    <div className="flex-1">[m
+[32m+[m[32m                      <div className="flex items-center space-x-1 mb-2">[m
+                                 {[...Array(testimonial.rating)].map((_, i) => ([m
+[31m-                                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />[m
+[31m-                                ))}[m
+[31m-                              </div>[m
+[32m+[m[32m                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />[m
+[32m+[m[32m                        ))}[m
+[32m+[m[32m                      </div>[m
+ [m
+                               <p className="text-gray-700 mb-3 italic">"{testimonial.content}"</p>[m
+ [m
+[31m-                              <div>[m
+[32m+[m[32m                      <div>[m
+                                 <p className="font-medium text-gray-900">{testimonial.name}</p>[m
+[31m-                                <p className="text-sm text-gray-600">[m
+[32m+[m[32m                        <p className="text-sm text-gray-600">[m
+                                   {testimonial.role} at {testimonial.company}[m
+[31m-                                </p>[m
+[31m-                              </div>
