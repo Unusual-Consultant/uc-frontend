@@ -1,153 +1,180 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Search,
-  ArrowRight,
-  Star,
-  MapPin,
-  ChevronLeft,
-  ChevronRight,
-  Award,
-  Verified,
-} from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Search, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Award, Verified } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { featuredMentors, testimonials } from "@/lib/data"
 
-const featuredMentors = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    title: "Senior Product Manager",
-    company: "Google",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    sessions: 127,
-    location: "San Francisco, CA",
-    skills: ["Product Strategy", "Leadership", "Analytics"],
-    price: 1500,
-    available: true,
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    title: "Senior Software Engineer",
-    company: "Meta",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.8,
-    sessions: 89,
-    location: "Seattle, WA",
-    skills: ["React", "System Design", "Architecture"],
-    price: 120,
-    available: false,
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    title: "UX Design Lead",
-    company: "Apple",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    sessions: 156,
-    location: "Cupertino, CA",
-    skills: ["UX Design", "Design Systems", "Research"],
-    price: 180,
-    available: true,
-  },
-  {
-    id: 4,
-    name: "David Kim",
-    title: "Data Science Manager",
-    company: "Netflix",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.7,
-    sessions: 73,
-    location: "Los Angeles, CA",
-    skills: ["Data Science", "Machine Learning", "Python"],
-    price: 140,
-    available: true,
-  },
-];
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Alex Thompson",
-    role: "Software Engineer",
-    company: "Stripe",
-    image: "/placeholder.svg?height=60&width=60",
-    content:
-      "The mentorship I received helped me transition from junior to senior engineer in just 8 months. The guidance was invaluable.",
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: "Maria Garcia",
-    role: "Product Manager",
-    company: "Airbnb",
-    image: "/placeholder.svg?height=60&width=60",
-    content:
-      "My mentor helped me navigate complex product decisions and develop leadership skills. Highly recommend this platform!",
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: "James Wilson",
-    role: "UX Designer",
-    company: "Figma",
-    image: "/placeholder.svg?height=60&width=60",
-    content:
-      "The design mentorship program transformed my approach to user research and helped me land my dream job.",
-    rating: 5,
-  },
-];
 
 export function HeroSection() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentMentor, setCurrentMentor] = useState(0);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const router = useRouter()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [currentMentor, setCurrentMentor] = useState(0)
+  const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [isClient, setIsClient] = useState(false) // SSG optimization
+  const [autoRotateInterval, setAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)
+  const [testimonialAutoRotateInterval, setTestimonialAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      window.location.href = `/mentors?search=${encodeURIComponent(
-        searchQuery
-      )}`;
-    } else {
-      window.location.href = "/mentors";
+  const handleSearch = useCallback(() => {
+    try {
+      if (searchQuery.trim()) {
+        router.push(`/mentors?search=${encodeURIComponent(searchQuery)}`)
+      } else {
+        router.push("/mentors")
+      }
+    } catch (error) {
+      console.error('Error during search navigation:', error)
     }
-  };
+  }, [searchQuery, router])
 
-  const nextMentor = () => {
-    setCurrentMentor((prev) => (prev + 1) % featuredMentors.length);
-  };
+  const nextMentor = useCallback(() => {
+    console.log('nextMentor called', { isClient })
+    if (!isClient) {
+      console.log('nextMentor blocked - not client side')
+      return
+    }
+    try {
+      setCurrentMentor((prev) => {
+        const newIndex = (prev + 1) % featuredMentors.length
+        console.log('nextMentor: changing from', prev, 'to', newIndex)
+        return newIndex
+      })
+      // Reset auto-rotation timer
+      if (autoRotateInterval) {
+        clearInterval(autoRotateInterval)
+      }
+      // Restart auto-rotation
+      const newInterval = setInterval(() => {
+        setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
+      }, 6000)
+      setAutoRotateInterval(newInterval)
+    } catch (error) {
+      console.error('Error in nextMentor:', error)
+    }
+  }, [autoRotateInterval, isClient])
 
-  const prevMentor = () => {
-    setCurrentMentor(
-      (prev) => (prev - 1 + featuredMentors.length) % featuredMentors.length
-    );
-  };
+  const prevMentor = useCallback(() => {
+    console.log('prevMentor called', { isClient })
+    if (!isClient) {
+      console.log('prevMentor blocked - not client side')
+      return
+    }
+    try {
+      setCurrentMentor((prev) => {
+        const newIndex = (prev - 1 + featuredMentors.length) % featuredMentors.length
+        console.log('prevMentor: changing from', prev, 'to', newIndex)
+        return newIndex
+      })
+      // Reset auto-rotation timer
+      if (autoRotateInterval) {
+        clearInterval(autoRotateInterval)
+      }
+      // Restart auto-rotation
+      const newInterval = setInterval(() => {
+        setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
+      }, 6000)
+      setAutoRotateInterval(newInterval)
+    } catch (error) {
+      console.error('Error in prevMentor:', error)
+    }
+  }, [autoRotateInterval, isClient])
 
-  const nextTestimonial = () => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  };
+  const nextTestimonial = useCallback(() => {
+    console.log('nextTestimonial called', { isClient })
+    if (!isClient) {
+      console.log('nextTestimonial blocked - not client side')
+      return
+    }
+    try {
+      setCurrentTestimonial((prev) => {
+        const newIndex = (prev + 1) % testimonials.length
+        console.log('nextTestimonial: changing from', prev, 'to', newIndex)
+        return newIndex
+      })
+      // Reset auto-rotation timer
+      if (testimonialAutoRotateInterval) {
+        clearInterval(testimonialAutoRotateInterval)
+      }
+      // Restart auto-rotation
+      const newInterval = setInterval(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+      }, 6000)
+      setTestimonialAutoRotateInterval(newInterval)
+    } catch (error) {
+      console.error('Error in nextTestimonial:', error)
+    }
+  }, [testimonialAutoRotateInterval, isClient])
 
-  const prevTestimonial = () => {
-    setCurrentTestimonial(
-      (prev) => (prev - 1 + testimonials.length) % testimonials.length
-    );
-  };
+  const prevTestimonial = useCallback(() => {
+    console.log('prevTestimonial called', { isClient })
+    if (!isClient) {
+      console.log('prevTestimonial blocked - not client side')
+      return
+    }
+    try {
+      setCurrentTestimonial((prev) => {
+        const newIndex = (prev - 1 + testimonials.length) % testimonials.length
+        console.log('prevTestimonial: changing from', prev, 'to', newIndex)
+        return newIndex
+      })
+      // Reset auto-rotation timer
+      if (testimonialAutoRotateInterval) {
+        clearInterval(testimonialAutoRotateInterval)
+      }
+      // Restart auto-rotation
+      const newInterval = setInterval(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+      }, 6000)
+      setTestimonialAutoRotateInterval(newInterval)
+    } catch (error) {
+      console.error('Error in prevTestimonial:', error)
+    }
+  }, [testimonialAutoRotateInterval, isClient])
+
+
+  // Client-side hydration check for SSG optimization
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Auto-rotate mentors and testimonials every 6 seconds (client-side only)
+  useEffect(() => {
+    if (!isClient) return // Don't run on server
+    if (featuredMentors.length <= 1) return // No need for interval with single item
+    
+    // Start auto-rotation for mentors
+    const mentorInterval = setInterval(() => {
+      setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
+    }, 6000)
+    
+    // Start auto-rotation for testimonials
+    const testimonialInterval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+    }, 6000)
+    
+    // Store intervals for cleanup
+    setAutoRotateInterval(mentorInterval)
+    setTestimonialAutoRotateInterval(testimonialInterval)
+    
+    return () => {
+      clearInterval(mentorInterval)
+      clearInterval(testimonialInterval)
+    }
+  }, [isClient]) // Only run when client-side
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
+    <section className="relative min-h-screen overflow-hidden" style={{background: 'linear-gradient(165deg, #FFFFFF 0%, #FFFFFF 40%, #D1EAFF 55%, #B7DFFF 70%)'}}>
       {/* Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-100 rounded-full filter blur-xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-50 rounded-full filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-200 rounded-full filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
       <div className="relative container mx-auto px-4 py-16">
@@ -248,7 +275,9 @@ export function HeroSection() {
                     variant="outline"
                     size="sm"
                     onClick={prevMentor}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent"
+                    disabled={!isClient}
+                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
+                    aria-label="Previous mentor"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -256,108 +285,126 @@ export function HeroSection() {
                     variant="outline"
                     size="sm"
                     onClick={nextMentor}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent"
+                    disabled={!isClient}
+                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
+                    aria-label="Next mentor"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              <Card className="w-full max-w-md rounded-xl border border-gray-200 bg-white shadow-[0px_-4px_12px_rgba(0,0,0,0.1)]">
-                {/* Top-right Avatar */}
-
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="relative flex-shrink-0">
-                      <Avatar className="w-12 h-12 flex-shrink-0">
+              <div className="relative overflow-hidden" role="region" aria-label="Featured Mentors Carousel">
+                <div 
+                  className="flex transition-transform duration-1500 ease-out"
+                  style={{ 
+                    transform: isClient ? `translateX(-${currentMentor * 100}%)` : 'translateX(0%)' 
+                  }}
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {featuredMentors.map((mentor, index) => (
+                    <div key={mentor.id} className="w-full flex-shrink-0">
+              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <div className="relative">
+                      <Avatar className="w-16 h-16">
                         <AvatarImage
-                          src={
-                            featuredMentors[currentMentor].image ||
-                            "/placeholder.svg"
-                          }
-                          alt={featuredMentors[currentMentor].name}
+                                  src={mentor.image || "/placeholder.svg"}
+                                  alt={mentor.name}
                         />
                         <AvatarFallback>
-                          {featuredMentors[currentMentor].name
+                                  {mentor.name
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
-                      {featuredMentors[currentMentor].available && (
-                        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                              {mentor.available && (
+                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
                       )}
                     </div>
 
-                    <div className="flex flex-col justify-center">
-                      <div className="flex items-center gap-1">
-                        <h4 className="font-semibold text-base text-gray-900 trunacate">
-                          {featuredMentors[currentMentor].name}
-                        </h4>
-                        <Verified className="h-3 w-3 text-[#0073CF] flex-shrink-0" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-bold text-lg text-gray-900">{mentor.name}</h4>
+                        <Verified className="h-4 w-4 text-blue-500" />
                       </div>
-                      <p className="text-sm text-gray-600 trunacate">
-                        {featuredMentors[currentMentor].title}
-                      </p>
-                      <p className="text-xs font-medium text-[#0073CF] mb-2">
-                        {featuredMentors[currentMentor].company}
-                      </p>
+                              <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>
+                              <p className="text-sm font-medium text-blue-600 mb-3">{mentor.company}</p>
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1 text-xs text-gray-600">
-                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                          <span>{featuredMentors[currentMentor].rating}</span>
-                          <span>
-                            ({featuredMentors[currentMentor].sessions})
-                          </span>
+                      <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
+                        <div className="flex items-center space-x-1">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                  <span>{mentor.rating}</span>
+                                  <span>({mentor.sessions})</span>
                         </div>
-                        <div className="w-full flex justify-center mt-4">
-                          <span className="text-base font-extrabold text-black bg-white px-4 py-1 rounded-full shadow-sm">
-                            ${featuredMentors[currentMentor].price}/hr
-                          </span>
+                        <div className="flex items-center space-x-1">
+                          <MapPin className="h-4 w-4" />
+                                  <span>{mentor.location}</span>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {featuredMentors[currentMentor].skills
-                          .slice(0, 3)
-                          .map((skill) => (
-                            <Badge
-                              key={skill}
-                              variant="secondary"
-                              className="text-xs py-0 px-1"
-                            >
-                              {skill}
-                            </Badge>
-                          ))}
+                                {mentor.skills.map((skill) => (
+                          <Badge key={skill} variant="secondary" className="text-xs">
+                            {skill}
+                          </Badge>
+                        ))}
                       </div>
 
-                      <div className="flex items-center justify-between items-center">
+                      <div className="flex items-center justify-between">
+                                <div className="font-bold text-xl">${mentor.price}/hr</div>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="text-xs px-4 py-1.5 h-8 rounded-full border-gray-300"
+                                  disabled={!mentor.available}
+                          className="disabled:opacity-50"
                         >
-                          View Profile
-                        </Button>
-                        <Button
-                          size="sm"
-                          disabled={!featuredMentors[currentMentor].available}
-                          className={`text-xs px-4 py-1.5 h-8 rounded-full ${
-                            featuredMentors[currentMentor].available
-                              ? "bg-[#0073CF] hover:bg-[#005fa3] text-white"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
-                        >
-                          {featuredMentors[currentMentor].available
-                            ? "Book Now"
-                            : "Unavailable"}
+                                  {mentor.available ? "Book Now" : "Unavailable"}
                         </Button>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+                {/* Carousel Indicators - Only render on client */}
+                {isClient && (
+                  <div className="flex justify-center mt-4 space-x-2">
+                    {featuredMentors.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          try {
+                            setCurrentMentor(index)
+                            // Reset auto-rotation timer
+                            if (autoRotateInterval) {
+                              clearInterval(autoRotateInterval)
+                            }
+                            // Restart auto-rotation
+                            const newInterval = setInterval(() => {
+                              setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
+                            }, 6000)
+                            setAutoRotateInterval(newInterval)
+                          } catch (error) {
+                            console.error('Error in mentor indicator click:', error)
+                          }
+                        }}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          index === currentMentor
+                            ? 'bg-blue-500 w-6'
+                            : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        aria-label={`Go to mentor ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
             </div>
 
             {/* Success Stories */}
@@ -371,7 +418,9 @@ export function HeroSection() {
                     variant="outline"
                     size="sm"
                     onClick={prevTestimonial}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent"
+                    disabled={!isClient}
+                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
+                    aria-label="Previous testimonial"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -379,26 +428,36 @@ export function HeroSection() {
                     variant="outline"
                     size="sm"
                     onClick={nextTestimonial}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent"
+                    disabled={!isClient}
+                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
+                    aria-label="Next testimonial"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
 
-              <Card className="w-full max-w-md rounded-xl border border-gray-200 bg-white shadow-[0px_-4px_12px_rgba(0,0,0,0.1)]">
-                <CardContent className="p-4">
-                  <div className="flex items-start space-x-3">
-                    <Avatar className="w-12 h-12 flex-shrink-0">
+              <div className="relative overflow-hidden" role="region" aria-label="Success Stories Carousel">
+                <div 
+                  className="flex transition-transform duration-1500 ease-out"
+                  style={{ 
+                    transform: isClient ? `translateX(-${currentTestimonial * 100}%)` : 'translateX(0%)' 
+                  }}
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {testimonials.map((testimonial, index) => (
+                    <div key={index} className="w-full flex-shrink-0">
+              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-4">
+                    <Avatar className="w-12 h-12">
                       <AvatarImage
-                        src={
-                          testimonials[currentTestimonial].image ||
-                          "/placeholder.svg"
-                        }
-                        alt={testimonials[currentTestimonial].name}
+                                src={testimonial.image || "/placeholder.svg"}
+                                alt={testimonial.name}
                       />
                       <AvatarFallback>
-                        {testimonials[currentTestimonial].name
+                                {testimonial.name
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
@@ -406,34 +465,61 @@ export function HeroSection() {
                     </Avatar>
 
                     <div className="flex-1">
-                      <div className="flex items-center space-x-1 mb-3">
-                        {[
-                          ...Array(testimonials[currentTestimonial].rating),
-                        ].map((_, i) => (
-                          <Star
-                            key={i}
-                            className="h-4 w-4 fill-yellow-400 text-yellow-400"
-                          />
+                      <div className="flex items-center space-x-1 mb-2">
+                                {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         ))}
                       </div>
 
-                      <p className="text-gray-700 mb-4 italic leading-relaxed">
-                        "{testimonials[currentTestimonial].content}" "
-                        {testimonials[currentTestimonial].content}"
-                      </p>
+                              <p className="text-gray-700 mb-3 italic">"{testimonial.content}"</p>
+
                       <div>
-                        <p className="font-semibold text-sm text-gray-900">
-                          {testimonials[currentTestimonial].name}
-                        </p>
+                                <p className="font-medium text-gray-900">{testimonial.name}</p>
                         <p className="text-sm text-gray-600">
-                          {testimonials[currentTestimonial].role} at{" "}
-                          {testimonials[currentTestimonial].company}
+                                  {testimonial.role} at {testimonial.company}
                         </p>
                       </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Carousel Indicators - Only render on client */}
+              {isClient && (
+                <div className="flex justify-center mt-4 space-x-2">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        try {
+                          setCurrentTestimonial(index)
+                          // Reset auto-rotation timer
+                          if (testimonialAutoRotateInterval) {
+                            clearInterval(testimonialAutoRotateInterval)
+                          }
+                          // Restart auto-rotation
+                          const newInterval = setInterval(() => {
+                            setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+                          }, 6000)
+                          setTestimonialAutoRotateInterval(newInterval)
+                        } catch (error) {
+                          console.error('Error in testimonial indicator click:', error)
+                        }
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentTestimonial
+                          ? 'bg-blue-500 w-6'
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to testimonial ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
