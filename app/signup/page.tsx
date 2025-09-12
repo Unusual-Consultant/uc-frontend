@@ -27,37 +27,61 @@ export default function SignupPage() {
   };
 
   const handleSocialSignup = (
-    provider: string,
-    userType: "mentee" | "mentor"
-  ) => {
-    if (provider === "google") {
-      window.location.href = api.auth.google.login();
-      return;
-    }
-    handleSignup(userType);
-  };
+  provider: string,
+  userType: "mentee" | "mentor"
+) => {
+  // Save who is signing up before redirect
+  localStorage.setItem("userType", userType);
 
+  if (provider === "google") {
+    // Pass userType as query parameter to backend
+    window.location.href = `http://localhost:8000/api/v1/auth/google/login?user_type=${userType}`;
+    return;
+  }
+  handleSignup(userType);
+};
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden">
-     {/* 🔹 Background Infinite Scroll Rows */}
-<div className="absolute top-[230px] left-0 w-full overflow-hidden">
-  <div className="flex animate-scroll-left w-full">
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    
-  </div>
-</div>
+      {/* 🔹 Background Infinite Scroll Rows */}
+      <div className="absolute top-[230px] left-0 w-full overflow-hidden">
+        <div className="flex animate-scroll-left w-full">
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+        </div>
+      </div>
 
-<div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
-  <div className="flex animate-scroll-right w-full">
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    <img src="/image.png" alt="Scrolling profiles" className="h-[245px] flex-shrink-0" />
-    
-  </div>
-</div>
-
+      <div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
+        <div className="flex animate-scroll-right w-full">
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+          <img
+            src="/image.png"
+            alt="Scrolling profiles"
+            className="h-[245px] flex-shrink-0"
+          />
+        </div>
+      </div>
 
       {/* 🔹 Frosted Glass Signup Box */}
       <div className="absolute w-[509px] top-[25px] left-1/2 -translate-x-1/2 bg-gradient-to-b from-[rgba(209,234,255,0.4)] to-[rgba(209,234,255,0.1)] backdrop-blur-[700px] rounded-[30px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] flex flex-col items-center px-6 py-8 z-10">
@@ -246,7 +270,14 @@ export default function SignupPage() {
                 <Button className="w-full max-w-[400px] rounded-3xl bg-[#0073CF] text-white">
                   Continue
                 </Button>
-                <p className="text-[13px] text-black-500 text-center"> Already have an account?<a href="/login" className="text-[#0073CF] underline"> Sign In</a></p>
+                <p className="text-[13px] text-black-500 text-center">
+                  {" "}
+                  Already have an account?
+                  <a href="/login" className="text-[#0073CF] underline">
+                    {" "}
+                    Sign In
+                  </a>
+                </p>
               </TabsContent>
             </Tabs>
           </TabsContent>
@@ -277,7 +308,6 @@ export default function SignupPage() {
               ))}
             </div>
             <p className="text-[15px] text-black-500">Step 1 of 5</p>
-            
 
             {/* Social Buttons */}
             <div className="space-y-3">
@@ -409,44 +439,50 @@ export default function SignupPage() {
                 <Button className="w-full max-w-[400px] rounded-3xl bg-[#0073CF] text-white">
                   Continue
                 </Button>
-                <p className="text-[13px] text-black-500 text-center"> Already have an account?<a href="/login" className="text-[#0073CF] underline"> Sign In</a></p>
+                <p className="text-[13px] text-black-500 text-center">
+                  {" "}
+                  Already have an account?
+                  <a href="/login" className="text-[#0073CF] underline">
+                    {" "}
+                    Sign In
+                  </a>
+                </p>
               </TabsContent>
             </Tabs>
           </TabsContent>
         </Tabs>
         {/* 🔹 Keyframes for scrolling */}
         <style jsx global>{`
-  @keyframes scroll-left {
-    0% {
-      transform: translateX(0);
-    }
-    100% {
-      transform: translateX(-50%);
-    }
-  }
+          @keyframes scroll-left {
+            0% {
+              transform: translateX(0);
+            }
+            100% {
+              transform: translateX(-50%);
+            }
+          }
 
-  @keyframes scroll-right {
-    0% {
-      transform: translateX(-50%);
-    }
-    100% {
-      transform: translateX(0);
-    }
-  }
+          @keyframes scroll-right {
+            0% {
+              transform: translateX(-50%);
+            }
+            100% {
+              transform: translateX(0);
+            }
+          }
 
-  .animate-scroll-left {
-    display: flex;
-    width: 200%;
-    animation: scroll-left 30s linear infinite;
-  }
+          .animate-scroll-left {
+            display: flex;
+            width: 200%;
+            animation: scroll-left 30s linear infinite;
+          }
 
-  .animate-scroll-right {
-    display: flex;
-    width: 200%;
-    animation: scroll-right 30s linear infinite;
-  }
-`}</style>
-
+          .animate-scroll-right {
+            display: flex;
+            width: 200%;
+            animation: scroll-right 30s linear infinite;
+          }
+        `}</style>
       </div>
     </div>
   );
