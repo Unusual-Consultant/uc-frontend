@@ -10,16 +10,19 @@ import { ArrowRight, Shield, Upload, Award, FileText } from "lucide-react"
 interface MentorStep5Props {
   onNext: (data: any) => void
   onBack: () => void
+  initialData?: any
 }
 
-export function MentorStep5Enhanced({ onNext, onBack }: MentorStep5Props) {
+export function MentorStep5Enhanced({ onNext, onBack, initialData }: MentorStep5Props) {
   const [formData, setFormData] = useState({
-    agreedToTerms: false,
-    agreedToGuidelines: false,
+    agreedToTerms: initialData?.agreed_to_terms || false,
+    agreedToGuidelines: initialData?.agreed_to_guidelines || false,
     uploadedId: false,
     uploadedCertificate: false,
-    wantsVerifiedBadge: false,
+    wantsVerifiedBadge: initialData?.wants_verified_badge || false,
   })
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleFileUpload = (type: "id" | "certificate") => {
     // Simulate file upload
@@ -30,9 +33,38 @@ export function MentorStep5Enhanced({ onNext, onBack }: MentorStep5Props) {
     }
   }
 
-  const handleFinish = () => {
-    if (formData.agreedToTerms && formData.agreedToGuidelines) {
-      onNext(formData)
+  const handleFinish = async () => {
+    if (!formData.agreedToTerms || !formData.agreedToGuidelines) {
+      alert("Please agree to the terms and guidelines to continue")
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/step5", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+        },
+        body: JSON.stringify({
+          agreed_to_terms: formData.agreedToTerms,
+          agreed_to_guidelines: formData.agreedToGuidelines,
+          wants_verified_badge: formData.wantsVerifiedBadge
+        })
+      })
+
+      if (response.ok) {
+        onNext(formData)
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.detail}`)
+      }
+    } catch (error) {
+      console.error("Error saving step 5 data:", error)
+      alert("Error saving data. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -181,10 +213,10 @@ export function MentorStep5Enhanced({ onNext, onBack }: MentorStep5Props) {
             </Button>
             <Button
               onClick={handleFinish}
-              disabled={!formData.agreedToTerms || !formData.agreedToGuidelines}
+              disabled={isLoading || !formData.agreedToTerms || !formData.agreedToGuidelines}
               className="bg-green-700 hover:bg-green-800"
             >
-              Complete Profile Setup
+              {isLoading ? "Completing..." : "Complete Profile Setup"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
