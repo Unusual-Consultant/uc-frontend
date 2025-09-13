@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -17,9 +17,12 @@ import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 export function Header() {
   const { user, isAuthenticated, logout } = useAuthenticatedUser()
   const router = useRouter()
+  const pathname = usePathname()
+
+  // Pages where we only show the logo
+  const authPages = ["/login", "/signup"]
 
   const quickLinks = [
-    
     { name: "Find Mentors", href: "/mentors" },
     { name: "Courses", href: "/courses" },
     { name: "Templates", href: "/templates" },
@@ -28,21 +31,39 @@ export function Header() {
     { name: "Blogs", href: "/blogs" },
   ]
 
-
   const displayName = user?.firstName || user?.name || "User"
 
+  // ✅ Only logo for auth pages
+  if (authPages.includes(pathname)) {
+    return (
+      <header className="flex justify-start py-2 px-6">
+        <Link href="/" className="flex items-center space-x-2">
+          <img
+            src="/unusual-consultant-logo.jpg"
+            alt="Unusual Consultant Logo"
+            className="h-10 w-10"
+          />
+          <span className="font-semibold text-lg text-black">
+            Unusual Consultant
+          </span>
+        </Link>
+      </header>
+    )
+  }
+
+  // ✅ Full header for all other pages
   return (
     <header className="flex justify-center py-2">
       <div className="container mx-7xl flex h-16 items-center justify-between px-6 
                   bg-white rounded-2xl shadow-2xl shadow-[0_0_25px_rgba(0,0,0,0.2)] max-w-9xl">
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">
-          <img
-               src="/unusual-consultant-logo.jpg"
-               alt="Unusual Consultant Logo"
-                className="h-10 w-10"
-                />
-            <span className="font-semibold text-lg text-black">Unusual Consultant</span> 
+            <img
+              src="/unusual-consultant-logo.jpg"
+              alt="Unusual Consultant Logo"
+              className="h-10 w-10"
+            />
+            <span className="font-semibold text-lg text-black">Unusual Consultant</span>
           </Link>
         </div>
 
@@ -105,11 +126,11 @@ export function Header() {
           ) : (
             <>
               <Button  
-              asChild
-              className="bg-[#0073CF] text-white px-7 py-4 rounded-3xl hover:bg-Primary Blue">
+                asChild
+                className="bg-[#0073CF] text-white px-7 py-4 rounded-3xl hover:bg-blue-700"
+              >
                 <Link href="/login">Login</Link>
               </Button>
-             
             </>
           )}
         </div>
@@ -164,12 +185,11 @@ export function Header() {
                 ) : (
                   <>
                     <Button
-                    asChild
+                      asChild
                       className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700"
-                      >
-                        <Link href="/login">Sign In</Link>
+                    >
+                      <Link href="/login">Sign In</Link>
                     </Button>
-                    
                     <Button className="w-full bg-green-700 hover:bg-green-800" asChild>
                       <Link href="/onboarding/mentor">Become a Mentor</Link>
                     </Button>
