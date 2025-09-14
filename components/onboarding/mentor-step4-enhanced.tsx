@@ -1,266 +1,378 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowRight, Calendar, Video, CreditCard, Smartphone } from "lucide-react"
+import { ArrowRight, Calendar, Video, DollarSign, X } from "lucide-react"
 
 interface MentorStep4Props {
   onNext: (data: any) => void
   onBack: () => void
+  initialData?: any
 }
 
-const availabilitySlots = [
-  "Monday 9 AM - 12 PM",
-  "Monday 2 PM - 6 PM",
-  "Monday 7 PM - 10 PM",
-  "Tuesday 9 AM - 12 PM",
-  "Tuesday 2 PM - 6 PM",
-  "Tuesday 7 PM - 10 PM",
-  "Wednesday 9 AM - 12 PM",
-  "Wednesday 2 PM - 6 PM",
-  "Wednesday 7 PM - 10 PM",
-  "Thursday 9 AM - 12 PM",
-  "Thursday 2 PM - 6 PM",
-  "Thursday 7 PM - 10 PM",
-  "Friday 9 AM - 12 PM",
-  "Friday 2 PM - 6 PM",
-  "Friday 7 PM - 10 PM",
-  "Saturday Morning",
-  "Saturday Evening",
-  "Sunday Morning",
-  "Sunday Evening",
+const days = [
+  "Monday",
+  "Tuesday", 
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
 ]
 
 const sessionFormats = [
-  { id: "gmeet", label: "Google Meet", icon: Video },
-  { id: "zoom", label: "Zoom", icon: Video },
-  { id: "chat", label: "Chat", icon: Smartphone },
-  { id: "topmate", label: "Topmate-style call", icon: Video },
+  "Video Call",
+  "Phone Call",
+  "In-Person",
+  "Chat/Text"
 ]
 
-export function MentorStep4Enhanced({ onNext, onBack }: MentorStep4Props) {
+export function MentorStep4Enhanced({ onNext, onBack, initialData }: MentorStep4Props) {
   const [formData, setFormData] = useState({
-    availability: [] as string[],
-    sessionFormat: "",
-    upiId: "",
-    bankAccount: "",
-    ifscCode: "",
-    panNumber: "",
-    gstNumber: "",
-    preferredPayout: "upi",
+    availabilitySlots: initialData?.availability_slots || [],
+    sessionFormat: initialData?.session_format || "",
+    payoutMethod: initialData?.payout_method || "upi",
+    upiId: initialData?.upi_id || "",
+    bankAccount: initialData?.bank_account || "",
+    ifscCode: initialData?.ifsc_code || "",
+    panNumber: initialData?.pan_number || "ABCDE1234F",
+    gstNumber: initialData?.gst_number || "",
   })
 
-  const toggleAvailability = (slot: string) => {
-    if (formData.availability.includes(slot)) {
+  const [selectedDay, setSelectedDay] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const addAvailability = () => {
+    if (selectedDay && startTime && endTime) {
+      const newSlot = {
+        day: selectedDay,
+        start_time: startTime,
+        end_time: endTime
+      }
       setFormData({
         ...formData,
-        availability: formData.availability.filter((a) => a !== slot),
+        availabilitySlots: [...formData.availabilitySlots, newSlot]
       })
-    } else {
-      setFormData({
-        ...formData,
-        availability: [...formData.availability, slot],
-      })
+      setSelectedDay("")
+      setStartTime("")
+      setEndTime("")
     }
   }
 
-  const handleNext = () => {
-    if (
-      formData.availability.length > 0 &&
-      formData.sessionFormat &&
-      (formData.upiId || (formData.bankAccount && formData.ifscCode))
-    ) {
-      onNext(formData)
+  const removeAvailability = (index: number) => {
+    setFormData({
+      ...formData,
+      availabilitySlots: formData.availabilitySlots.filter((_, i) => i !== index)
+    })
+  }
+
+  const handleNext = async () => {
+    if (formData.availabilitySlots.length === 0 || !formData.sessionFormat || !formData.payoutMethod) {
+      alert("Please fill in all required fields")
+      return
+    }
+
+    if (formData.payoutMethod === "upi" && !formData.upiId) {
+      alert("Please enter UPI ID")
+      return
+    }
+
+    if (formData.payoutMethod === "bank_transfer" && (!formData.bankAccount || !formData.ifscCode)) {
+      alert("Please enter bank account details")
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/step4", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+        },
+        body: JSON.stringify({
+          availability_slots: formData.availabilitySlots,
+          session_format: formData.sessionFormat,
+          payout_method: formData.payoutMethod,
+          upi_id: formData.payoutMethod === "upi" ? formData.upiId : null,
+          bank_account: formData.payoutMethod === "bank_transfer" ? formData.bankAccount : null,
+          ifsc_code: formData.payoutMethod === "bank_transfer" ? formData.ifscCode : null,
+          pan_number: formData.panNumber,
+          gst_number: formData.gstNumber || null
+        })
+      })
+
+      if (response.ok) {
+        onNext(formData)
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.detail}`)
+      }
+    } catch (error) {
+      console.error("Error saving step 4 data:", error)
+      alert("Error saving data. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Availability & Payout Setup</CardTitle>
-          <CardDescription>Set your schedule and payment preferences</CardDescription>
-          <div className="flex justify-center mt-4">
-            <div className="flex space-x-1">
-              <div className="w-6 h-2 bg-green-600 rounded-full"></div>
-              <div className="w-6 h-2 bg-green-600 rounded-full"></div>
-              <div className="w-6 h-2 bg-green-600 rounded-full"></div>
-              <div className="w-6 h-2 bg-blue-600 rounded-full"></div>
-              <div className="w-6 h-2 bg-gray-200 rounded-full"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 rounded flex items-center justify-center" style={{ backgroundColor: '#0073CF' }}>
+              <span className="text-white text-sm font-semibold">UC</span>
             </div>
+            <span className="font-medium text-gray-800">Unusual Consultant</span>
           </div>
-          <p className="text-xs text-gray-500 mt-2">Step 4 of 5 • 30-40 seconds</p>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          {/* Available Days/Time */}
-          <div>
-            <div className="flex items-center mb-4">
-              <Calendar className="h-5 w-5 text-blue-600 mr-2" />
-              <h3 className="text-lg font-semibold">Available Days/Time</h3>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-sm p-8">
+          {/* Title and Progress */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Mulish, sans-serif' }}>Availability and Payout-Setup</h1>
+            <p className="text-gray-600 mb-6">Set your schedule and payment preferences</p>
+            
+            {/* Progress Dots */}
+            <div className="flex justify-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+              <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+              <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#0073CF' }}></div>
+              <div className="w-2 h-2 rounded-full bg-gray-300"></div>
             </div>
-            <p className="text-sm text-gray-600 mb-3">Select all time slots when you're available for mentoring</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-              {availabilitySlots.map((slot) => (
-                <div key={slot} className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.availability.includes(slot)}
-                    onCheckedChange={() => toggleAvailability(slot)}
-                  />
-                  <Label className="text-sm">{slot}</Label>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-gray-500">Step 4 of 5 • 30-40 seconds</p>
           </div>
-
-          {/* Session Format */}
-          <div>
-            <div className="flex items-center mb-3">
-              <Video className="h-5 w-5 text-blue-600 mr-2" />
-              <h3 className="text-lg font-semibold">Session Format</h3>
-            </div>
-            <Select
-              value={formData.sessionFormat}
-              onValueChange={(value) => setFormData({ ...formData, sessionFormat: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose your preferred session format" />
-              </SelectTrigger>
-              <SelectContent>
-                {sessionFormats.map((format) => (
-                  <SelectItem key={format.id} value={format.id}>
-                    {format.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Payout Details */}
-          <div>
-            <div className="flex items-center mb-4">
-              <CreditCard className="h-5 w-5 text-blue-600 mr-2" />
-              <h3 className="text-lg font-semibold">Payout Details</h3>
-            </div>
-
-            {/* Payout Method Selection */}
-            <div className="mb-4">
-              <Label>Preferred Payout Method</Label>
-              <div className="flex space-x-4 mt-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.preferredPayout === "upi"}
-                    onCheckedChange={() => setFormData({ ...formData, preferredPayout: "upi" })}
-                  />
-                  <Label>UPI (Recommended)</Label>
+          
+          <div className="space-y-8">
+            {/* Available Days/Time */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="h-5 w-5" style={{ color: '#0073CF' }} />
+                <h3 className="text-lg font-semibold" style={{ fontFamily: 'Mulish, sans-serif' }}>Available Days/ Time</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Select all time slots when you're available for mentoring.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <Label htmlFor="day" className="text-sm font-medium">Days you're available</Label>
+                  <Select value={selectedDay} onValueChange={setSelectedDay}>
+                    <SelectTrigger className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                      <SelectValue placeholder="Select day" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {days.map((day) => (
+                        <SelectItem key={day} value={day}>{day}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={formData.preferredPayout === "bank"}
-                    onCheckedChange={() => setFormData({ ...formData, preferredPayout: "bank" })}
+                
+                <div>
+                  <Label htmlFor="startTime" className="text-sm font-medium">From</Label>
+                  <Input
+                    id="startTime"
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
-                  <Label>Bank Transfer</Label>
                 </div>
+                
+                <div>
+                  <Label htmlFor="endTime" className="text-sm font-medium">To</Label>
+                  <Input
+                    id="endTime"
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  />
+                </div>
+              </div>
+              
+              <Button
+                onClick={addAvailability}
+                className="w-full p-3 text-white rounded-lg hover:opacity-90 transition-colors flex items-center justify-center gap-2"
+                style={{ backgroundColor: '#0073CF' }}
+              >
+                + Add availability
+              </Button>
+              
+              {/* Added Availability List */}
+              {formData.availabilitySlots.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  {formData.availabilitySlots.map((slot, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <span className="text-sm">
+                        {slot.day}, {slot.start_time} - {slot.end_time}
+                      </span>
+                      <button
+                        onClick={() => removeAvailability(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Preferred mode */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Video className="h-5 w-5" style={{ color: '#0073CF' }} />
+                <h3 className="text-lg font-semibold" style={{ fontFamily: 'Mulish, sans-serif' }}>Preferred mode</h3>
+              </div>
+              
+              <div>
+                <Label htmlFor="sessionFormat" className="text-sm font-medium">Select Session format</Label>
+                <Select value={formData.sessionFormat} onValueChange={(value) => setFormData({ ...formData, sessionFormat: value })}>
+                  <SelectTrigger className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    <SelectValue placeholder="Select Session format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sessionFormats.map((format) => (
+                      <SelectItem key={format} value={format}>{format}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {/* UPI Details */}
-            {formData.preferredPayout === "upi" && (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center mb-2">
-                    <Smartphone className="h-4 w-4 text-blue-600 mr-2" />
-                    <Label htmlFor="upiId">UPI ID</Label>
-                  </div>
+            {/* Payout Details */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <DollarSign className="h-5 w-5" style={{ color: '#0073CF' }} />
+                <h3 className="text-lg font-semibold" style={{ fontFamily: 'Mulish, sans-serif' }}>Payout Details</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">Preferred Payout method:</p>
+              
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="upi"
+                    name="payoutMethod"
+                    value="upi"
+                    checked={formData.payoutMethod === "upi"}
+                    onChange={(e) => setFormData({ ...formData, payoutMethod: e.target.value })}
+                    className="text-blue-600"
+                  />
+                  <Label htmlFor="upi" className="text-sm">UPI (Recommended)</Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="bank"
+                    name="payoutMethod"
+                    value="bank_transfer"
+                    checked={formData.payoutMethod === "bank_transfer"}
+                    onChange={(e) => setFormData({ ...formData, payoutMethod: e.target.value })}
+                    className="text-blue-600"
+                  />
+                  <Label htmlFor="bank" className="text-sm">Bank Transfer</Label>
+                </div>
+              </div>
+              
+              {formData.payoutMethod === "upi" && (
+                <div className="mt-4">
+                  <Label htmlFor="upiId" className="text-sm font-medium">UPI ID</Label>
                   <Input
                     id="upiId"
                     value={formData.upiId}
                     onChange={(e) => setFormData({ ...formData, upiId: e.target.value })}
-                    placeholder="yourname@paytm / yourname@gpay"
+                    placeholder="yourname@paytm"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                 </div>
-              </div>
-            )}
-
-            {/* Bank Details */}
-            {formData.preferredPayout === "bank" && (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              )}
+              
+              {formData.payoutMethod === "bank_transfer" && (
+                <div className="mt-4 space-y-4">
                   <div>
-                    <Label htmlFor="bankAccount">Bank Account Number</Label>
+                    <Label htmlFor="bankAccount" className="text-sm font-medium">Bank Account Number</Label>
                     <Input
                       id="bankAccount"
                       value={formData.bankAccount}
                       onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })}
-                      placeholder="Account number"
+                      placeholder="Enter bank account number"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="ifscCode">IFSC Code</Label>
+                    <Label htmlFor="ifscCode" className="text-sm font-medium">IFSC Code</Label>
                     <Input
                       id="ifscCode"
                       value={formData.ifscCode}
                       onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
-                      placeholder="IFSC Code"
+                      placeholder="Enter IFSC code"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                     />
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Optional Tax Details */}
-            <div className="space-y-4 mt-6">
-              <h4 className="font-medium text-gray-700">Tax Details (Optional - can be added later)</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Tax Details */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4" style={{ fontFamily: 'Mulish, sans-serif' }}>Tax Details (Optional - can be added later)</h3>
+              
+              <div className="space-y-4">
                 <div>
-                  <Label htmlFor="panNumber">PAN Number</Label>
+                  <Label htmlFor="panNumber" className="text-sm font-medium">PAN Number</Label>
                   <Input
                     id="panNumber"
                     value={formData.panNumber}
                     onChange={(e) => setFormData({ ...formData, panNumber: e.target.value })}
-                    placeholder="ABCDE1234F (optional)"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
                   <p className="text-xs text-gray-500 mt-1">Required for payouts above ₹50,000/year</p>
                 </div>
+                
                 <div>
-                  <Label htmlFor="gstNumber">GST Number</Label>
+                  <Label htmlFor="gstNumber" className="text-sm font-medium">GST Number</Label>
                   <Input
                     id="gstNumber"
                     value={formData.gstNumber}
                     onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value })}
-                    placeholder="GST Number (optional)"
+                    placeholder="GST Number"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-1">For advanced mentors with GST registration</p>
+                  <p className="text-xs text-gray-500 mt-1">For mentors with GST registration</p>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Navigation */}
-          <div className="flex justify-between pt-6">
-            <Button variant="outline" onClick={onBack} className="bg-transparent">
-              Back
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={
-                formData.availability.length === 0 ||
-                !formData.sessionFormat ||
-                (formData.preferredPayout === "upi" && !formData.upiId) ||
-                (formData.preferredPayout === "bank" && (!formData.bankAccount || !formData.ifscCode))
-              }
-              className="bg-green-700 hover:bg-green-800"
-            >
-              Continue
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            {/* Navigation Buttons */}
+            <div className="flex justify-between items-center pt-8 mt-8">
+              <button 
+                onClick={onBack}
+                className="px-6 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+              >
+                Back
+              </button>
+              <button 
+                onClick={handleNext}
+                disabled={isLoading}
+                className="px-6 py-2 text-white rounded-lg hover:opacity-90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#0073CF' }}
+              >
+                {isLoading ? "Saving..." : "Continue →"}
+              </button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
