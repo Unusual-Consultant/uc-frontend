@@ -38,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden">
+    <div className="relative flex min-h-screen  items-center justify-center bg-white px-4 overflow-hidden pb-32 pt-32 ">
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left">
@@ -49,7 +49,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
+      <div className="absolute bottom-[230px] left-0 w-full overflow-hidden ">
         <div className="flex animate-scroll-right">
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
@@ -60,7 +60,7 @@ export default function LoginPage() {
 
       {/* 🔹 Mirror Glaze Rectangle with Login Card Inside */}
       <div
-        className="absolute w-[509px] h-[685px] top-[110px] left-1/2 -translate-x-1/2 bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex items-center justify-center px-6 py-8 z-10"
+        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex items-center justify-center px-6 py-8 z-10"
       >
         {/* Login Card */}
         <div className="w-full max-w-md">

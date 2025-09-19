@@ -41,7 +41,7 @@ export default function SignupPage() {
   handleSignup(userType);
 };
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24 pt-24 ">
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
@@ -84,7 +84,7 @@ export default function SignupPage() {
       </div>
 
       {/* 🔹 Frosted Glass Signup Box */}
-      <div className="absolute w-[509px] top-[25px] left-1/2 -translate-x-1/2 bg-gradient-to-b from-[rgba(209,234,255,0.4)] to-[rgba(209,234,255,0.1)] backdrop-blur-[700px] rounded-[30px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] flex flex-col items-center px-6 py-8 z-10">
+      <div className=" bg-gradient-to-b from-[rgba(209,234,255,0.4)] to-[rgba(209,234,255,0.1)] backdrop-blur-[700px] rounded-[30px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] flex flex-col items-center px-6 py-8 z-10">
         {/* Header + Tabs */}
         <h1 className="font-mulish font-extrabold text-[22px] mb-2">
           {activeTab === "mentee" ? "Mentee Onboarding" : "Mentor Onboarding"}
