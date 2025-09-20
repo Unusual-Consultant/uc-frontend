@@ -59,7 +59,7 @@ const recentActivityData = [
 
 export default function MenteeDashboardPage() {
   const { user } = useAuthenticatedUser()
-  const userName =  user?.firstName 
+  const userName =  user?.firstName || user?.first_name
   || user?.username 
   || user?.name 
   || "User"
