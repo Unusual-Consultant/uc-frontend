@@ -56,31 +56,74 @@ export default function SignupStep2() {
       setIsLoading(true)
       setApiError(null)
       console.log("🔍 Fetching signup options from API...")
-      
+  
       const response = await fetch("http://localhost:8000/api/v1/mentee/signup/options", {
         headers: { "Content-Type": "application/json" }
       })
       console.log("📡 API Response status:", response.status)
-      
+  
       if (!response.ok) {
         const errorText = await response.text()
         console.error("❌ API Error:", response.status, errorText)
         throw new Error(`API Error: ${response.status} - ${errorText}`)
       }
-      
+  
       const data = await response.json()
       console.log("✅ API Data received:", data)
-      
-      // Check if data is empty
-      if (!data.career_goals || data.career_goals.length === 0) {
-        throw new Error("API returned empty data")
-      }
-      
-      setOptions(data)
+  
+      // ✅ Instead of throwing, just fall back per section if empty
+      setOptions({
+        career_goals: data.career_goals?.length ? data.career_goals : [
+          { id: 1, name: "Crack Product management Interview" },
+          { id: 2, name: "Get job abroad" },
+          { id: 3, name: "Switch to Data Science" },
+          { id: 4, name: "Learn UI UX Design" },
+          { id: 5, name: "MBA Preparation" },
+          { id: 6, name: "Government Exams Preparation" },
+          { id: 7, name: "Start my own Startup" },
+          { id: 8, name: "Learn Coding/Programming" },
+          { id: 9, name: "Get promoted to Senior role" },
+          { id: 10, name: "Career change guidance" },
+          { id: 11, name: "Improve leadership skills" },
+          { id: 12, name: "Freelancing Guidance" }
+        ],
+        interests: data.interests?.length ? data.interests : [
+          { id: 1, name: "Product management" },
+          { id: 2, name: "Data Science" },
+          { id: 3, name: "UI UX Design" },
+          { id: 4, name: "Software Engineering" },
+          { id: 5, name: "Digital Marketing" },
+          { id: 6, name: "MBA Preparation" },
+          { id: 7, name: "Government Exams" },
+          { id: 8, name: "Startup Guidance" },
+          { id: 9, name: "Consulting" },
+          { id: 10, name: "Finance & Banking" },
+          { id: 11, name: "Content Writing" },
+          { id: 12, name: "Graphic Design" },
+          { id: 13, name: "Sales & Business Development" },
+          { id: 14, name: "HR & People Operations" }
+        ],
+        languages: data.languages?.length ? data.languages : [
+          { id: 1, name: "English" },
+          { id: 2, name: "Hindi" },
+          { id: 3, name: "German" },
+          { id: 4, name: "Spanish" },
+          { id: 5, name: "French" },
+          { id: 6, name: "Mandarin" }
+        ],
+        career_stages: data.career_stages?.length ? data.career_stages : [
+          { id: 1, name: "Student" },
+          { id: 2, name: "Entry Level (0-2 years)" },
+          { id: 3, name: "Mid Level (3-7 years)" },
+          { id: 4, name: "Senior Level (8+ years)" }
+        ]
+      })
     } catch (error) {
       console.error("❌ Error fetching signup options:", error)
       setApiError(error instanceof Error ? error.message : "Unknown error")
       console.log("🔄 Falling back to hardcoded data...")
+  
+      // 👇 fallback if API totally fails
       setOptions({
         career_goals: [
           { id: 1, name: "Crack Product management Interview" },
@@ -131,6 +174,7 @@ export default function SignupStep2() {
       setIsLoading(false)
     }
   }
+  
 
   const handleCareerGoalSelect = (goalId: number) => {
     setSelectedCareerGoal(goalId)
@@ -174,7 +218,9 @@ export default function SignupStep2() {
     const selections = {
       email: email,
       user_type: userType,
-      career_goal: selectedCareerGoal ? options?.career_goals.find(g => g.id === selectedCareerGoal)?.name || customGoal : customGoal,
+      career_goal:  selectedCareerGoal && options?.career_goals
+      ? options.career_goals.find(g => g.id === selectedCareerGoal)?.name || customGoal
+      : customGoal,
       interests: selectedInterests,
       languages: selectedLanguages,
       career_stage: selectedCareerStage,

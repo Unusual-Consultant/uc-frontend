@@ -1,3 +1,5 @@
+"use client"
+
 import { WelcomeHeader } from "@/components/dashboard/welcome-header"
 import { SuggestedMentorsCarousel } from "@/components/dashboard/suggested-mentors-carousel"
 import { ActionPanel } from "@/components/dashboard/action-panel"
@@ -6,6 +8,7 @@ import { CareerToolkit } from "@/components/dashboard/career-toolkit"
 import { SessionHistory } from "@/components/dashboard/session-history"
 import { ProgressTracker } from "@/components/dashboard/progress-tracker"
 import { PromotionsBanner } from "@/components/dashboard/promotions-banner"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 const upcomingSessionsData = [
   {
@@ -55,6 +58,12 @@ const recentActivityData = [
 ]
 
 export default function MenteeDashboardPage() {
+  const { user } = useAuthenticatedUser()
+  const userName =  user?.firstName || user?.first_name
+  || user?.username 
+  || user?.name 
+  || "User"
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
@@ -62,7 +71,7 @@ export default function MenteeDashboardPage() {
         <div className="space-y-8">
           {/* Welcome Header */}
           <WelcomeHeader
-            userName="Apoorv"
+            userName={userName}
             currentGoal="Product Manager"
             avgTimeToReach="4–6 months"
             progressPercentage={30}

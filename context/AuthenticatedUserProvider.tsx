@@ -19,6 +19,7 @@ type AuthenticatedUserContext = {
   setUser: (user: User | null) => void;
   processOAuthCallback: (code: string) => Promise<void>
   isAuthenticated: boolean;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
   makeAuthenticatedRequest: (url: string, options?: RequestInit) => Promise<Response>;
   logout: () => void;
   getCurrentUser: () => Promise<void>;
@@ -285,6 +286,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
     setUser,
     processOAuthCallback,
     isAuthenticated,
+    setIsAuthenticated,
     makeAuthenticatedRequest,
     logout,
     getCurrentUser,

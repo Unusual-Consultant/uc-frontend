@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import { User, GraduationCap } from "lucide-react";
 import { api } from "@/lib/api";
+import LoginForm from "@/components/login-form";
 
 export default function LoginPage() {
   const [activeTab, setActiveTab] = useState("mentee");
@@ -110,42 +109,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <div className="w-[395px] flex flex-col gap-2">
-                <Label
-                  htmlFor="mentee-email"
-                  className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="mentee-email"
-                  type="email"
-                  placeholder="john@example.com"
-                  className="w-[450px] px-4 py-3 rounded-3xl border border-black text-gray-800 font-medium"
-                />
-
-                <div className="w-[395px] flex flex-col gap-2">
-                  <Label
-                    htmlFor="mentee-password"
-                    className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
-                  >
-                    Password
-                  </Label>
-                  <Input
-                    id="mentee-password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="w-[450px] px-4 py-3 rounded-3xl border border-black text-gray-800"
-                  />
-                </div>
-              </div>
-
-              <Button
-                className="w-full bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-3xl"
-                onClick={() => handleLogin("mentee")}
-              >
-                Sign In as Mentee
-              </Button>
+              <LoginForm userType="mentee" />
 
               <div className="text-center">
                 <Link
@@ -188,42 +152,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <div className="w-[395px] flex flex-col gap-2">
-                <Label
-                  htmlFor="mentor-email"
-                  className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
-                >
-                  Email
-                </Label>
-                <Input
-                  id="mentor-email"
-                  type="email"
-                  placeholder="mentor@example.com"
-                  className="w-[450px] px-4 py-3 rounded-3xl border border-black text-gray-800 font-medium"
-                />
-
-                <div className="w-[395px] flex flex-col gap-2">
-                  <Label
-                    htmlFor="mentor-password"
-                    className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
-                  >
-                    Password
-                  </Label>
-                  <Input
-                    id="mentor-password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="w-[450px] px-4 py-3 rounded-3xl border border-black text-gray-800"
-                  />
-                </div>
-              </div>
-
-              <Button
-                className="w-full bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-3xl"
-                onClick={() => handleLogin("mentor")}
-              >
-                Sign In as Mentor
-              </Button>
+              <LoginForm userType="mentor" />
 
               <div className="text-center">
                 <Link

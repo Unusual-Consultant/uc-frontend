@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
 import { User, GraduationCap } from "lucide-react";
+import SignupForm from "@/components/signup-form";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -172,114 +172,8 @@ export default function SignupPage() {
               <div className="flex-grow h-px bg-gray-300"></div>
             </div>
 
-            {/* OTP / Password Toggle */}
-            <Tabs defaultValue="OTP" className="w-[418px]">
-              <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
-                <TabsTrigger
-                  value="OTP"
-                  className="flex items-center gap-2 rounded-2xl
-                  data-[state=active]:bg-[#0073CF] 
-                  data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
-                >
-                  <User className="h-4 w-4" />
-                  <span>Sign up with OTP</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="PW"
-                  className="flex items-center gap-1 rounded-2xl
-                  data-[state=active]:bg-[#0073CF] 
-                  data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
-                >
-                  <GraduationCap className="h-4 w-4" />
-                  <span>Create Password</span>
-                </TabsTrigger>
-              </TabsList>
-
-              {/* OTP signup content */}
-              <TabsContent value="OTP" className="space-y-4">
-                <div className="w-full max-w-[425px] space-y-4">
-                  <Input
-                    placeholder="Full Name"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Phone number"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Email"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                </div>
-
-                <div className="w-full max-w-[400px] space-y-2">
-                  <p className="text-[12px] text-black-500">Send OTP to:</p>
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 text-[13px]">
-                      <input type="radio" name="otp" /> Phone number
-                    </label>
-                    <label className="flex items-center gap-2 text-[13px]">
-                      <input type="radio" name="otp" /> Email
-                    </label>
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter OTP"
-                      className="flex-1 rounded-3xl border px-4 py-3 border border-black"
-                    />
-                    <Button className="rounded-3xl bg-gray border border-black">
-                      Get OTP
-                    </Button>
-                  </div>
-                </div>
-
-                <Button className="w-full max-w-[400px] rounded-3xl bg-gray-400 text-white">
-                  Verify OTP
-                </Button>
-              </TabsContent>
-
-              {/* Password signup content */}
-              <TabsContent value="PW" className="space-y-4">
-                <div className="w-full max-w-[400px] space-y-4">
-                  <Input
-                    placeholder="Full Name"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Phone number"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Email"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Create Password"
-                    className="rounded-3xl border px-4 py-3  border border-black"
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                </div>
-
-                <Button className="w-full max-w-[400px] rounded-3xl bg-[#0073CF] text-white">
-                  Continue
-                </Button>
-                <p className="text-[13px] text-black-500 text-center">
-                  {" "}
-                  Already have an account?
-                  <a href="/login" className="text-[#0073CF] underline">
-                    {" "}
-                    Sign In
-                  </a>
-                </p>
-              </TabsContent>
-            </Tabs>
+            {/* Signup Form */}
+            <SignupForm userType={activeTab as "mentee" | "mentor"} />
           </TabsContent>
 
           {/* Mentor Tab */}
@@ -341,114 +235,8 @@ export default function SignupPage() {
               <div className="flex-grow h-px bg-gray-300"></div>
             </div>
 
-            {/* OTP / Password Toggle */}
-            <Tabs defaultValue="OTP" className="w-[418px]">
-              <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
-                <TabsTrigger
-                  value="OTP"
-                  className="flex items-center gap-2 rounded-2xl
-                  data-[state=active]:bg-[#0073CF] 
-                  data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
-                >
-                  <User className="h-4 w-4" />
-                  <span>Sign up with OTP</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="PW"
-                  className="flex items-center gap-1 rounded-2xl
-                  data-[state=active]:bg-[#0073CF] 
-                  data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
-                >
-                  <GraduationCap className="h-4 w-4" />
-                  <span>Create Password</span>
-                </TabsTrigger>
-              </TabsList>
-
-              {/* OTP signup content */}
-              <TabsContent value="OTP" className="space-y-4">
-                <div className="w-full max-w-[425px] space-y-4">
-                  <Input
-                    placeholder="Full Name"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Phone number"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Email"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                </div>
-
-                <div className="w-full max-w-[400px] space-y-2">
-                  <p className="text-[12px] text-black-500">Send OTP to:</p>
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 text-[13px]">
-                      <input type="radio" name="mentor-otp" /> Phone number
-                    </label>
-                    <label className="flex items-center gap-2 text-[13px]">
-                      <input type="radio" name="mentor-otp" /> Email
-                    </label>
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter OTP"
-                      className="flex-1 rounded-3xl border px-4 py-3 border border-black"
-                    />
-                    <Button className="rounded-3xl bg-gray border border-black">
-                      Get OTP
-                    </Button>
-                  </div>
-                </div>
-
-                <Button className="w-full max-w-[400px] rounded-3xl bg-gray-400 text-white">
-                  Verify OTP
-                </Button>
-              </TabsContent>
-
-              {/* Password signup content */}
-              <TabsContent value="PW" className="space-y-4">
-                <div className="w-full max-w-[400px] space-y-4">
-                  <Input
-                    placeholder="Full Name"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Phone number"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    placeholder="Email"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Create Password"
-                    className="rounded-3xl border px-4 py-3  border border-black"
-                  />
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    className="rounded-3xl border px-4 py-3 border border-black"
-                  />
-                </div>
-
-                <Button className="w-full max-w-[400px] rounded-3xl bg-[#0073CF] text-white">
-                  Continue
-                </Button>
-                <p className="text-[13px] text-black-500 text-center">
-                  {" "}
-                  Already have an account?
-                  <a href="/login" className="text-[#0073CF] underline">
-                    {" "}
-                    Sign In
-                  </a>
-                </p>
-              </TabsContent>
-            </Tabs>
+            {/* Signup Form */}
+            <SignupForm userType={activeTab as "mentee" | "mentor"} />
           </TabsContent>
         </Tabs>
         {/* 🔹 Keyframes for scrolling */}
