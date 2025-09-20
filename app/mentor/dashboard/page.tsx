@@ -9,14 +9,17 @@ import { PackagesPricing } from "@/components/mentor-dashboard/packages-pricing"
 import { ReviewsFeedback } from "@/components/mentor-dashboard/reviews-feedback"
 import { EarningsWithdrawals } from "@/components/mentor-dashboard/earnings-withdrawals"
 import { LayoutDashboard, Calendar, Briefcase, Package, Star, DollarSign } from "lucide-react"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
+  const { user } = useAuthenticatedUser()
+  const userName = user?.first_name || user?.name || "Mentor"
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Mentor Dashboard</h1>
+        <h1 className="text-3xl font-bold">Welcome back, {userName}!</h1>
         <p className="text-muted-foreground">Manage your mentorship business and track your success</p>
       </div>
 

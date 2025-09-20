@@ -5,8 +5,14 @@ export const api = {
     google: {
       login: () => `${API_BASE_URL}/auth/google/login`,
       callback: (code: string) => `${API_BASE_URL}/auth/google/callback?code=${code}`,
-      
     },
+    signup: {
+      password: () => `${API_BASE_URL}/auth/signup`,
+      otp: () => `${API_BASE_URL}/auth/signup/otp`,
+      verifyOtp: () => `${API_BASE_URL}/auth/signup/verify-otp`,
+    },
+    login: () => `${API_BASE_URL}/auth/login`,
+    me: () => `${API_BASE_URL}/auth/me`,
     clientCredentials: () => `${API_BASE_URL}/auth/client-credentials`,
   },
   pdf: {
