@@ -2,9 +2,25 @@
 
 import { useRouter } from "next/navigation"
 import { CheckCircle, Home, FileText, Mail } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export function MentorSuccess() {
   const router = useRouter()
+  const [countdown, setCountdown] = useState(3)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          router.push("/mentor/dashboard")
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [router])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
@@ -35,24 +51,40 @@ export function MentorSuccess() {
             Your mentor application is under review
           </p>
           
-          <p className="text-gray-700 mb-8">
-            Thank you for applying to become a mentor on <span className="text-blue-600 font-semibold">Unusual Consultant</span>. 
-            Our team will review your profile and get back to you within <span className="text-blue-600 font-bold">24-48 hours</span>.
+          <p className="text-gray-700 mb-4">
+            Thank you for completing your mentor profile on <span className="text-blue-600 font-semibold">Unusual Consultant</span>! 
+            Your profile is now live and ready to help mentees.
           </p>
+          
+          <div className="bg-blue-100 border border-blue-200 rounded-lg p-4 mb-8">
+            <p className="text-blue-800 font-medium">
+              🎉 Redirecting to your dashboard in {countdown} seconds...
+            </p>
+          </div>
 
-          {/* What happens next */}
+          {/* What you can do now */}
           <div className="text-left mb-8">
             <h2 className="text-xl font-semibold mb-4" style={{ fontFamily: 'Mulish, sans-serif' }}>
-              What happens next?
+              What you can do now?
             </h2>
             <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-white text-sm font-bold">✓</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">Profile is Live</h3>
+                  <p className="text-gray-600 text-sm">Your profile is now visible to mentees and ready for bookings</p>
+                </div>
+              </div>
+              
               <div className="flex items-start gap-3">
                 <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                   <span className="text-white text-sm font-bold">1</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">Profile Review</h3>
-                  <p className="text-gray-600 text-sm">Our team reviews your professional background and expertise</p>
+                  <h3 className="font-semibold text-gray-800">Manage Sessions</h3>
+                  <p className="text-gray-600 text-sm">View and manage your mentorship sessions from the dashboard</p>
                 </div>
               </div>
               
@@ -61,18 +93,8 @@ export function MentorSuccess() {
                   <span className="text-white text-sm font-bold">2</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-800">Verification</h3>
-                  <p className="text-gray-600 text-sm">We verify your LinkedIn account and work experience</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-white text-sm font-bold">3</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">Profile goes live</h3>
-                  <p className="text-gray-600 text-sm">Once approved, your profile will be visible to mentees</p>
+                  <h3 className="font-semibold text-gray-800">Track Earnings</h3>
+                  <p className="text-gray-600 text-sm">Monitor your earnings and manage payouts</p>
                 </div>
               </div>
             </div>
@@ -97,11 +119,11 @@ export function MentorSuccess() {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/mentor/dashboard")}
               className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <Home className="h-4 w-4" />
-              Return to homepage
+              Go to Dashboard
             </button>
             <button
               onClick={() => router.push("/mentor/resources")}

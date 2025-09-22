@@ -48,8 +48,13 @@ export default function MentorStep5Page() {
   }
 
   const handleStepComplete = (stepData: any) => {
-    // Show success page
+    // Show success page briefly, then redirect to dashboard
     setShowSuccess(true)
+    
+    // Auto-redirect to dashboard after 3 seconds
+    setTimeout(() => {
+      router.push("/mentor/dashboard")
+    }, 3000)
   }
 
   const handleBack = () => {

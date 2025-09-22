@@ -4,8 +4,9 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowRight, Calendar, Video, DollarSign, X } from "lucide-react"
+import { ArrowRight, Calendar, Video, DollarSign, X, FileText, Users, MessageCircle, Briefcase, Target, Lightbulb, GraduationCap, Plus, Globe, Clock } from "lucide-react"
 
 interface MentorStep3Props {
   onNext: (data: any) => void
