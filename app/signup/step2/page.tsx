@@ -57,6 +57,7 @@ export default function SignupStep2() {
       setApiError(null)
       console.log("🔍 Fetching signup options from API...")
   
+      // Use mentee signup options for both mentee and mentor (they share the same data)
       const response = await fetch("http://localhost:8000/api/v1/mentee/signup/options", {
         headers: { "Content-Type": "application/json" }
       })
@@ -229,7 +230,12 @@ export default function SignupStep2() {
 
     try {
       setIsLoading(true)
-      const response = await fetch("http://localhost:8000/api/v1/mentee/signup/step2", {
+      // Use different endpoints for mentee vs mentor
+      const endpoint = userType === "mentee" 
+        ? `http://localhost:8000/api/v1/${userType}/signup/step2`
+        : `http://localhost:8000/api/v1/${userType}/onboarding/step2`
+      
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(selections)

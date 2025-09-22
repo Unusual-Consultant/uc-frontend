@@ -23,7 +23,7 @@ export default function MentorStep2Page() {
   }, [searchParams])
 
   const loadExistingData = async () => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("auth_token") || localStorage.getItem("access_token")
     console.log("Loading data with token:", token ? token.substring(0, 20) + "..." : "null")
     
     try {
@@ -48,7 +48,7 @@ export default function MentorStep2Page() {
 
   const handleStepComplete = (stepData: any) => {
     // Move to step 3 with token
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("auth_token") || localStorage.getItem("access_token")
     if (token) {
       router.push(`/onboarding/mentor/step-3?token=${token}`)
     } else {

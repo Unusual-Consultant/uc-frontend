@@ -14,7 +14,7 @@ import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 export default function MentorDashboard() {
   const [activeTab, setActiveTab] = useState("overview")
   const { user } = useAuthenticatedUser()
-  const userName = user?.first_name || user?.name || "Mentor"
+  const userName = user?.firstName || user?.first_name || user?.name || "Mentor"
 
   return (
     <div className="container mx-auto px-4 py-8">

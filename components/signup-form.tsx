@@ -153,7 +153,14 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         setIsAuthenticated(true);
 
         if (onSuccess) onSuccess();
-        else router.push(`/signup/step2?email=${encodeURIComponent(formData.email)}&userType=${userType}`);
+        else {
+          // Redirect to appropriate onboarding flow based on user type
+          if (userType === "mentor") {
+            router.push(`/onboarding/mentor/step-2?email=${encodeURIComponent(formData.email)}&token=${data.token}`);
+          } else {
+            router.push(`/signup/step2?email=${encodeURIComponent(formData.email)}&userType=${userType}`);
+          }
+        }
       } else setErrors({ general: data.detail || "OTP verification failed" });
     } catch (error) {
       console.error("Network error:", error);
@@ -189,7 +196,14 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         setIsAuthenticated(true);
 
         if (onSuccess) onSuccess();
-        else router.push(`/signup/step2?email=${encodeURIComponent(formData.email)}&userType=${userType}`);
+        else {
+          // Redirect to appropriate onboarding flow based on user type
+          if (userType === "mentor") {
+            router.push(`/onboarding/mentor/step-2?email=${encodeURIComponent(formData.email)}&token=${data.token}`);
+          } else {
+            router.push(`/signup/step2?email=${encodeURIComponent(formData.email)}&userType=${userType}`);
+          }
+        }
       } else setErrors({ general: data.detail || "Signup failed" });
     } catch (error) {
       console.error("Network error:", error);
