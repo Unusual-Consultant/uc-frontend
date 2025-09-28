@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Root CSS variables */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -59,24 +60,24 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Map CSS variables to Tailwind classes */
+@layer utilities {
+  .bg-background { background-color: hsl(var(--background)); }
+  .bg-card { background-color: hsl(var(--card)); }
+  .text-foreground { color: hsl(var(--foreground)); }
+  .text-card-foreground { color: hsl(var(--card-foreground)); }
+  .border-border { border-color: hsl(var(--border)); }
 }
 
-/* Custom animations for Smart Buddy */
+/* Optional: body default styling */
+body {
+  @apply bg-background text-foreground;
+}
+
+/* Custom animations */
 @keyframes bounce-gentle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 .animate-bounce-gentle {

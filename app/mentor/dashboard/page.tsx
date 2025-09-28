@@ -24,57 +24,57 @@ export default function MentorDashboard() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="overview" className="flex items-center space-x-2">
-            <LayoutDashboard className="h-4 w-4" />
-            <span className="hidden sm:inline">Overview</span>
-          </TabsTrigger>
-          <TabsTrigger value="mentorship" className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4" />
-            <span className="hidden sm:inline">Sessions</span>
-          </TabsTrigger>
-          <TabsTrigger value="freelance" className="flex items-center space-x-2">
-            <Briefcase className="h-4 w-4" />
-            <span className="hidden sm:inline">Projects</span>
-          </TabsTrigger>
-          <TabsTrigger value="packages" className="flex items-center space-x-2">
-            <Package className="h-4 w-4" />
-            <span className="hidden sm:inline">Packages</span>
-          </TabsTrigger>
-          <TabsTrigger value="reviews" className="flex items-center space-x-2">
-            <Star className="h-4 w-4" />
-            <span className="hidden sm:inline">Reviews</span>
-          </TabsTrigger>
-          <TabsTrigger value="earnings" className="flex items-center space-x-2">
-            <DollarSign className="h-4 w-4" />
-            <span className="hidden sm:inline">Earnings</span>
-          </TabsTrigger>
-        </TabsList>
+  {/* Outer pill container */}
+  <TabsList className="flex bg-white rounded-full p-2 shadow-sm overflow-hidden shadow-md hover:shadow-lg transition">
+    {[
+      { value: "overview", icon: LayoutDashboard, label: "Overview" },
+      { value: "mentorship", icon: Calendar, label: "Sessions" },
+      { value: "freelance", icon: Briefcase, label: "Projects" },
+      { value: "packages", icon: Package, label: "Packages" },
+      { value: "reviews", icon: Star, label: "Reviews" },
+      { value: "earnings", icon: DollarSign, label: "Earnings" },
+    ].map((tab) => (
+      <TabsTrigger
+        key={tab.value}
+        value={tab.value}
+        className="flex items-center justify-center space-x-2 px-4 py-2 text-sm rounded-full transition-all duration-200
+          data-[state=active]:bg-blue-600
+          data-[state=active]:text-white
+          data-[state=active]:shadow-md
+          text-gray-600
+          hover:bg-blue-100
+          "
+      >
+        <tab.icon className="h-4 w-4 data-[state=active]:text-white text-gray-600" />
+        <span className="hidden sm:inline">{tab.label}</span>
+      </TabsTrigger>
+    ))}
+  </TabsList>
 
-        <TabsContent value="overview" className="mt-6">
-          <DashboardOverview />
-        </TabsContent>
+  {/* Tab Contents */}
+  <div className="mt-6">
+    <TabsContent value="overview">
+      <DashboardOverview />
+    </TabsContent>
+    <TabsContent value="mentorship">
+      <MentorshipManagement />
+    </TabsContent>
+    <TabsContent value="freelance">
+      <FreelanceProjects />
+    </TabsContent>
+    <TabsContent value="packages">
+      <PackagesPricing />
+    </TabsContent>
+    <TabsContent value="reviews">
+      <ReviewsFeedback />
+    </TabsContent>
+    <TabsContent value="earnings">
+      <EarningsWithdrawals />
+    </TabsContent>
+  </div>
+</Tabs>
 
-        <TabsContent value="mentorship" className="mt-6">
-          <MentorshipManagement />
-        </TabsContent>
 
-        <TabsContent value="freelance" className="mt-6">
-          <FreelanceProjects />
-        </TabsContent>
-
-        <TabsContent value="packages" className="mt-6">
-          <PackagesPricing />
-        </TabsContent>
-
-        <TabsContent value="reviews" className="mt-6">
-          <ReviewsFeedback />
-        </TabsContent>
-
-        <TabsContent value="earnings" className="mt-6">
-          <EarningsWithdrawals />
-        </TabsContent>
-      </Tabs>
     </div>
   )
 }
