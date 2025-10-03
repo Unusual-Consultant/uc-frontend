@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 
-export function ActionPanel() {
+export function MentorActionPanel() {
   return (
     <div className="space-y-4">
       {/* Heading */}
@@ -9,7 +9,7 @@ export function ActionPanel() {
       <Image
     src="/quick_Access_icon.png" 
     alt="Quick Access"
-    width={24} 
+    width={24} // small size
     height={24}
     className="object-contain"
   />
@@ -22,7 +22,7 @@ export function ActionPanel() {
         <a href="/your-link-here" className="block cursor-pointer">
           <Card className="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
             <img
-              src="/get_resume_reviwed.png"
+              src="/schedule_session.png"
               alt="Resume Review"
               className="w-full h-full object-cover"
             />
@@ -32,7 +32,7 @@ export function ActionPanel() {
         <a href="/your-link-here" className="block cursor-pointer">
           <Card className="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
             <img
-              src="/book_session.png"
+              src="/create_package.png"
               alt="Book a Session"
               className="w-full h-full object-cover"
             />
@@ -42,7 +42,7 @@ export function ActionPanel() {
         <a href="/your-link-here" className="block cursor-pointer">
           <Card className="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
             <img
-              src="/plan_career.png"
+              src="/View_analytics.png"
               alt="Plan Career"
               className="w-full h-full object-cover"
             />
@@ -52,7 +52,7 @@ export function ActionPanel() {
         <a href="/your-link-here" className="block cursor-pointer">
           <Card className="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-shadow">
             <img
-              src="/ask_ai.png"
+              src="/Withdraw_funds.png"
               alt="Ask AI"
               className="w-full h-full object-cover"
             />

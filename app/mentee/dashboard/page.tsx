@@ -1,14 +1,15 @@
 "use client"
 
-import { WelcomeHeader } from "@/components/dashboard/welcome-header"
+import Image from "next/image"
 import { SuggestedMentorsCarousel } from "@/components/dashboard/suggested-mentors-carousel"
 import { ActionPanel } from "@/components/dashboard/action-panel"
 import { UpcomingSessions } from "@/components/dashboard/upcoming-sessions"
-import { CareerToolkit } from "@/components/dashboard/career-toolkit"
+import { CareerToolkitSection } from "@/components/dashboard/career-toolkit"
 import { SessionHistory } from "@/components/dashboard/session-history"
 import { ProgressTracker } from "@/components/dashboard/progress-tracker"
 import { PromotionsBanner } from "@/components/dashboard/promotions-banner"
 import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
+import { ProfileProgressCircle } from "@/components/dashboard/profile-progress-circle"
 
 const upcomingSessionsData = [
   {
@@ -32,6 +33,16 @@ const upcomingSessionsData = [
     duration: "30 mins",
     price: "₹800",
     status: "pending",
+  },{
+    id: 3,
+    mentorName: "Brady Ackerman",
+    mentorTitle: "Ex-Amazon PM",
+    sessionType: "Mock Interview",
+    date: "Tomorrow",
+    time: "10:00 AM",
+    duration: "30 mins",
+    price: "₹800",
+    status: "processing",
   },
 ]
 
@@ -56,53 +67,70 @@ const recentActivityData = [
     time: "1 week ago",
   },
 ]
-
 export default function MenteeDashboardPage() {
   const { user } = useAuthenticatedUser()
-  const userName =  user?.firstName || user?.first_name
-  || user?.username 
-  || user?.name 
-  || "User"
-  
+  const userName =
+    user?.firstName ||
+    user?.first_name ||
+    user?.username ||
+    user?.name ||
+    "User"
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Above the Fold */}
-        <div className="space-y-8">
-          {/* Welcome Header */}
-          <WelcomeHeader
-            userName={userName}
-            currentGoal="Product Manager"
-            avgTimeToReach="4–6 months"
-            progressPercentage={30}
-          />
+      {/* ✅ Hero Section */}
+      <section className="relative w-full h-[400px] md:h-[500px] flex items-center">
+  {/* Background Image */}
+  <Image
+    src="/hero_background.png"
+    alt="Hero Background"
+    fill
+    className="object-cover"
+    priority
+  />
+  <div className="absolute inset-0 " /> {/* overlay for readability */}
 
-          {/* Suggested Mentors Carousel */}
-          <SuggestedMentorsCarousel />
+  {/* Content Overlay - lifted up */}
+  <div className="relative z-10 container mx-auto px-4 flex items-center space-x-8 -translate-y-10 md:-translate-y-24">
+    {/* Profile Circle */}
+    <ProfileProgressCircle
+      progress={30}
+      imageSrc={userName.profile_picture_url || "/default_pfp.png"}
+      size={120}
+    />
 
-          {/* Action Panel */}
-          <ActionPanel />
+    {/* Text Content */}
+    <div className="flex-1">
+      <h1 className="text-3xl md:text-5xl font-bold text-BLACK mb-2 ">
+        Hello, <span className="text-blue-400">{userName}! 👋</span>
+      </h1>
+      <p className="text-lg md:text-2xl text-black-200 drop-shadow">
+        Welcome to your career dashboard
+      </p>
+      <p className="mt-2 text-black font-semibold drop-shadow">
+        {/* need to ftch from db mentee, fill taget role in a form */}
+        🎯 Target Role: Product Manager 
+       </p>
 
-          {/* Upcoming Sessions */}
-          <UpcomingSessions sessions={upcomingSessionsData} />
-        </div>
+      <p className="mt-1 text-blue-400 font-medium drop-shadow">{30}% progress to Goal</p>
+    </div>
+  </div>
+</section>
 
-        {/* Below the Fold */}
-        <div className="mt-12 space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Career Toolkit */}
-            <CareerToolkit />
 
-            {/* Progress Tracker */}
-            <ProgressTracker />
-          </div>
+      {/* ✅ Dashboard content overlaps naturally */}
+      <div className="-mt-45 md:-mt-60 container mx-auto px-4 py-2 space-y-8 relative z-20">
+        <SuggestedMentorsCarousel />
+        <ActionPanel />
+        <UpcomingSessions sessions={upcomingSessionsData} />
 
-          {/* Session History */}
-          <SessionHistory activities={recentActivityData} />
+        
+          <CareerToolkitSection />
+          {/* <ProgressTracker /> */}
+        
 
-          {/* Promotions Banner */}
-          <PromotionsBanner />
-        </div>
+        <SessionHistory activities={recentActivityData} />
+        <PromotionsBanner />
       </div>
     </div>
   )
