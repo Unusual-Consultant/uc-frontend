@@ -2,231 +2,169 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Filter } from "lucide-react"
 
-interface MentorFiltersProps {
-  onFiltersChange?: (filters: any) => void
-}
-
-export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
-  const [priceRange, setPriceRange] = useState([50, 200])
-  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([])
-  const [experienceLevel, setExperienceLevel] = useState<string[]>([])
-  const [availability, setAvailability] = useState<string[]>([])
-  const [verifiedOnly, setVerifiedOnly] = useState(false)
-  const [sortBy, setSortBy] = useState("relevance")
-
-  const industries = [
-    "Technology",
-    "Finance",
-    "Marketing",
-    "Design",
-    "Healthcare",
-    "Education",
-    "Consulting",
-    "Sales",
-    "Operations",
-    "HR",
-    "Manufacturing",
-    "Retail",
-    "Media",
-    "Legal",
-    "Real Estate",
-  ]
-
   const skills = [
-    "Leadership",
     "Product Management",
     "Software Engineering",
     "Data Science",
-    "UX/UI Design",
-    "Digital Marketing",
-    "Business Strategy",
-    "Project Management",
+  "UX Design",
+  "Marketing",
     "Sales",
-    "Customer Success",
-    "DevOps",
-    "Machine Learning",
-    "Analytics",
-    "Content Strategy",
-    "Brand Management",
+  "Finance",
     "Operations",
-  ]
+  "Strategy",
+  "Leadership"
+]
 
-  const languages = [
-    "English",
-    "Spanish",
-    "French",
-    "German",
-    "Chinese",
-    "Japanese",
-    "Portuguese",
-    "Italian",
-    "Russian",
-    "Arabic",
-    "Hindi",
+const locations = [
+  "San Francisco, CA",
+  "New York, NY", 
+  "Seattle, WA",
+  "Austin, TX",
+  "Boston, MA",
+  "Chicago, IL",
+  "Los Angeles, CA",
+  "Remote"
   ]
 
   const experienceLevels = [
     "Entry Level (0-2 years)",
-    "Mid Level (3-5 years)",
-    "Senior Level (6-10 years)",
-    "Executive Level (10+ years)",
-  ]
+  "Mid Level (3-7 years)", 
+  "Senior Level (8+ years)",
+  "Executive (15+ years)"
+]
 
-  const availabilityOptions = ["Available Today", "Available This Week", "Available Next Week", "Flexible Schedule"]
+const availability = [
+  "Available today",
+  "Available this week",
+  "Available next week"
+]
 
-  const sortOptions = [
-    { value: "relevance", label: "Relevance" },
-    { value: "price-low", label: "Price: Low to High" },
-    { value: "price-high", label: "Price: High to Low" },
-    { value: "rating", label: "Highest Rated" },
-    { value: "experience", label: "Most Experienced" },
-    { value: "reviews", label: "Most Reviews" },
-  ]
+export function MentorFilters() {
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([])
+  const [selectedExperience, setSelectedExperience] = useState<string[]>([])
+  const [selectedAvailability, setSelectedAvailability] = useState<string[]>([])
+  const [priceRange, setPriceRange] = useState<number[]>([50, 300])
+  const [rating, setRating] = useState<number>(0)
 
-  const clearAllFilters = () => {
-    setPriceRange([50, 200])
-    setSelectedIndustries([])
-    setSelectedSkills([])
-    setSelectedLanguages([])
-    setExperienceLevel([])
-    setAvailability([])
-    setVerifiedOnly(false)
-    setSortBy("relevance")
-  }
-
-  const getActiveFiltersCount = () => {
-    return (
-      selectedIndustries.length +
-      selectedSkills.length +
-      selectedLanguages.length +
-      experienceLevel.length +
-      availability.length +
-      (verifiedOnly ? 1 : 0)
+  const toggleSkill = (skill: string) => {
+    setSelectedSkills(prev => 
+      prev.includes(skill) 
+        ? prev.filter(s => s !== skill)
+        : [...prev, skill]
     )
   }
 
+  const toggleLocation = (location: string) => {
+    setSelectedLocations(prev => 
+      prev.includes(location) 
+        ? prev.filter(l => l !== location)
+        : [...prev, location]
+    )
+  }
+
+  const toggleExperience = (exp: string) => {
+    setSelectedExperience(prev => 
+      prev.includes(exp) 
+        ? prev.filter(e => e !== exp)
+        : [...prev, exp]
+    )
+  }
+
+  const toggleAvailability = (avail: string) => {
+    setSelectedAvailability(prev => 
+      prev.includes(avail) 
+        ? prev.filter(a => a !== avail)
+        : [...prev, avail]
+    )
+  }
+
+  const clearAllFilters = () => {
+    setSelectedSkills([])
+    setSelectedLocations([])
+    setSelectedExperience([])
+    setSelectedAvailability([])
+    setPriceRange([50, 300])
+    setRating(0)
+  }
+
+  const hasActiveFilters = selectedSkills.length > 0 || 
+    selectedLocations.length > 0 || 
+    selectedExperience.length > 0 || 
+    selectedAvailability.length > 0 || 
+    priceRange[0] !== 50 || 
+    priceRange[1] !== 300 || 
+    rating > 0
+
   return (
     <div className="space-y-6">
-      {/* Sort and Verified Toggle */}
-      <Card>
-        <CardHeader className="pb-4">
+      {/* Header */}
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters & Sort
-            </CardTitle>
-            {getActiveFiltersCount() > 0 && (
-              <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+        <h3 className="text-lg font-semibold">Filters</h3>
+        {hasActiveFilters && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={clearAllFilters}
+            className="text-blue-600 hover:text-blue-700"
+          >
                 <X className="h-4 w-4 mr-1" />
-                Clear All
+            Clear all
               </Button>
             )}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Sort By */}
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Sort By</Label>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
 
-          {/* Verified Mentors Only */}
-          <div className="flex items-center justify-between">
-            <Label htmlFor="verified" className="text-sm font-medium">
-              Verified Mentors Only
-            </Label>
-            <Switch id="verified" checked={verifiedOnly} onCheckedChange={setVerifiedOnly} />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Price Range */}
+      {/* Skills Filter */}
       <Card>
-        <CardHeader>
-          <CardTitle>Price Range (per hour)</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Skills & Expertise</CardTitle>
         </CardHeader>
-        <CardContent>
-          <Slider value={priceRange} onValueChange={setPriceRange} max={500} min={25} step={25} className="mb-4" />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}+</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Industries */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Industry</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {industries.map((industry) => (
-              <div key={industry} className="flex items-center space-x-2">
-                <Checkbox
-                  id={industry}
-                  checked={selectedIndustries.includes(industry)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedIndustries([...selectedIndustries, industry])
-                    } else {
-                      setSelectedIndustries(selectedIndustries.filter((i) => i !== industry))
-                    }
-                  }}
-                />
-                <label htmlFor={industry} className="text-sm cursor-pointer">
-                  {industry}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Skills */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Skills</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
+        <CardContent className="space-y-3">
+          <div className="flex flex-wrap gap-2">
             {skills.map((skill) => (
-              <div key={skill} className="flex items-center space-x-2">
+              <Badge
+                key={skill}
+                variant={selectedSkills.includes(skill) ? "default" : "outline"}
+                className={`cursor-pointer transition-colors ${
+                  selectedSkills.includes(skill)
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "hover:bg-blue-50 hover:border-blue-300"
+                }`}
+                onClick={() => toggleSkill(skill)}
+              >
+                {skill}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Location Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Location</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-2">
+            {locations.map((location) => (
+              <div key={location} className="flex items-center space-x-2">
                 <Checkbox
-                  id={skill}
-                  checked={selectedSkills.includes(skill)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedSkills([...selectedSkills, skill])
-                    } else {
-                      setSelectedSkills(selectedSkills.filter((s) => s !== skill))
-                    }
-                  }}
+                  id={location}
+                  checked={selectedLocations.includes(location)}
+                  onCheckedChange={() => toggleLocation(location)}
                 />
-                <label htmlFor={skill} className="text-sm cursor-pointer">
-                  {skill}
+                <label 
+                  htmlFor={location}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {location}
                 </label>
               </div>
             ))}
@@ -234,27 +172,24 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
         </CardContent>
       </Card>
 
-      {/* Experience Level */}
+      {/* Experience Level Filter */}
       <Card>
-        <CardHeader>
-          <CardTitle>Experience Level</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Experience Level</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
           <div className="space-y-2">
             {experienceLevels.map((level) => (
               <div key={level} className="flex items-center space-x-2">
                 <Checkbox
                   id={level}
-                  checked={experienceLevel.includes(level)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setExperienceLevel([...experienceLevel, level])
-                    } else {
-                      setExperienceLevel(experienceLevel.filter((l) => l !== level))
-                    }
-                  }}
+                  checked={selectedExperience.includes(level)}
+                  onCheckedChange={() => toggleExperience(level)}
                 />
-                <label htmlFor={level} className="text-sm cursor-pointer">
+                <label 
+                  htmlFor={level}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
                   {level}
                 </label>
               </div>
@@ -263,57 +198,68 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
         </CardContent>
       </Card>
 
-      {/* Languages */}
+      {/* Price Range Filter */}
       <Card>
-        <CardHeader>
-          <CardTitle>Languages</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Price Range (₹/hr)</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {languages.map((language) => (
-              <div key={language} className="flex items-center space-x-2">
-                <Checkbox
-                  id={language}
-                  checked={selectedLanguages.includes(language)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedLanguages([...selectedLanguages, language])
-                    } else {
-                      setSelectedLanguages(selectedLanguages.filter((l) => l !== language))
-                    }
-                  }}
-                />
-                <label htmlFor={language} className="text-sm cursor-pointer">
-                  {language}
-                </label>
+        <CardContent className="space-y-4">
+          <div className="px-2">
+            <Slider
+              value={priceRange}
+              onValueChange={setPriceRange}
+              max={500}
+              min={0}
+              step={10}
+              className="w-full"
+            />
               </div>
-            ))}
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>₹{priceRange[0]}</span>
+            <span>₹{priceRange[1]}</span>
           </div>
         </CardContent>
       </Card>
 
-      {/* Availability */}
+      {/* Rating Filter */}
       <Card>
-        <CardHeader>
-          <CardTitle>Availability</CardTitle>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Minimum Rating</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
+          <Select value={rating.toString()} onValueChange={(value) => setRating(Number(value))}>
+            <SelectTrigger>
+              <SelectValue placeholder="Any rating" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="0">Any rating</SelectItem>
+              <SelectItem value="3">3+ stars</SelectItem>
+              <SelectItem value="4">4+ stars</SelectItem>
+              <SelectItem value="4.5">4.5+ stars</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Availability Filter */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium">Availability</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
           <div className="space-y-2">
-            {availabilityOptions.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
+            {availability.map((avail) => (
+              <div key={avail} className="flex items-center space-x-2">
                 <Checkbox
-                  id={option}
-                  checked={availability.includes(option)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setAvailability([...availability, option])
-                    } else {
-                      setAvailability(availability.filter((a) => a !== option))
-                    }
-                  }}
+                  id={avail}
+                  checked={selectedAvailability.includes(avail)}
+                  onCheckedChange={() => toggleAvailability(avail)}
                 />
-                <label htmlFor={option} className="text-sm cursor-pointer">
-                  {option}
+                <label 
+                  htmlFor={avail}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
+                  {avail}
                 </label>
               </div>
             ))}
@@ -322,37 +268,42 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </Card>
 
       {/* Active Filters Summary */}
-      {getActiveFiltersCount() > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Filters ({getActiveFiltersCount()})</CardTitle>
-          </CardHeader>
-          <CardContent>
+      {hasActiveFilters && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2 mb-2">
+              <Filter className="h-4 w-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-900">Active Filters</span>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {selectedIndustries.map((industry) => (
-                <Badge key={industry} variant="secondary" className="text-xs">
-                  {industry}
-                  <X
-                    className="h-3 w-3 ml-1 cursor-pointer"
-                    onClick={() => setSelectedIndustries(selectedIndustries.filter((i) => i !== industry))}
-                  />
-                </Badge>
-              ))}
-              {selectedSkills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="text-xs">
+              {selectedSkills.map(skill => (
+                <Badge key={skill} variant="secondary" className="bg-blue-100 text-blue-800">
                   {skill}
-                  <X
-                    className="h-3 w-3 ml-1 cursor-pointer"
-                    onClick={() => setSelectedSkills(selectedSkills.filter((s) => s !== skill))}
-                  />
                 </Badge>
               ))}
-              {verifiedOnly && (
-                <Badge variant="secondary" className="text-xs">
-                  Verified Only
-                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setVerifiedOnly(false)} />
+              {selectedLocations.map(location => (
+                <Badge key={location} variant="secondary" className="bg-blue-100 text-blue-800">
+                  {location}
+                </Badge>
+              ))}
+              {selectedExperience.map(exp => (
+                <Badge key={exp} variant="secondary" className="bg-blue-100 text-blue-800">
+                  {exp}
+                </Badge>
+              ))}
+              {selectedAvailability.map(avail => (
+                <Badge key={avail} variant="secondary" className="bg-blue-100 text-blue-800">
+                  {avail}
+                </Badge>
+              ))}
+              {rating > 0 && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  {rating}+ stars
                 </Badge>
               )}
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                ₹{priceRange[0]}-{priceRange[1]}/hr
+              </Badge>
             </div>
           </CardContent>
         </Card>

@@ -11,24 +11,24 @@ import Link from "next/link"
 const mentors = [
   {
     id: 1,
-    name: "Sarah Johnson",
-    title: "Senior Product Manager",
-    company: "Google",
+    name: "Michael Chen",
+    title: "Engineering Manager",
+    company: "Meta",
     image: "/placeholder.svg?height=120&width=120",
-    rating: 4.9,
-    reviews: 127,
-    location: "San Francisco, CA",
-    expertise: ["Product Management", "Strategy", "Leadership", "Analytics", "Growth Hacking"],
-    price: 150,
-    mentees: 45,
-    experience: "8+ years",
-    bio: "Passionate about helping product managers scale their impact and advance their careers through data-driven strategies.",
+    rating: 4.8,
+    reviews: 110,
+    location: "Seattle, WA",
+    expertise: ["Engineering Management", "System Design", "Node.js"],
+    price: 120,
+    mentees: 32,
+    experience: "10+ years",
+    bio: "I'm an Engineering Manager at Meta with over 10 years of experience in building scalable systems and leading engineering teams.",
     availability: "Available this week",
     verified: true,
     recentlyActive: true,
-    languages: ["English", "Spanish"],
-    responseTime: "< 2 hours",
-    successRate: 98,
+    languages: ["English", "Chinese"],
+    responseTime: "< 4 hours",
+    successRate: 95,
     badge: "Top Mentor",
   },
   {
@@ -283,92 +283,83 @@ export function MentorGrid({ searchQuery }: MentorGridProps) {
             onMouseLeave={() => setHoveredMentor(null)}
           >
             <CardContent className="p-6">
-              <div className="text-center space-y-4">
-                {/* Profile Image */}
-                <div className="relative mx-auto">
-                  <Avatar className="w-24 h-24 mx-auto">
-                    <AvatarImage src={mentor.image || "/placeholder.svg"} alt={mentor.name} />
-                    <AvatarFallback className="text-lg">
-                      {mentor.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  {mentor.recentlyActive && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full" />
-                  )}
-
-                  {/* Favorite Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleFavorite(mentor.id)
-                    }}
-                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white shadow-md hover:shadow-lg"
-                  >
-                    <Heart
-                      className={`h-4 w-4 ${
-                        favorites.includes(mentor.id) ? "fill-red-500 text-red-500" : "text-gray-400"
-                      }`}
-                    />
-                  </Button>
-                </div>
-
-                {/* Badge */}
-                <div className="flex justify-center">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    <Award className="h-3 w-3 mr-1" />
-                    {mentor.badge}
-                  </Badge>
-                </div>
-
-                {/* Name and Title */}
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <h3 className="font-bold text-xl text-gray-900">{mentor.name}</h3>
-                    {mentor.verified && <Verified className="h-5 w-5 text-blue-500" />}
+              <div className="space-y-4">
+                {/* Header with Image and Basic Info */}
+                <div className="flex items-start space-x-4">
+                  {/* Profile Image */}
+                  <div className="relative">
+                    <Avatar className="w-16 h-16">
+                      <AvatarImage src={mentor.image || "/placeholder.svg"} alt={mentor.name} />
+                      <AvatarFallback className="text-lg">
+                        {mentor.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {mentor.verified && (
+                      <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <Verified className="h-3 w-3 text-white" />
+                      </div>
+                    )}
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>
-                  <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
+
+                  {/* Basic Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-lg text-gray-900 truncate">{mentor.name}</h3>
+                        <p className="text-sm text-gray-600 truncate">{mentor.title}</p>
+                        <p className="text-sm font-medium text-blue-600 truncate">{mentor.company}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleFavorite(mentor.id)
+                        }}
+                        className="p-1"
+                      >
+                        <Heart
+                          className={`h-4 w-4 ${
+                            favorites.includes(mentor.id) ? "fill-red-500 text-red-500" : "text-gray-400"
+                          }`}
+                        />
+                      </Button>
+                    </div>
+
+                    {/* Rating and Quick Stats */}
+                    <div className="flex items-center space-x-3 mt-2 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span className="font-medium">{mentor.rating}</span>
+                        <span>({mentor.reviews})</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-4 w-4" />
+                        <span>{mentor.mentees}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Rating and Stats */}
-                <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
+                {/* Location and Experience */}
+                <div className="flex items-center justify-between text-sm text-gray-600">
                   <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{mentor.rating}</span>
-                    <span>({mentor.reviews})</span>
+                    <MapPin className="h-4 w-4" />
+                    <span>{mentor.location}</span>
                   </div>
                   <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4" />
-                    <span>{mentor.mentees} mentees</span>
+                    <Clock className="h-4 w-4" />
+                    <span>{mentor.experience}</span>
                   </div>
-                </div>
-
-                {/* Location */}
-                <div className="flex items-center justify-center space-x-1 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{mentor.location}</span>
-                </div>
-
-                {/* Bio with hover expansion */}
-                <div>
-                  <p
-                    className={`text-sm text-gray-700 transition-all duration-300 ${
-                      hoveredMentor === mentor.id ? "line-clamp-none" : "line-clamp-2"
-                    }`}
-                  >
-                    {mentor.bio}
-                  </p>
                 </div>
 
                 {/* Skills */}
-                <div className="flex flex-wrap justify-center gap-1">
+                <div className="flex flex-wrap gap-1">
                   {mentor.expertise.slice(0, 3).map((skill) => (
-                    <Badge key={skill} variant="outline" className="text-xs">
+                    <Badge key={skill} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                       {skill}
                     </Badge>
                   ))}
@@ -379,46 +370,29 @@ export function MentorGrid({ searchQuery }: MentorGridProps) {
                   )}
                 </div>
 
-                {/* Additional Info */}
-                <div className="flex items-center justify-center space-x-3 text-xs text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{mentor.responseTime}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <MessageCircle className="h-3 w-3" />
-                    <span>{mentor.successRate}% success</span>
-                  </div>
+                {/* Bio */}
+                <div>
+                  <p className="text-sm text-gray-700 line-clamp-2">
+                    {mentor.bio}
+                  </p>
                 </div>
 
-                {/* Price and Availability */}
-                <div className="text-center">
-                  <div className="font-bold text-2xl text-gray-900">${mentor.price}/hr</div>
-                  <div
-                    className={`text-sm ${
-                      mentor.availability.includes("today")
-                        ? "text-green-600"
-                        : mentor.availability.includes("week")
-                          ? "text-blue-600"
-                          : "text-gray-600"
-                    }`}
-                  >
-                    {mentor.availability}
+                {/* Price and Action */}
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <div>
+                    <div className="font-bold text-xl text-gray-900">₹{mentor.price}/hr</div>
+                    <div className="text-xs text-gray-500">{mentor.availability}</div>
                   </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex space-x-2">
-                  <Button asChild className="flex-1" size="sm">
-                    <Link href={`/mentors/${mentor.id}`}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="flex-1 bg-transparent" size="sm">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Book Now
-                  </Button>
+                  <div className="flex space-x-2">
+                    <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700">
+                      <Link href={`/mentors/${mentor.id}`}>
+                        View
+                      </Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="bg-transparent">
+                      Book
+                    </Button>
+                  </div>
                 </div>
               </div>
             </CardContent>

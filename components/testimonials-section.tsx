@@ -1,170 +1,284 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Star, Quote } from "lucide-react"
 import { useState, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Star, ChevronLeft, ChevronRight } from "lucide-react"
 
-const testimonials = [
+interface Testimonial {
+  id: string
+  menteeName: string
+  menteeImage: string
+  menteeRole: string
+  menteeCompany: string
+  rating: number
+  review: string
+  date: string
+  sessionType: string
+}
+
+interface TestimonialsSectionProps {
+  testimonials?: Testimonial[]
+  autoRotate?: boolean
+  showControls?: boolean
+}
+
+const defaultTestimonials: Testimonial[] = [
   {
-    id: 1,
-    name: "Alex Thompson",
-    role: "Software Engineer",
-    company: "Stripe",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "The mentorship I received through Unusual Consultant was game-changing. My mentor helped me navigate a career transition from frontend to full-stack development.",
+    id: "1",
+    menteeName: "Cion Reyes",
+    menteeImage: "/placeholder.svg?height=60&width=60",
+    menteeRole: "Software Engineer",
+    menteeCompany: "Tech Corp",
     rating: 5,
-    industry: "Technology",
+    review: "Great session overall. He helped me understand system design concepts better.",
+    date: "2 days ago",
+    sessionType: "System Design Review"
   },
   {
-    id: 2,
-    name: "Maria Garcia",
-    role: "Marketing Manager",
-    company: "HubSpot",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "I was able to increase my salary by 40% after working with my mentor on negotiation strategies and leadership skills. Highly recommend!",
-    rating: 5,
-    industry: "Marketing",
+    id: "2",
+    menteeName: "Shreyas",
+    menteeImage: "/placeholder.svg?height=60&width=60", 
+    menteeRole: "Product Manager",
+    menteeCompany: "Startup Inc",
+    rating: 4.5,
+    review: "Excellent communication and guidance throughout the session. I appreciated how structured and thoughtful the approach was.",
+    date: "1 week ago",
+    sessionType: "Career Strategy Call"
   },
   {
-    id: 3,
-    name: "James Wilson",
-    role: "Product Designer",
-    company: "Figma",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "The design mentorship program helped me build a portfolio that landed me my dream job. The feedback was invaluable.",
-    rating: 5,
-    industry: "Design",
+    id: "3",
+    menteeName: "Smith Moron",
+    menteeImage: "/placeholder.svg?height=60&width=60",
+    menteeRole: "Engineering Manager", 
+    menteeCompany: "Big Tech",
+    rating: 4.5,
+    review: "Felt heard and encouraged. The advice was actionable, and I now have a clear roadmap to follow.",
+    date: "2 weeks ago",
+    sessionType: "Leadership Coaching"
   },
   {
-    id: 4,
-    name: "Priya Patel",
-    role: "Data Scientist",
-    company: "Airbnb",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "My mentor guided me through complex machine learning projects and helped me develop the confidence to lead data initiatives.",
+    id: "4",
+    menteeName: "Sarah Johnson",
+    menteeImage: "/placeholder.svg?height=60&width=60",
+    menteeRole: "UX Designer",
+    menteeCompany: "Design Studio",
     rating: 5,
-    industry: "Data Science",
+    review: "Amazing mentor! The session was incredibly valuable and I learned so much about product strategy.",
+    date: "3 days ago",
+    sessionType: "Product Strategy"
   },
   {
-    id: 5,
-    name: "Robert Chen",
-    role: "Finance Director",
-    company: "Goldman Sachs",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "The financial modeling expertise I gained through mentorship was crucial for my promotion to director level.",
-    rating: 5,
-    industry: "Finance",
-  },
-  {
-    id: 6,
-    name: "Lisa Johnson",
-    role: "HR Manager",
-    company: "Microsoft",
-    image: "/placeholder.svg?height=80&width=80",
-    content:
-      "Learning about organizational psychology and change management from my mentor transformed how I approach HR challenges.",
-    rating: 5,
-    industry: "Human Resources",
-  },
+    id: "5",
+    menteeName: "Alex Chen",
+    menteeImage: "/placeholder.svg?height=60&width=60",
+    menteeRole: "Data Scientist",
+    menteeCompany: "Analytics Co",
+    rating: 4.8,
+    review: "Very knowledgeable and patient. Helped me understand complex technical concepts with real-world examples.",
+    date: "1 week ago",
+    sessionType: "Technical Interview Prep"
+  }
 ]
 
-export function TestimonialsSection() {
+export function TestimonialsSection({ 
+  testimonials = defaultTestimonials, 
+  autoRotate = true,
+  showControls = true 
+}: TestimonialsSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(testimonials.length / 3))
-    }, 5000)
-    return () => clearInterval(timer)
+    setIsClient(true)
   }, [])
 
-  const getVisibleTestimonials = () => {
-    const startIndex = currentIndex * 3
-    return testimonials.slice(startIndex, startIndex + 3)
+  useEffect(() => {
+    if (!isClient || !autoRotate || testimonials.length <= 1) return
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [isClient, autoRotate, testimonials.length])
+
+  const nextTestimonial = () => {
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length)
   }
 
+  const prevTestimonial = () => {
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)
+  }
+
+  const goToTestimonial = (index: number) => {
+    setCurrentIndex(index)
+  }
+
+  if (!isClient) {
+    return (
+      <div className="w-full">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4" />
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-1/2" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const currentTestimonial = testimonials[currentIndex]
+
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-50 to-blue-100">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Success Stories</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Hear from professionals who transformed their careers with our mentorship platform
+    <div className="w-full">
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex items-start space-x-4">
+            {/* Avatar */}
+            <Avatar className="w-12 h-12 flex-shrink-0">
+              <AvatarImage src={currentTestimonial.menteeImage} alt={currentTestimonial.menteeName} />
+              <AvatarFallback>
+                {currentTestimonial.menteeName
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
+            </Avatar>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {/* Header */}
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h4 className="font-semibold text-gray-900">{currentTestimonial.menteeName}</h4>
+                  <p className="text-sm text-gray-600">
+                    {currentTestimonial.menteeRole} at {currentTestimonial.menteeCompany}
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          {getVisibleTestimonials().map((testimonial) => (
-            <Card key={testimonial.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Quote className="h-8 w-8 text-blue-500 mr-2" />
-                  <div className="flex">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
+                <div className="flex items-center space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-4 w-4 ${
+                        i < Math.floor(currentTestimonial.rating)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
+                    />
+                  ))}
+                  <span className="ml-1 text-sm text-gray-600">{currentTestimonial.rating}</span>
                   </div>
                 </div>
 
-                <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.content}"</p>
+              {/* Review */}
+              <blockquote className="text-gray-700 mb-3 italic">
+                "{currentTestimonial.review}"
+              </blockquote>
 
-                <div className="flex items-center">
-                  <img
-                    src={testimonial.image || "/placeholder.svg"}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4 object-cover"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                    <p className="text-sm font-medium text-blue-600">{testimonial.company}</p>
+              {/* Footer */}
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>{currentTestimonial.sessionType}</span>
+                <span>{currentTestimonial.date}</span>
+              </div>
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    {testimonial.industry}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Controls */}
+          {showControls && testimonials.length > 1 && (
+            <div className="flex items-center justify-between mt-6 pt-4 border-t">
+              {/* Navigation Buttons */}
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={prevTestimonial}
+                  className="w-8 h-8 p-0 rounded-full"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={nextTestimonial}
+                  className="w-8 h-8 p-0 rounded-full"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
         </div>
 
-        {/* Pagination dots */}
-        <div className="flex justify-center space-x-2">
-          {Array.from({ length: Math.ceil(testimonials.length / 3) }).map((_, index) => (
+              {/* Dots Indicator */}
+              <div className="flex items-center space-x-1">
+                {testimonials.map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                index === currentIndex ? "bg-blue-600" : "bg-gray-300"
-              }`}
+                    onClick={() => goToTestimonial(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentIndex
+                        ? "bg-blue-500 w-6"
+                        : "bg-gray-300 hover:bg-gray-400"
+                    }`}
+                    aria-label={`Go to testimonial ${index + 1}`}
             />
           ))}
         </div>
 
-        {/* Overall stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">4.9/5</div>
-            <div className="text-gray-600">Average Rating</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
-            <div className="text-gray-600">Success Stories</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
-            <div className="text-gray-600">Would Recommend</div>
+              {/* Testimonial Counter */}
+              <div className="text-sm text-gray-500">
+                {currentIndex + 1} of {testimonials.length}
           </div>
         </div>
+          )}
+        </CardContent>
+      </Card>
       </div>
-    </section>
+  )
+}
+
+// Compact version for sidebars
+export function TestimonialsCompact({ 
+  testimonials = defaultTestimonials.slice(0, 3)
+}: { testimonials?: Testimonial[] }) {
+  return (
+    <div className="space-y-4">
+      {testimonials.map((testimonial) => (
+        <div key={testimonial.id} className="flex items-start space-x-3">
+          <Avatar className="w-8 h-8 flex-shrink-0">
+            <AvatarImage src={testimonial.menteeImage} alt={testimonial.menteeName} />
+            <AvatarFallback className="text-xs">
+              {testimonial.menteeName
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-1 mb-1">
+              <span className="font-medium text-sm text-gray-900">{testimonial.menteeName}</span>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-3 w-3 ${
+                      i < Math.floor(testimonial.rating)
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+            <p className="text-sm text-gray-700 line-clamp-2">"{testimonial.review}"</p>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
