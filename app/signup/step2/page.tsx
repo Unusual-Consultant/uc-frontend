@@ -58,7 +58,7 @@ export default function SignupStep2() {
       console.log("🔍 Fetching signup options from API...")
   
       // Use mentee signup options for both mentee and mentor (they share the same data)
-      const response = await fetch("http://localhost:8000/api/v1/mentee/signup/options", {
+      const response = await fetch("http://localhost:8000/api/v1/mentees/signup/options", {
         headers: { "Content-Type": "application/json" }
       })
       console.log("📡 API Response status:", response.status)
@@ -199,70 +199,89 @@ export default function SignupStep2() {
   }
 
   const handleContinue = async () => {
-    if (!selectedCareerGoal && !customGoal.trim()) {
-      alert("Please select a career goal or enter a custom one")
-      return
-    }
-    if (selectedInterests.length === 0 && !customInterest.trim()) {
-      alert("Please select at least one interest")
-      return
-    }
-    if (selectedLanguages.length === 0) {
-      alert("Please select at least one language")
-      return
-    }
-    if (!selectedCareerStage) {
-      alert("Please select your current career stage")
-      return
-    }
-
-    const selections = {
-      email: email,
-      user_type: userType,
-      career_goal:  selectedCareerGoal && options?.career_goals
-      ? options.career_goals.find(g => g.id === selectedCareerGoal)?.name || customGoal
-      : customGoal,
-      interests: selectedInterests,
-      languages: selectedLanguages,
-      career_stage: selectedCareerStage,
-      custom_interest: customInterest
-    }
-
-    try {
-      setIsLoading(true)
-      // Use different endpoints for mentee vs mentor
-      const endpoint = userType === "mentee" 
-        ? `http://localhost:8000/api/v1/${userType}/signup/step2`
-        : `http://localhost:8000/api/v1/${userType}/onboarding/step2`
-      
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(selections)
-      })
-      
-      if (!response.ok) {
-        throw new Error("Failed to save data")
-      }
-      
-      const result = await response.json()
-      console.log("Step 2 data saved:", result)
-      
-      // Store user data for step 3
-      if (typeof window !== "undefined") {
-        localStorage.setItem(`${userType}_onboarding_data`, JSON.stringify(selections))
-        localStorage.setItem("user_id", result.user_id)
-      }
-      
-      // Redirect to step 3
-      router.push(`/signup/step3?email=${encodeURIComponent(email)}&userType=${userType}`)
-    } catch (error) {
-      console.error("Error saving step 2 data:", error)
-      alert("Failed to save data. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
+  // --- Validation ---
+  if (!selectedCareerGoal && !customGoal.trim()) {
+    alert("Please select a career goal or enter a custom one")
+    return
   }
+  if (selectedInterests.length === 0 && !customInterest.trim()) {
+    alert("Please select at least one interest")
+    return
+  }
+  if (selectedLanguages.length === 0) {
+    alert("Please select at least one language")
+    return
+  }
+  if (!selectedCareerStage) {
+    alert("Please select your current career stage")
+    return
+  }
+
+  // --- Prepare payload ---
+  const payload = {
+    email,
+    user_type: userType, // "mentee"
+    career_goal:
+      selectedCareerGoal != null
+        ? options?.career_goals.find((g) => g.id === selectedCareerGoal)?.name ||
+          customGoal.trim()
+        : customGoal.trim(),
+    interests: [
+      ...selectedInterests.map((id) => id.toString()), // UUID strings expected
+      ...(customInterest.trim() ? [customInterest.trim()] : []),
+    ],
+    languages: selectedLanguages.map((id) => id.toString()),
+    career_stage: selectedCareerStage?.toString() || null,
+    custom_interest: customInterest.trim(),
+  }
+
+  try {
+    setIsLoading(true)
+
+    // --- Correct endpoint for mentee onboarding ---
+    const endpoint = "http://localhost:8000/api/v1/mentees/signup/step2"
+
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error("❌ Failed to save step 2:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        payload: payload
+      })
+      alert(`Failed to save data: ${response.status} - ${errorText}. Please try again.`)
+      return
+    }
+
+    const result = await response.json()
+    console.log("Step 2 saved:", result)
+
+    // --- Save localStorage for next step ---
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`${userType}_onboarding_data`, JSON.stringify(payload))
+      localStorage.setItem("user_id", result.user_id)
+    }
+
+    // --- Redirect to step 3 ---
+    router.push(`/signup/step3?email=${encodeURIComponent(email)}&userType=${userType}`)
+  } catch (err) {
+    console.error("❌ Error saving step 2 data:", {
+      error: err,
+      payload: payload,
+      endpoint: endpoint
+    })
+    alert(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`)
+  } finally {
+    setIsLoading(false)
+  }
+}
+
 
   if (isLoading) {
     return (
