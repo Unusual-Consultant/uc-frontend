@@ -1,82 +1,146 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-import { UploadCloud, FileText } from "lucide-react"
+import { FileText, Loader2 } from "lucide-react"
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
 import UploadBox from "../components/uploadbox"
 import AnalysisResults from "../components/analysis_results"
 
-// mock data
-const resumeText = `John Doe
-john.doe@email.com | (123) 456-7890 | LinkedIn.com/in/johndoe
+// API Configuration
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1/resume-analysis"
 
-Summary
-Highly motivated and results-oriented professional with 5 years of experience in Product Management. 
-Proven ability to lead cross-functional teams and drive product strategy. Seeking to leverage expertise 
-in SaaS and agile methodologies to contribute to a dynamic tech company.
+// Types for API responses
+interface AnalysisResponse {
+  match_score: number
+  matched_keywords: string[]
+  missing_keywords: string[]
+  ai_insights: string[]
+  analysis_timestamp: string
+  resume_length: number
+  job_description_length: number
+  resume_text: string
+}
 
-Experience
-Senior Product Manager | Tech Solutions Inc. | San Francisco, CA Jan 2022 – Present
-• Led product roadmap for flagship SaaS platform, increasing user engagement by 20%.
-• Managed a team of 5 engineers and 2 designers, fostering an agile development environment.
-• Conducted market research and competitive analysis to identify new product opportunities.
-
-Product Manager | Innovate Corp. | San Francisco, CA Mar 2019 – Dec 2021
-• Launched 3 new features, resulting in a 15% increase in customer satisfaction.
-• Collaborated with sales and marketing to develop go-to-market strategies.
-• Analyzed user data to inform product decisions and prioritize backlog.
-
-Education
-MBA | University of California, Berkeley | 2019
-B.S. Computer Science | Stanford University | 2015
-
-Skills
-Product Management, Agile, Scrum, SaaS, Market Research, User Stories, JIRA, Confluence, SQL, 
-Data Analysis, Cross-functional Leadership, Go-to-Market Strategy.`
-
-const highlightWords = ["Product", "SaaS", "agile", "Management", "market", "user"]
-
-const missingKeywords = [
-  "A/B Testing",
-  "Customer Retention",
-  "Cloud Deployment",
-  "Data Visualization",
-  "OKRs",
-]
-
-const aiInsights = [
-  "Emphasize quantifiable results in bullet points (e.g., 'Improved conversion by 25%').",
-  "Add more measurable KPIs to show business impact.",
-  "Include leadership and communication keywords to strengthen profile.",
-]
+interface UsageResponse {
+  gemini_requests: number
+  openai_requests: number
+  gemini_limit: number
+  openai_limit: number
+}
 
 export default function AIResumeAnalyzer() {
-  const [totalUses] = useState(5)
-  const [usesRemaining, setUsesRemaining] = useState(5)
+  // State management
+  const [totalUses, setTotalUses] = useState(15) // Gemini limit
+  const [usesRemaining, setUsesRemaining] = useState(15)
   const [analysisTriggered, setAnalysisTriggered] = useState(false)
   const [jobDescription, setJobDescription] = useState("")
-  const [matchScore, setMatchScore] = useState(78)
   const [dragActive, setDragActive] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  
+  // Analysis results state
+  const [analysisResults, setAnalysisResults] = useState<AnalysisResponse | null>(null)
+  const [resumeText, setResumeText] = useState("")
+  
+  // File refs
+  const resumeFileRef = useRef<HTMLInputElement | null>(null)
+  const jobDescFileRef = useRef<HTMLInputElement | null>(null)
+  
+  // Selected files
+  const [selectedResumeFile, setSelectedResumeFile] = useState<File | null>(null)
+  const [selectedJobDescFile, setSelectedJobDescFile] = useState<File | null>(null)
 
-  const handleStart = () => {
-    if (usesRemaining > 0) setUsesRemaining((prev) => prev - 1)
+  // Fetch usage stats on component mount
+  useEffect(() => {
+    fetchUsageStats()
+  }, [])
+
+  // API Functions
+  const fetchUsageStats = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/usage`)
+      if (!response.ok) throw new Error('Failed to fetch usage stats')
+      const data: UsageResponse = await response.json()
+      setUsesRemaining(data.gemini_limit - data.gemini_requests)
+      setTotalUses(data.gemini_limit)
+    } catch (error) {
+      console.error('Error fetching usage stats:', error)
+    }
   }
 
-  const handleAnalyze = () => {
-    setAnalysisTriggered(true)
-    setMatchScore(Math.floor(Math.random() * 21) + 70) // random 70–90
+  const analyzeResume = async () => {
+    if (!selectedResumeFile) {
+      setError("Please upload a resume file")
+      return
+    }
+
+    if (!jobDescription.trim() && !selectedJobDescFile) {
+      setError("Please provide a job description or upload a job description file")
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('resume_file', selectedResumeFile)
+      
+      if (jobDescription.trim()) {
+        formData.append('job_description', jobDescription)
+      }
+      
+      if (selectedJobDescFile) {
+        formData.append('job_description_file', selectedJobDescFile)
+      }
+
+      const response = await fetch(`${API_BASE_URL}/analyze`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Analysis failed')
+      }
+
+      const data: AnalysisResponse = await response.json()
+      setAnalysisResults(data)
+      setResumeText(data.resume_text) // Use resume text from backend
+      setAnalysisTriggered(true)
+      
+      // Update usage stats
+      await fetchUsageStats()
+      
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred during analysis')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const openFileDialog = () => fileInputRef.current?.click()
+  // File handling functions
+  const openResumeFileDialog = () => resumeFileRef.current?.click()
+  const openJobDescFileDialog = () => jobDescFileRef.current?.click()
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) console.log("File selected:", e.target.files[0].name)
+  const handleResumeFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedResumeFile(file)
+      setError(null)
+    }
+  }
+
+  const handleJobDescFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedJobDescFile(file)
+      setError(null)
+    }
   }
 
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
@@ -86,17 +150,26 @@ export default function AIResumeAnalyzer() {
     else if (e.type === "dragleave") setDragActive(false)
   }
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, type: 'resume' | 'jobdesc') => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
-    if (e.dataTransfer.files?.[0]) console.log("File dropped:", e.dataTransfer.files[0].name)
+    
+    const file = e.dataTransfer.files?.[0]
+    if (file) {
+      if (type === 'resume') {
+        setSelectedResumeFile(file)
+      } else {
+        setSelectedJobDescFile(file)
+      }
+      setError(null)
+    }
   }
 
   // highlight keywords
-  const highlightText = (text: string) => {
-    const regex = new RegExp(`\\b(${highlightWords.join("|")})\\b`, "gi")
-    return text.replace(regex, (match) => `<span class="bg-yellow-200 font-semibold">${match}</span>`)
+  const highlightText = (text: string, keywords: string[]) => {
+    const regex = new RegExp(`\\b(${keywords.join("|")})\\b`, "gi")
+    return text.replace(regex, (match) => `<span class="bg-green-200 font-semibold">${match}</span>`)
   }
 
   return (
@@ -113,7 +186,7 @@ export default function AIResumeAnalyzer() {
         </div>
 
         <Button
-          onClick={handleStart}
+          onClick={fetchUsageStats}
           className={cn(
             "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8 md:top-auto md:right-auto"
           )}
@@ -130,7 +203,7 @@ export default function AIResumeAnalyzer() {
     <div className="flex flex-col lg:flex-row gap-4">
 
       {/* ===== Resume Upload ===== */}
-      <div className="flex-[0.9] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[300px]">
+      <div className="flex-[0.9] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[350px]">
   <div className="flex items-center gap-2 mb-2">
     <Image
       src="/upload_Resume_icon.png"
@@ -145,16 +218,29 @@ export default function AIResumeAnalyzer() {
 
 <UploadBox
   dragActive={dragActive}
-  openFileDialog={openFileDialog}
+  openFileDialog={openResumeFileDialog}
   handleDrag={handleDrag}
-  handleFileChange={handleFileChange}
+  handleFileChange={handleResumeFileChange}
+  handleDrop={(e: React.DragEvent<HTMLDivElement>) => handleDrop(e, 'resume')}
   infoText={{ formats: "PDF, DOCX, TXT", maxSize: "5MB" }}
 />
+<input
+  ref={resumeFileRef}
+  type="file"
+  accept=".pdf,.docx,.txt"
+  onChange={handleResumeFileChange}
+  className="hidden"
+/>
+{selectedResumeFile && (
+  <div className="mt-2 text-sm text-green-600 font-medium">
+    Selected: {selectedResumeFile.name}
+  </div>
+)}
 
 </div>
 
       {/* ===== Job Description ===== */}
-      <div className="flex-[1.5] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[300px]">
+      <div className="flex-[1.5] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[350px]">
         <div className="flex items-center gap-2 mb-2">
           <Image
             src="/job_desc_icon.png"
@@ -186,39 +272,65 @@ export default function AIResumeAnalyzer() {
           </div>
 
           {/* Upload Box */}
-
+          <div className="w-full lg:w-2/5">
 <UploadBox
   dragActive={dragActive}
-  openFileDialog={openFileDialog}
+  openFileDialog={openJobDescFileDialog}
   handleDrag={handleDrag}
-  handleFileChange={handleFileChange}
+  handleFileChange={handleJobDescFileChange}
+  handleDrop={(e: React.DragEvent<HTMLDivElement>) => handleDrop(e, 'jobdesc')}
   infoText={{ formats: "PDF, DOCX, TXT", maxSize: "5MB" }}
 />
+<input
+  ref={jobDescFileRef}
+  type="file"
+  accept=".pdf,.docx,.txt"
+  onChange={handleJobDescFileChange}
+  className="hidden"
+/>
+{selectedJobDescFile && (
+  <div className="mt-2 text-sm text-green-600 font-medium">
+    Selected: {selectedJobDescFile.name}
+  </div>
+)}
+</div>
 </div>
       </div>
     </div>
 
+    {/* Error Message */}
+    {error && (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <p className="text-red-600 text-sm">{error}</p>
+      </div>
+    )}
+
     {/* Analyze Button */}
     <div className="flex justify-end pt-6">
       <Button
-        onClick={handleAnalyze}
-        className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px]"
+        onClick={analyzeResume}
+        disabled={isLoading || (!selectedResumeFile && !jobDescription.trim())}
+        className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <FileText className="w-5 h-5" />
-        Analyze Resume
+        {isLoading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : (
+          <FileText className="w-5 h-5" />
+        )}
+        {isLoading ? "Analyzing..." : "Analyze Resume"}
       </Button>
     </div>
   </CardContent>
 </Card>
 
       {/* ===== ANALYSIS RESULTS ===== */}
-{analysisTriggered && (
+{analysisTriggered && analysisResults && (
   <AnalysisResults
-    resumeText={resumeText}
-    highlightWords={highlightWords}
-    missingKeywords={missingKeywords}
-    aiInsights={aiInsights}
-    matchScore={matchScore}
+    resumeText={analysisResults.resume_text}
+    highlightWords={analysisResults.matched_keywords}
+    missingKeywords={analysisResults.missing_keywords}
+    aiInsights={analysisResults.ai_insights}
+    matchScore={analysisResults.match_score}
   />
 )}
 

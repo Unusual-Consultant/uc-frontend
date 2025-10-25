@@ -7,6 +7,7 @@ interface UploadBoxProps {
   openFileDialog: any;
   handleDrag: any;
   handleFileChange: any;
+  handleDrop?: any;
   labelText?: string; // <-- make optional
   infoText?: { formats: string; maxSize: string };
 }
@@ -16,6 +17,7 @@ export default function UploadBox({
   openFileDialog,
   handleDrag,
   handleFileChange,
+  handleDrop,
   labelText,
   infoText = { formats: "PDF, DOCX, TXT", maxSize: "5MB" },
 }: UploadBoxProps) {
@@ -33,7 +35,7 @@ export default function UploadBox({
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
-        onDrop={handleDrag}
+        onDrop={handleDrop || handleDrag}
         className={cn(
           "flex flex-col items-center justify-center border-2 border-dashed rounded-xl bg-white p-5 text-center space-y-2 cursor-pointer transition w-full h-[180px]",
           dragActive ? "border-blue-400 bg-blue-50" : "border-gray-400"

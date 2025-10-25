@@ -21,7 +21,7 @@ export default function AnalysisResults({
   // highlight keywords
   const highlightText = (text: string) => {
     const regex = new RegExp(`\\b(${highlightWords.join("|")})\\b`, "gi")
-    return text.replace(regex, (match) => `<span class="bg-yellow-200 font-semibold">${match}</span>`)
+    return text.replace(regex, (match) => `<span class="bg-green-200 font-semibold">${match}</span>`)
   }
 
   return (
