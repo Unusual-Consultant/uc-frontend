@@ -134,15 +134,19 @@ export function StatsSection() {
       const monthlyResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/monthly?months=6")
       if (monthlyResponse.ok) {
         const monthlyData = await monthlyResponse.json()
+        console.log("Monthly data from API:", monthlyData)
         if (monthlyData.monthly_stats) {
           setMonthlyGrowth(monthlyData.monthly_stats)
         }
+      } else {
+        console.log("Monthly stats API failed, using fallback")
       }
 
       // Fetch KPIs
       const kpisResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/kpis")
       if (kpisResponse.ok) {
         const kpisData = await kpisResponse.json()
+        console.log("KPIs data from API:", kpisData)
         // Transform KPI data to match chart format
         const kpis = [
           {
@@ -159,15 +163,20 @@ export function StatsSection() {
           },
         ]
         setPerformanceKPIs(kpis)
+      } else {
+        console.log("KPIs API failed, using fallback")
       }
 
       // Fetch success metrics
       const successResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/success-metrics")
       if (successResponse.ok) {
         const successData = await successResponse.json()
+        console.log("Success metrics data from API:", successData)
         if (successData.metrics) {
           setSuccessMetrics(successData.metrics)
         }
+      } else {
+        console.log("Success metrics API failed, using fallback")
       }
     } catch (error) {
       console.error("Error fetching statistics:", error)
