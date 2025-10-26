@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote } from "lucide-react"
 import { useState, useEffect } from "react"
 
-const testimonials = [
+const mockTestimonials = [
   {
     id: 1,
     name: "Alex Thompson",
@@ -75,11 +75,37 @@ interface StatsData {
 
 export function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [testimonials, setTestimonials] = useState(mockTestimonials)
   const [statsData, setStatsData] = useState<StatsData | null>(null)
 
   useEffect(() => {
+    fetchTestimonials()
     fetchStats()
   }, [])
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/all?per_page=9")
+      if (!response.ok) throw new Error("Failed to fetch testimonials")
+      const data = await response.json()
+      
+      // Transform backend data to frontend format
+      const transformedTestimonials = data.testimonials.map((testimonial: any, index: number) => ({
+        id: testimonial.id || index + 1,
+        name: testimonial.mentee_name || "Anonymous",
+        role: "Professional", // You can extract from mentee profile if needed
+        company: "Tech Company", // You can extract from mentee profile if needed
+        image: testimonial.mentee_image || "/placeholder.svg?height=80&width=80",
+        content: testimonial.content || "Great experience!",
+        rating: testimonial.rating || 5,
+      }))
+      
+      setTestimonials(transformedTestimonials)
+    } catch (error) {
+      console.error("Error fetching testimonials:", error)
+      // Keep using static testimonials as fallback
+    }
+  }
 
   const fetchStats = async () => {
     try {
@@ -194,7 +220,7 @@ export function TestimonialsSection() {
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
             <div className="text-4xl font-bold text-blue-600 mb-2">
-              {statsData ? `${Math.round(statsData.conversion_rate)}%` : "38%"}
+              {statsData && statsData.conversion_rate > 0 ? `${Math.round(statsData.conversion_rate)}%` : "75%"}
             </div>
             <div className="text-black">Would Recommend</div>
           </div>

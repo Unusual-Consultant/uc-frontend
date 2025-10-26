@@ -13,7 +13,8 @@ import {
   Tooltip,
 } from "recharts"
 
-const monthlyGrowth = [
+// These will be replaced by API data
+const monthlyGrowthFallback = [
   { month: "Jan", clicks: 12500, sessions: 450, courses: 120, goals: 89 },
   { month: "Feb", clicks: 18600, sessions: 680, courses: 180, goals: 134 },
   { month: "Mar", clicks: 24200, sessions: 920, courses: 240, goals: 187 },
@@ -22,7 +23,7 @@ const monthlyGrowth = [
   { month: "Jun", clicks: 52000, sessions: 1950, courses: 520, goals: 389 },
 ]
 
-const performanceKPIs = [
+const performanceKPIsFallback = [
   {
     category: "User Engagement",
     "Mentor Response Rate": 96,
@@ -37,7 +38,7 @@ const performanceKPIs = [
   },
 ]
 
-const successMetrics = [
+const successMetricsFallback = [
   { metric: "Career Growth", percentage: 89 },
   { metric: "Skill Development", percentage: 94 },
   { metric: "Salary Increase", percentage: 76 },
@@ -66,6 +67,29 @@ const SafeTooltip = ({ active, payload, label }: any) => {
   )
 }
 
+interface MonthlyGrowth {
+  month: string
+  clicks: number
+  sessions: number
+  courses: number
+  goals: number
+}
+
+interface KPI {
+  category: string
+  "Mentor Response Rate"?: number
+  "Session Completion"?: number
+  "User Satisfaction"?: number
+  "Platform Uptime"?: number
+  "Course Completion"?: number
+  "Goal Achievement"?: number
+}
+
+interface SuccessMetric {
+  metric: string
+  percentage: number
+}
+
 interface StatsData {
   platform: {
     total_users: number
@@ -89,6 +113,9 @@ interface StatsData {
 
 export function StatsSection() {
   const [statsData, setStatsData] = useState<StatsData | null>(null)
+  const [monthlyGrowth, setMonthlyGrowth] = useState<MonthlyGrowth[]>(monthlyGrowthFallback)
+  const [performanceKPIs, setPerformanceKPIs] = useState<KPI[]>(performanceKPIsFallback)
+  const [successMetrics, setSuccessMetrics] = useState<SuccessMetric[]>(successMetricsFallback)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -97,10 +124,51 @@ export function StatsSection() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
-      if (!response.ok) throw new Error("Failed to fetch statistics")
-      const data = await response.json()
-      setStatsData(data)
+      // Fetch overview stats
+      const overviewResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      if (!overviewResponse.ok) throw new Error("Failed to fetch overview stats")
+      const overviewData = await overviewResponse.json()
+      setStatsData(overviewData)
+
+      // Fetch monthly growth
+      const monthlyResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/monthly?months=6")
+      if (monthlyResponse.ok) {
+        const monthlyData = await monthlyResponse.json()
+        if (monthlyData.monthly_stats) {
+          setMonthlyGrowth(monthlyData.monthly_stats)
+        }
+      }
+
+      // Fetch KPIs
+      const kpisResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/kpis")
+      if (kpisResponse.ok) {
+        const kpisData = await kpisResponse.json()
+        // Transform KPI data to match chart format
+        const kpis = [
+          {
+            category: "User Engagement",
+            "Mentor Response Rate": kpisData.user_engagement?.mentor_response_rate || 96,
+            "Session Completion": kpisData.user_engagement?.session_completion || 94,
+            "User Satisfaction": kpisData.user_engagement?.user_satisfaction || 92,
+          },
+          {
+            category: "Platform Performance",
+            "Platform Uptime": kpisData.platform_performance?.platform_uptime || 99.9,
+            "Course Completion": kpisData.platform_performance?.course_completion || 87,
+            "Goal Achievement": kpisData.platform_performance?.goal_achievement || 89,
+          },
+        ]
+        setPerformanceKPIs(kpis)
+      }
+
+      // Fetch success metrics
+      const successResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/success-metrics")
+      if (successResponse.ok) {
+        const successData = await successResponse.json()
+        if (successData.metrics) {
+          setSuccessMetrics(successData.metrics)
+        }
+      }
     } catch (error) {
       console.error("Error fetching statistics:", error)
     } finally {

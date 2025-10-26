@@ -7,7 +7,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 
-const industries = [
+const industriesFallback = [
   {
     name: "Technology",
     image: "/industries/technology.jpg",
@@ -64,6 +64,16 @@ const industries = [
   },
 ]
 
+interface Industry {
+  name: string
+  image?: string
+  description: string
+  mentor_count: number
+  avg_salary: string
+  growth: string
+  roles?: string[]
+}
+
 interface StatsData {
   platform: {
     active_mentors: number
@@ -73,9 +83,21 @@ interface StatsData {
 export function IndustriesSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [statsData, setStatsData] = useState<StatsData | null>(null)
+  const [industries, setIndustries] = useState<Industry[]>(industriesFallback.map(ind => ({
+    name: ind.name,
+    image: ind.image,
+    description: ind.description,
+    mentor_count: ind.mentors,
+    avg_salary: ind.avgSalary,
+    growth: ind.growth,
+    roles: ind.roles
+  })))
+  const [industryStats, setIndustryStats] = useState<any>(null)
 
   useEffect(() => {
     fetchStats()
+    fetchIndustries()
+    fetchIndustryStats()
   }, [])
 
   const fetchStats = async () => {
@@ -86,6 +108,49 @@ export function IndustriesSection() {
       setStatsData(data)
     } catch (error) {
       console.error("Error fetching statistics:", error)
+    }
+  }
+
+  const fetchIndustries = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/industries")
+      if (response.ok) {
+        const data = await response.json()
+        if (data.industries && data.industries.length > 0) {
+          // Transform backend data to match frontend format
+          const transformed = data.industries.map((ind: any) => ({
+            name: ind.name,
+            image: `/industries/${ind.name.toLowerCase()}.jpg`,
+            description: ind.description,
+            mentor_count: ind.mentor_count,
+            avg_salary: ind.avg_salary,
+            growth: ind.growth,
+            roles: ind.roles || []
+          }))
+          setIndustries(transformed)
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching industries:", error)
+      // Keep using default fallback industries
+    }
+  }
+
+  const fetchIndustryStats = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/industry-summary")
+      if (response.ok) {
+        const data = await response.json()
+        setIndustryStats(data)
+      }
+    } catch (error) {
+      console.error("Error fetching industry stats:", error)
+      // Set fallback stats
+      setIndustryStats({
+        industries_covered: 0,
+        avg_salary: 0,
+        avg_growth: 0
+      })
     }
   }
 
@@ -152,7 +217,7 @@ export function IndustriesSection() {
                     >
                       <h4 className="text-sm font-semibold text-gray-900 mb-2">Popular Roles:</h4>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {industry.roles.map((role, i) => (
+                        {(industry.roles || []).map((role, i) => (
                           <span
                             key={i}
                             className="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-0.5 rounded-full"
@@ -165,11 +230,11 @@ export function IndustriesSection() {
                       {/* Stats Boxes */}
                       <div className="grid grid-cols-3 gap-3">
                         <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] rounded-bl-[48px] p-3 text-center">
-                          <div className="text-lg font-bold text-blue-600">{industry.mentors}</div>
+                          <div className="text-lg font-bold text-blue-600">{industry.mentor_count}</div>
                           <div className="text-xs text-black">Mentors</div>
                         </div>
                         <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-3 text-center">
-                          <div className="text-lg font-bold text-green-600">{industry.avgSalary}</div>
+                          <div className="text-lg font-bold text-green-600">{industry.avg_salary}</div>
                           <div className="text-xs text-black">Avg Salary</div>
                         </div>
                         <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] rounded-br-[48px] p-3 text-center">
@@ -221,7 +286,9 @@ export function IndustriesSection() {
 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-16">
   {/* Industries Covered */}
   <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
-    <div className="text-4xl font-bold text-blue-600 mb-2">15+</div>
+    <div className="text-4xl font-bold text-blue-600 mb-2">
+      {industryStats ? `${industryStats.industries_covered}+` : "15+"}
+    </div>
     <div className="text-black">Industries Covered</div>
   </div>
 
@@ -235,13 +302,17 @@ export function IndustriesSection() {
 
   {/* Avg Salary */}
   <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tl-[48px] ">
-    <div className="text-4xl font-bold text-blue-600 mb-2">125K</div>
+    <div className="text-4xl font-bold text-blue-600 mb-2">
+      {industryStats ? `${industryStats.avg_salary}K` : "125K"}
+    </div>
     <div className="text-black">Avg Salary</div>
   </div>
 
   {/* Avg Growth */}
   <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
-    <div className="text-4xl font-bold text-yellow-600 mb-2">+23%</div>
+    <div className="text-4xl font-bold text-yellow-600 mb-2">
+      {industryStats ? `+${industryStats.avg_growth}%` : "+23%"}
+    </div>
     <div className="text-black">Avg Growth</div>
   </div>
 </div>
