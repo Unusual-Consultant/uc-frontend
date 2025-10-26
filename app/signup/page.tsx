@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api } from "@/lib/api";
+import { api, API_BASE_URL } from "@/lib/api";
 import { User, GraduationCap } from "lucide-react";
 import SignupForm from "@/components/signup-form";
 
@@ -35,7 +35,7 @@ export default function SignupPage() {
 
   if (provider === "google") {
     // Pass userType as query parameter to backend
-    window.location.href = `http://localhost:8000/api/v1/auth/google/login?user_type=${userType}`;
+    window.location.href = `${API_BASE_URL}/auth/google/login?user_type=${userType}`;
     return;
   }
   handleSignup(userType);

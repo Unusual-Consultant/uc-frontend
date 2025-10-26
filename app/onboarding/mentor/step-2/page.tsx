@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { MentorStep2Enhanced } from "@/components/onboarding/mentor-step2-enhanced"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function MentorStep2Page() {
   const [onboardingData, setOnboardingData] = useState<any>({})
@@ -27,7 +28,7 @@ export default function MentorStep2Page() {
     console.log("Loading data with token:", token ? token.substring(0, 20) + "..." : "null")
     
     try {
-      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/data", {
+      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/data`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }

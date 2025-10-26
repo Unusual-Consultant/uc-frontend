@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/api"
 
 interface SignupOption {
   id: number
@@ -58,7 +59,7 @@ export default function SignupStep2() {
       console.log("🔍 Fetching signup options from API...")
   
       // Use mentee signup options for both mentee and mentor (they share the same data)
-      const response = await fetch("http://localhost:8000/api/v1/mentees/signup/options", {
+      const response = await fetch(`${API_BASE_URL}/mentees/signup/options`, {
         headers: { "Content-Type": "application/json" }
       })
       console.log("📡 API Response status:", response.status)
@@ -239,7 +240,7 @@ export default function SignupStep2() {
     setIsLoading(true)
 
     // --- Correct endpoint for mentee onboarding ---
-    const endpoint = "http://localhost:8000/api/v1/mentees/signup/step2"
+    const endpoint = `${API_BASE_URL}/mentees/signup/step2`
 
     const response = await fetch(endpoint, {
       method: "POST",

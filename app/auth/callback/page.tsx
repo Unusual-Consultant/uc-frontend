@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/api"
 
 function AuthCallbackContent() {
   const router = useRouter()
@@ -26,7 +27,7 @@ function AuthCallbackContent() {
         
         // Call backend callback endpoint
         const response = await fetch(
-          `http://localhost:8000/api/v1/auth/google/callback?code=${code}&state=${state}`,
+          `${API_BASE_URL}/auth/google/callback?code=${code}&state=${state}`,
           {
             method: 'GET',
             redirect: 'manual' // Don't follow redirects automatically
