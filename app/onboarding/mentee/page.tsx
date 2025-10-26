@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/api"
 
 interface SignupOption {
   id: number
@@ -39,7 +40,7 @@ export default function SignupStep2() {
     try {
       // Since this is step 2, we might not have the auth token yet
       // We'll need to get the options without authentication for new users
-      const response = await fetch("http://localhost:8000/api/v1/mentee/signup/options", {
+      const response = await fetch(`${API_BASE_URL}/mentee/signup/options`, {
         headers: {
           "Content-Type": "application/json"
         }

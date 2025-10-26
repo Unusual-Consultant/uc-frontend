@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, User, Building, Award, LinkIcon, Clock, Trophy } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
 
 interface MentorStep2Props {
   onNext: (data: any) => void
@@ -74,7 +75,7 @@ export function MentorStep2Enhanced({ onNext, onBack, initialData }: MentorStep2
 
     setIsLoading(true)
     try {
-      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/step2", {
+      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/step2`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

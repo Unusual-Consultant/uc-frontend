@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { MentorStep5Enhanced } from "@/components/onboarding/mentor-step5-enhanced"
 import { MentorSuccess } from "@/components/onboarding/mentor-success"
 import { useRouter, useSearchParams } from "next/navigation"
+import { API_BASE_URL } from "@/lib/api"
 
 export default function MentorStep5Page() {
   const [onboardingData, setOnboardingData] = useState({})
@@ -25,7 +26,7 @@ export default function MentorStep5Page() {
 
   const loadExistingData = async () => {
     try {
-      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/data", {
+      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/data`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("access_token")}`
         }
