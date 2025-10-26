@@ -29,8 +29,12 @@ export default function LoginPage() {
     provider: string,
     userType: "mentee" | "mentor"
   ) => {
+    // Save who is signing up before redirect
+    localStorage.setItem("userType", userType);
+
     if (provider === "google") {
-      window.location.href = api.auth.google.login();
+      // Use the API object for consistency
+      window.location.href = api.auth.google.login(userType);
       return;
     }
     handleLogin(userType);

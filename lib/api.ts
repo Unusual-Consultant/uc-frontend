@@ -86,3 +86,33 @@ export async function fetchStatisticsOverview() {
     return null;
   }
 }
+
+// Google OAuth API functions
+export const googleAuth = {
+  login: (userType?: string) => {
+    const baseUrl = `${API_BASE_URL}/auth/google/login`;
+    return userType ? `${baseUrl}?user_type=${userType}` : baseUrl;
+  },
+  callback: (code: string) => {
+    return `${API_BASE_URL}/auth/google/callback?code=${code}`;
+  }
+};
+
+// Authentication API functions
+export const authApi = {
+  login: () => `${API_BASE_URL}/auth/login`,
+  signup: {
+    otp: () => `${API_BASE_URL}/auth/signup/otp`,
+    verifyOtp: () => `${API_BASE_URL}/auth/signup/verify-otp`,
+    password: () => `${API_BASE_URL}/auth/signup/password`
+  }
+};
+
+// Main API object
+export const api = {
+  auth: {
+    google: googleAuth,
+    login: authApi.login,
+    signup: authApi.signup
+  }
+};

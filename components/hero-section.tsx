@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
   Star,
@@ -186,14 +187,26 @@ export function HeroSection() {
 
 
   const words = ["AI", "Guidance", "Mentorship", "Support"];
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = up, -1 = down
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentWordIndex((prev) => (prev + 1) % words.length);
-    }, 1500); // change word every 1.5s
+      setIndex((prev) => {
+        // handle direction reversal at the ends
+        if (prev === words.length - 1) {
+          setDirection(-1);
+          return prev - 1;
+        } else if (prev === 0 && direction === -1) {
+          setDirection(1);
+          return prev + 1;
+        } else {
+          return prev + direction;
+        }
+      });
+    }, 1500); // pause time between transitions
     return () => clearInterval(interval);
-  }, []);
+  }, [direction, words.length]);
 
   return (
     <section
@@ -216,12 +229,28 @@ export function HeroSection() {
           <div className="space-y-[2rem]">
             {/* Animated Heading */}
             <div className="space-y-[1.5rem]">
-  <h1 className="text-4xl md:text-5xl lg:text-[55px] font-bold text-gray-900 leading-tight">
-    Find Unusual growth
-    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#0073CF] to-[#003C6C]">
-      <span className="text-black">through</span> {words[currentWordIndex]}
-    </span>
-  </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-[55px] font-bold text-gray-900 leading-tight">
+            Find Unusual growth&nbsp;
+      <span className="text-black">through&nbsp;</span>
+      <span className="relative inline-block h-[1.3em] overflow-hidden align-baseline w-[8ch]">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.span
+            key={index}
+            custom={direction}
+            initial={{ y: direction === 1 ? "100%" : "-100%", opacity: 0 }}
+            animate={{ y: "0%", opacity: 1 }}
+            exit={{ y: direction === 1 ? "-100%" : "100%", opacity: 0 }}
+            transition={{
+              duration: 0.7,
+              ease: [0.45, 0, 0.55, 1],
+            }}
+            className="absolute left-0 top-0 text-gray-900 bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
+          >
+            {words[index]}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </h1>
 
 
 
