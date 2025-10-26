@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Verified, MapPin, Clock, Users, Check } from "lucide-react"
+import { Star, Users, ChevronLeft, ChevronRight, Verified } from "lucide-react"
 import Link from "next/link"
 
 const mentors = [
@@ -22,10 +22,6 @@ const mentors = [
     price: 150,
     mentees: 45,
     available: true,
-    responseTime: "<4 hrs",
-    successRate: 95,
-    description:
-      "Experienced product manager with a passion for building user-centric products and mentoring teams.",
   },
   {
     id: 2,
@@ -40,10 +36,6 @@ const mentors = [
     price: 120,
     mentees: 32,
     available: false,
-    responseTime: "<6 hrs",
-    successRate: 90,
-    description:
-      "Full-stack engineer specializing in scalable applications and mentoring junior developers.",
   },
   {
     id: 3,
@@ -58,9 +50,20 @@ const mentors = [
     price: 180,
     mentees: 67,
     available: true,
-    responseTime: "<3 hrs",
-    successRate: 97,
-    description: "UX leader guiding product teams to create intuitive and engaging experiences.",
+  },
+  {
+    id: 4,
+    name: "David Kim",
+    title: "Data Science Manager",
+    company: "Netflix",
+    image: "/placeholder.svg?height=80&width=80",
+    rating: 4.7,
+    reviews: 73,
+    location: "Los Angeles, CA",
+    expertise: ["Data Science", "Machine Learning", "Python"],
+    price: 140,
+    mentees: 28,
+    available: true,
   },
 ]
 
@@ -68,8 +71,13 @@ export function FeaturedMentors() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const mentorsPerView = 3
 
-  const nextSlide = () => setCurrentIndex((prev) => (prev + mentorsPerView) % mentors.length)
-  const prevSlide = () => setCurrentIndex((prev) => (prev - mentorsPerView + mentors.length) % mentors.length)
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + mentorsPerView) % mentors.length)
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - mentorsPerView + mentors.length) % mentors.length)
+  }
 
   const visibleMentors = []
   for (let i = 0; i < mentorsPerView; i++) {
@@ -85,88 +93,84 @@ export function FeaturedMentors() {
             <p className="text-gray-600">Connect with top industry professionals</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={prevSlide} className="w-10 h-10 p-0 rounded-full">
-              &lt;
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={prevSlide}
+              className="w-10 h-10 p-0 rounded-full bg-transparent"
+            >
+              <ChevronLeft className="h-5 w-5" />
             </Button>
-            <Button variant="outline" size="sm" onClick={nextSlide} className="w-10 h-10 p-0 rounded-full">
-              &gt;
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={nextSlide}
+              className="w-10 h-10 p-0 rounded-full bg-transparent"
+            >
+              <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {visibleMentors.map((mentor) => (
-            <Card
-              key={mentor.id}
-              className="relative hover:shadow-lg transition-shadow duration-300 border overflow-hidden rounded-xl flex flex-col items-center"
-            >
-              {/* Sky-blue top layer */}
-              <div className="h-24 bg-sky-100 w-full flex justify-center items-end">
-                {/* Avatar overlaps */}
-                <Avatar className="w-24 h-24 -mb-12 ring-4 ring-sky-100">
-                  <AvatarImage src={mentor.image} alt={mentor.name} />
-                  <AvatarFallback>
-                    {mentor.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-
-              {/* Online badge */}
-              {mentor.available && (
-                <div className="absolute top-4 left-4 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold z-10">
-                  Online
-                </div>
-              )}
-
-              <CardContent className="pt-16 flex flex-col items-center text-center">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-lg font-bold text-gray-900">{mentor.name}</h3>
-                  <Verified className="h-4 w-4 text-blue-500" />
-                </div>
-                <p className="text-sm text-gray-600">{mentor.title}</p>
-                <p className="text-sm font-medium text-blue-600 mb-2">{mentor.company}</p>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3 justify-center">
-                  <MapPin className="w-4 h-4" />
-                  <span>{mentor.location}</span>
-                </div>
-
-                <p className="text-sm text-gray-700 mb-3">{mentor.description}</p>
-
-                <div className="flex flex-col sm:flex-row sm:justify-center items-center gap-4 text-sm text-gray-600 mb-3">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    <span>{mentor.responseTime}</span>
+            <Card key={mentor.id} className="hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="relative">
+                    <Avatar className="w-16 h-16">
+                      <AvatarImage src={mentor.image || "/placeholder.svg"} alt={mentor.name} />
+                      <AvatarFallback>
+                        {mentor.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    {mentor.available && (
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
+                    )}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    <span>{mentor.mentees}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Check className="w-4 h-4" />
-                    <span>{mentor.successRate}%</span>
-                  </div>
-                </div>
 
-                <div className="flex flex-wrap justify-center gap-2 mb-3">
-                  {mentor.expertise.map((skill) => (
-                    <Badge key={skill} variant="secondary" className="text-xs">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg text-gray-900">{mentor.name}</h3>
+                      <Verified className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>
+                    <p className="text-sm font-medium text-blue-600 mb-3">{mentor.company}</p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4 w-full">
-                  <div className="font-bold text-lg text-gray-900">₹{mentor.price}/Session</div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" asChild>
-                      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
-                    </Button>
-                    <Button size="sm" className="bg-blue-600 text-white hover:bg-blue-700">
-                      Quick Book
-                    </Button>
+                    <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
+                      <div className="flex items-center space-x-1">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span>{mentor.rating}</span>
+                        <span>({mentor.reviews})</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-4 w-4" />
+                        <span>{mentor.mentees}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {mentor.expertise.slice(0, 2).map((skill) => (
+                        <Badge key={skill} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {mentor.expertise.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{mentor.expertise.length - 2}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="font-bold text-lg">${mentor.price}/hr</div>
+                      <Button asChild size="sm">
+                        <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
