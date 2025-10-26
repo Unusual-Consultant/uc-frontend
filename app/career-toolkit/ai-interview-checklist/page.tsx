@@ -15,9 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
+import { API_BASE_URL } from "@/lib/api"
 
-// API Configuration
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1"
+// API Configuration - using environment variable from lib/api.ts
 
 // Types for API responses
 interface InterviewChecklistResponse {

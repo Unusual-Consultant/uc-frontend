@@ -5,17 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
-<<<<<<< HEAD
 import { FileText, Loader2 } from "lucide-react"
-=======
-import { FileText } from "lucide-react"
->>>>>>> 394caf02516b55af503c9309bd636fd6db9aae9d
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
 import UploadBox from "../components/uploadbox"
 import AnalysisResults from "../components/analysis_results"
+import { API_BASE_URL } from "@/lib/api"
 
-// API Configuration
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1/resume-analysis"
+// API Configuration - using environment variable from lib/api.ts
 
 // Types for API responses
 interface AnalysisResponse {
@@ -66,7 +62,7 @@ export default function AIResumeAnalyzer() {
   // API Functions
   const fetchUsageStats = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/usage`)
+      const response = await fetch(`${API_BASE_URL}/resume-analysis/usage`)
       if (!response.ok) throw new Error('Failed to fetch usage stats')
       const data: UsageResponse = await response.json()
       setUsesRemaining(data.gemini_limit - data.gemini_requests)
@@ -102,7 +98,7 @@ export default function AIResumeAnalyzer() {
         formData.append('job_description_file', selectedJobDescFile)
       }
 
-      const response = await fetch(`${API_BASE_URL}/analyze`, {
+      const response = await fetch(`${API_BASE_URL}/resume-analysis/analyze`, {
         method: 'POST',
         body: formData,
       })
