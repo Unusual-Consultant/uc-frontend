@@ -16,11 +16,165 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { featuredMentors, testimonials } from "@/lib/data";
+
+// API Configuration
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+
+// Types for API responses
+interface Mentor {
+  id: string;
+  mentor_id: string;
+  featured_since?: string;
+  mentor: {
+    id: string;
+    user_id: string;
+    bio?: string;
+    headline?: string;
+    location?: string;
+    rating?: number;
+    total_sessions?: number;
+    company?: string;
+    years_experience?: number;
+    current_position?: string;
+    hourly_rate?: number;
+    skills?: string[];
+    full_name?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+}
+
+interface Testimonial {
+  id: string;
+  testimonial_id: string;
+  priority: number;
+  featured_at?: string;
+  expires_at?: string;
+  created_at: string;
+  testimonial: {
+    id: string;
+    content?: string;
+    rating?: number;
+    created_at: string;
+    mentee_name?: string;
+    mentee_image?: string;
+  };
+}
 
 export function HeroSection() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [mentors, setMentors] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+
+  // Transform testimonial data to frontend format
+  const transformTestimonial = (backendTestimonial: any) => {
+    if (!backendTestimonial || !backendTestimonial.testimonial) {
+      return {
+        name: "Student",
+        content: "Great experience!",
+        rating: 5,
+        role: "Mentee",
+        company: "",
+        image: "/placeholder.svg"
+      };
+    }
+    
+    const testimonial = backendTestimonial.testimonial;
+    
+    return {
+      name: testimonial.mentee_name || "Student",
+      content: testimonial.content || "Great experience!",
+      rating: testimonial.rating || 5,
+      role: "Mentee",
+      company: "",
+      image: testimonial.mentee_image || "/placeholder.svg"
+    };
+  };
+
+  // Transform backend data to frontend format
+  const transformMentor = (backendMentor: any) => {
+    if (!backendMentor || !backendMentor.mentor) {
+      return {
+        id: "unknown",
+        name: "Mentor",
+        title: "Mentor",
+        company: "",
+        image: "/placeholder.svg?height=80&width=80",
+        rating: 0,
+        sessions: 0,
+        location: "Remote",
+        skills: ["Expert"],
+        price: 100,
+        available: true,
+      };
+    }
+    const mentor = backendMentor.mentor;
+    const bioParts = mentor.bio?.split(' at ') || [];
+    
+    // Extract name from full_name, first_name/last_name, or bio
+    let name = mentor.full_name || "Mentor";
+    if (!name || name === "Mentor") {
+      if (mentor.first_name && mentor.last_name) {
+        name = `${mentor.first_name} ${mentor.last_name}`;
+      } else if (bioParts[0]) {
+        name = bioParts[0];
+      }
+    }
+    
+    // Get skills array or use headline
+    const skills = mentor.skills && mentor.skills.length > 0 
+      ? mentor.skills 
+      : [mentor.headline || "Expert"];
+    
+    // Get hourly rate directly from backend
+    const price = mentor.hourly_rate || 1000;
+    
+    return {
+      id: backendMentor.mentor_id,
+      name: name,
+      title: bioParts[0] || mentor.headline || "Expert",
+      company: mentor.company || "",
+      image: mentor.profile_picture_url || "/placeholder.svg?height=80&width=80",
+      rating: mentor.rating || 0,
+      sessions: mentor.total_sessions || 0,
+      location: mentor.location || "Remote",
+      skills: skills,
+      price: price,
+      available: true,
+    };
+  };
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [mentorsRes, testimonialsRes] = await Promise.all([
+          fetch("http://127.0.0.1:8000/api/v1/featured-mentors/"),
+          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/")
+        ]);
+        
+        if (mentorsRes.ok) {
+          const mentorsData = await mentorsRes.json();
+          const transformedMentors = (mentorsData.featured_mentors || []).map(transformMentor);
+          setMentors(transformedMentors);
+        }
+        
+        if (testimonialsRes.ok) {
+          const testimonialsData = await testimonialsRes.json();
+          const transformedTestimonials = (testimonialsData.featured_testimonials || []).map(transformTestimonial);
+          setTestimonials(transformedTestimonials);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Fallback to mock data if API fails
+        const { featuredMentors, testimonials } = await import("@/lib/data");
+        setMentors(featuredMentors);
+        setTestimonials(testimonials);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSearch = useCallback(() => {
     if (searchQuery.trim()) {
@@ -147,7 +301,7 @@ export function HeroSection() {
               </h3>
               <div className="relative overflow-hidden whitespace-nowrap" role="region">
                 <div className="inline-flex gap-6 animate-scroll-left hover:[animation-play-state:paused]">
-                  {[...featuredMentors, ...featuredMentors].map((mentor, i) => (
+                  {[...mentors, ...mentors].map((mentor, i) => (
                     <Card key={`${mentor.id}-${i}`} className="min-w-[20rem] backdrop-blur-sm bg-white/80 border-0 shadow-xl"
                     >
                       <CardContent className="p-6">
@@ -159,9 +313,9 @@ export function HeroSection() {
                                 alt={mentor.name}
                               />
                               <AvatarFallback>
-                                {mentor.name
+                                {(mentor.name || "M")
                                   .split(" ")
-                                  .map((n) => n[0])
+                                  .map((n: string) => n[0])
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
@@ -197,7 +351,7 @@ export function HeroSection() {
                             </div>
 
                             <div className="flex flex-wrap gap-1 mb-3">
-                              {mentor.skills.map((skill) => (
+                              {mentor.skills.map((skill: string) => (
                                 <Badge
                                   key={skill}
                                   variant="secondary"
@@ -247,7 +401,7 @@ export function HeroSection() {
           <Avatar className="w-12 h-12">
             <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
             <AvatarFallback>
-              {t.name.split(" ").map((n) => n[0]).join("")}
+              {(t.name || "U").split(" ").map((n: string) => n[0]).join("")}
             </AvatarFallback>
           </Avatar>
     

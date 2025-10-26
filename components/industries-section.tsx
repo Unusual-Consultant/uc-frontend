@@ -1,9 +1,9 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
 
@@ -64,8 +64,30 @@ const industries = [
   },
 ]
 
+interface StatsData {
+  platform: {
+    active_mentors: number
+  }
+}
+
 export function IndustriesSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [statsData, setStatsData] = useState<StatsData | null>(null)
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      if (!response.ok) throw new Error("Failed to fetch statistics")
+      const data = await response.json()
+      setStatsData(data)
+    } catch (error) {
+      console.error("Error fetching statistics:", error)
+    }
+  }
 
   return (
     <section className="py-20 bg-gray-50">
@@ -205,7 +227,9 @@ export function IndustriesSection() {
 
   {/* Expert Mentors */}
   <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tr-[48px]">
-    <div className="text-4xl font-bold text-green-600 mb-2">1610+</div>
+    <div className="text-4xl font-bold text-green-600 mb-2">
+      {statsData ? `${statsData.platform.active_mentors}+` : "5+"}
+    </div>
     <div className="text-black">Expert Mentors</div>
   </div>
 

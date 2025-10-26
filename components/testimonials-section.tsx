@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const testimonials = [
   {
@@ -67,8 +67,30 @@ const testimonials = [
   },
 ]
 
+interface StatsData {
+  average_rating: number
+  total_testimonials: number
+  conversion_rate: number
+}
+
 export function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [statsData, setStatsData] = useState<StatsData | null>(null)
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/platform")
+      if (!response.ok) throw new Error("Failed to fetch statistics")
+      const data = await response.json()
+      setStatsData(data)
+    } catch (error) {
+      console.error("Error fetching statistics:", error)
+    }
+  }
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 3))
@@ -157,15 +179,23 @@ export function TestimonialsSection() {
         {/* === Stats Section === */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">4.9/5</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData && statsData.average_rating > 0 
+                ? `${statsData.average_rating.toFixed(1)}/5` 
+                : "4.9/5"}
+            </div>
             <div className="text-black">Average Rating</div>
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? `${statsData.total_testimonials}+` : "3+"}
+            </div>
             <div className="text-black">Success Stories</div>
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? `${Math.round(statsData.conversion_rate)}%` : "38%"}
+            </div>
             <div className="text-black">Would Recommend</div>
           </div>
         </div>

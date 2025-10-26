@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   XAxis,
@@ -65,7 +66,58 @@ const SafeTooltip = ({ active, payload, label }: any) => {
   )
 }
 
+interface StatsData {
+  platform: {
+    total_users: number
+    active_mentors: number
+    total_sessions: number
+    total_revenue: number
+    average_rating: number
+  }
+  featured_content: {
+    featured_mentors: number
+    featured_testimonials: number
+    hero_mentors: number
+    pricing_plans: number
+  }
+  growth: {
+    new_users_this_month: number
+    new_mentors_this_month: number
+    sessions_this_month: number
+  }
+}
+
 export function StatsSection() {
+  const [statsData, setStatsData] = useState<StatsData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      if (!response.ok) throw new Error("Failed to fetch statistics")
+      const data = await response.json()
+      setStatsData(data)
+    } catch (error) {
+      console.error("Error fetching statistics:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="relative -mt-32 pb-20">
+        <div className="max-w-[1159px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+          <p className="text-center text-gray-600">Loading statistics...</p>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="relative -mt-32 pb-20">
       <div className="max-w-[1159px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
@@ -163,20 +215,28 @@ export function StatsSection() {
         {/* Key Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">15+</div>
-            <div className="text-black">Industries Covered</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? `${statsData.platform.total_users}+` : "0+"}
+            </div>
+            <div className="text-black">Total Users</div>
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tl-[48px] rounded-tr-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">1,610+</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? `${statsData.platform.active_mentors}+` : "0+"}
+            </div>
             <div className="text-black">Expert Mentors</div>
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tl-[48px] rounded-tr-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">$125K</div>
-            <div className="text-black">Avg Salary</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? statsData.featured_content.pricing_plans : "3"}
+            </div>
+            <div className="text-black">Pricing Plans</div>
           </div>
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
-            <div className="text-4xl font-bold text-blue-600 mb-2">+23%</div>
-            <div className="text-black">Avg Growth</div>
+            <div className="text-4xl font-bold text-blue-600 mb-2">
+              {statsData ? `${Math.round(statsData.platform.average_rating * 10)}%` : "0%"}
+            </div>
+            <div className="text-black">Avg Rating</div>
           </div>
         </div>
       </div>

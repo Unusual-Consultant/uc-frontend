@@ -1,72 +1,82 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Verified, MapPin, Clock, Users, Check } from "lucide-react"
+import { Verified, MapPin, Clock, Users, Check, Heart, Star, Languages } from "lucide-react"
 import Link from "next/link"
 
-const mentors = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    title: "Senior Product Manager",
-    company: "Google",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    reviews: 127,
-    location: "San Francisco, CA",
-    expertise: ["Product Management", "Strategy", "Leadership"],
-    price: 150,
-    mentees: 45,
-    available: true,
-    responseTime: "<4 hrs",
-    successRate: 95,
-    description:
-      "Experienced product manager with a passion for building user-centric products and mentoring teams.",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    title: "Senior Software Engineer",
-    company: "Meta",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.8,
-    reviews: 89,
-    location: "Seattle, WA",
-    expertise: ["React", "Node.js", "System Design"],
-    price: 120,
-    mentees: 32,
-    available: false,
-    responseTime: "<6 hrs",
-    successRate: 90,
-    description:
-      "Full-stack engineer specializing in scalable applications and mentoring junior developers.",
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    title: "UX Design Lead",
-    company: "Apple",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    reviews: 156,
-    location: "Cupertino, CA",
-    expertise: ["UX Design", "Design Systems", "Research"],
-    price: 180,
-    mentees: 67,
-    available: true,
-    responseTime: "<3 hrs",
-    successRate: 97,
-    description: "UX leader guiding product teams to create intuitive and engaging experiences.",
-  },
-]
+interface Mentor {
+  id: string
+  name: string
+  title: string
+  company: string
+  image: string
+  rating: number
+  reviews: number
+  location: string
+  expertise: string[]
+  price: number
+  mentees: number
+  available: boolean
+  responseTime: string
+  successRate: number
+  description: string
+  yearsExperience?: number
+  languages?: string[]
+}
 
 export function FeaturedMentors() {
+  const [mentors, setMentors] = useState<Mentor[]>([])
+  const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const mentorsPerView = 3
+
+  useEffect(() => {
+    fetchMentors()
+  }, [])
+
+  const fetchMentors = async () => {
+    try {
+      console.log("Fetching mentors from backend...")
+      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-mentors/all/mentors?per_page=9")
+      console.log("Response status:", response.status)
+      if (!response.ok) throw new Error(`Failed to fetch mentors: ${response.status}`)
+      const data = await response.json()
+      console.log("Mentors data:", data)
+      
+      // Transform backend data to frontend format
+      const transformedMentors = data.mentors.map((mentor: any) => ({
+        id: mentor.id,
+        name: mentor.full_name || "Mentor",
+        title: mentor.headline || mentor.bio?.split(' at ')[0] || "Expert",
+        company: mentor.company || "",
+        image: mentor.profile_picture_url || "/placeholder.svg?height=80&width=80",
+        rating: mentor.rating || 0,
+        reviews: mentor.total_sessions || 0,
+        location: mentor.location || "Remote",
+        expertise: mentor.skills || [],
+        price: mentor.hourly_rate || 1000,
+        mentees: 0,
+        available: true,
+        responseTime: "<4 hrs",
+        successRate: 95,
+        description: mentor.bio || "",
+        yearsExperience: mentor.years_experience,
+        languages: mentor.languages || [],
+      }))
+      
+      setMentors(transformedMentors)
+    } catch (error) {
+      console.error("Error fetching mentors:", error)
+      // Fallback to empty array
+      setMentors([])
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const nextSlide = () => setCurrentIndex((prev) => (prev + mentorsPerView) % mentors.length)
   const prevSlide = () => setCurrentIndex((prev) => (prev - mentorsPerView + mentors.length) % mentors.length)
@@ -76,12 +86,36 @@ export function FeaturedMentors() {
     visibleMentors.push(mentors[(currentIndex + i) % mentors.length])
   }
 
+  if (loading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-gray-600">Loading mentors...</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (mentors.length === 0) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center">
+            <p className="text-gray-600">No mentors available at the moment.</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Featured Mentors</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Meet Our Mentors</h2>
             <p className="text-gray-600">Connect with top industry professionals</p>
           </div>
           <div className="flex gap-2">
@@ -121,6 +155,17 @@ export function FeaturedMentors() {
                 </div>
               )}
 
+              {/* Favorite button */}
+              <button className="absolute top-4 right-4 z-10 text-gray-400 hover:text-red-500 transition-colors">
+                <Heart className="w-5 h-5" />
+              </button>
+
+              {/* Rating badge */}
+              <div className="absolute left-1/2 transform -translate-x-1/2 -bottom-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 z-10">
+                <Star className="w-3 h-3 fill-current" />
+                {mentor.rating.toFixed(1)}
+              </div>
+
               <CardContent className="pt-16 flex flex-col items-center text-center">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="text-lg font-bold text-gray-900">{mentor.name}</h3>
@@ -128,9 +173,17 @@ export function FeaturedMentors() {
                 </div>
                 <p className="text-sm text-gray-600">{mentor.title}</p>
                 <p className="text-sm font-medium text-blue-600 mb-2">{mentor.company}</p>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-3 justify-center">
-                  <MapPin className="w-4 h-4" />
-                  <span>{mentor.location}</span>
+                <div className="flex items-center gap-4 text-sm text-gray-600 mb-3 justify-center">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    <span>{mentor.location}</span>
+                  </div>
+                  {mentor.yearsExperience && (
+                    <div className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      <span>{mentor.yearsExperience} yrs experience</span>
+                    </div>
+                  )}
                 </div>
 
                 <p className="text-sm text-gray-700 mb-3">{mentor.description}</p>
@@ -156,10 +209,20 @@ export function FeaturedMentors() {
                       {skill}
                     </Badge>
                   ))}
+                  {mentor.languages && mentor.languages.length > 0 && (
+                    <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                      <Languages className="w-3 h-3 text-blue-600" />
+                      {mentor.languages.length} Languages
+                    </Badge>
+                  )}
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mt-4 w-full">
-                  <div className="font-bold text-lg text-gray-900">₹{mentor.price}/Session</div>
+                <div className="flex flex-col sm:flex-row items-center justify-between w-full mt-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm text-gray-600">Starting from</span>
+                    <span className="font-bold text-lg text-gray-900">₹{mentor.price}</span>
+                    <span className="text-sm text-gray-600">/Session</span>
+                  </div>
                   <div className="flex gap-2">
                     <Button size="sm" variant="outline" asChild>
                       <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
