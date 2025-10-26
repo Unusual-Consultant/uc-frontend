@@ -35,6 +35,7 @@ export default function SignupStep2() {
     // Safely get values from searchParams and localStorage
     const emailParam = searchParams.get("email")
     const userTypeParam = searchParams.get("userType")
+    const tokenParam = searchParams.get("token")
     
     if (emailParam) {
       setEmail(emailParam)
@@ -46,6 +47,13 @@ export default function SignupStep2() {
       setUserType(userTypeParam)
     } else if (typeof window !== "undefined") {
       setUserType(localStorage.getItem("userType") || "mentee")
+    }
+    
+    // Store token if provided (from Google OAuth)
+    if (tokenParam && typeof window !== "undefined") {
+      localStorage.setItem("access_token", tokenParam)
+      localStorage.setItem("auth_token", tokenParam)
+      console.log("Token stored from URL:", tokenParam)
     }
     
     fetchSignupOptions()
@@ -243,7 +251,12 @@ export default function SignupStep2() {
 
     const response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        ...(localStorage.getItem("auth_token") && {
+          "Authorization": `Bearer ${localStorage.getItem("auth_token")}`
+        })
+      },
       body: JSON.stringify(payload),
     })
 

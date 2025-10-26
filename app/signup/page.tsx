@@ -34,8 +34,8 @@ export default function SignupPage() {
   localStorage.setItem("userType", userType);
 
   if (provider === "google") {
-    // Pass userType as query parameter to backend
-    window.location.href = `http://localhost:8000/api/v1/auth/google/login?user_type=${userType}`;
+    // Use the API object for consistency
+    window.location.href = api.auth.google.login(userType);
     return;
   }
   handleSignup(userType);

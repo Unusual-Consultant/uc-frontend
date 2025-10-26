@@ -175,13 +175,13 @@ const processOAuthCallback = useCallback(async (code: string) => {
       window.__oauthProcessing.blocked = false;
       window.__oauthProcessing.lastCode = null;
     }
-    router.push("/"); // ✅ go home, not /login
+    router.push("/"); 
   }, [router]);
 
   const getCurrentUser = useCallback(async () => {
-    console.log("getCurrentUser called - making request to /api/v1/auth/me");
+    console.log("getCurrentUser called - making request to /auth/me");
     try {
-      const response = await makeAuthenticatedRequest('/api/v1/auth/me');
+      const response = await makeAuthenticatedRequest('/auth/me');
       if (response.ok) {
         const userInfo = await response.json();
         setUser(userInfo);

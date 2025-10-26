@@ -24,77 +24,30 @@ function AuthCallbackContent() {
       try {
         isProcessing.current = true
         
-        // Call backend callback endpoint
+        // Call backend callback endpoint - let it handle redirects naturally
         const response = await fetch(
           `http://localhost:8000/api/v1/auth/google/callback?code=${code}&state=${state}`,
           {
             method: 'GET',
-            redirect: 'manual' // Don't follow redirects automatically
+            redirect: 'follow' // Follow redirects to let backend handle the flow
           }
         )
 
-        // Check if it's a redirect response (new user)
-        if (response.type === 'opaqueredirect' || response.status === 302 || response.redirected) {
-          console.log("New user detected - redirect response")
-          // For new users, we need to get the token from the redirect URL
-          // The backend should include the token in the redirect URL for new users
-          const urlParams = new URLSearchParams(window.location.search)
-          const token = urlParams.get('token')
-          
-          console.log("URL search params:", window.location.search)
-          console.log("Token from URL:", token)
-          
-          if (token) {
-            localStorage.setItem("access_token", token)
-            localStorage.setItem("auth_token", token)
-            console.log("Token stored in localStorage")
-          } else {
-            console.log("No token found in URL parameters")
-          }
-          
-          // New user - redirect based on user type
-          const userType = localStorage.getItem("userType") || state || "mentee"
-          console.log("User type for new user:", userType)
-          
-          if (userType === "mentor") {
-            if (token) {
-              console.log("Redirecting new mentor to step-2 with token")
-              router.push(`/onboarding/mentor/step-2?token=${token}`)
-            } else {
-              console.log("Redirecting new mentor to step-2 without token")
-              router.push("/onboarding/mentor/step-2")
-            }
-          } else {
-            if (token) {
-              console.log("Redirecting new mentee to step2 with token")
-              router.push(`/signup/step2?userType=${userType}&token=${token}`)
-            } else {
-              console.log("Redirecting new mentee to step2 without token")
-              router.push(`/signup/step2?userType=${userType}`)
-            }
-          }
+        // If we get here, it means the backend redirected us to the frontend
+        // The current URL should be the target page with token parameters
+        const currentUrl = window.location.href
+        console.log("Current URL after redirect:", currentUrl)
+        
+        // Check if we're on a step page with token
+        if (currentUrl.includes('/signup/step') || currentUrl.includes('/onboarding/mentor/step')) {
+          console.log("Successfully redirected to onboarding step")
           return
         }
-
-        // Check if response is ok for existing user
-        if (response.ok) {
-          const data = await response.json()
-          console.log("Existing user response:", data)
-          
-          if (data.token) {
-            // Existing user - store token and redirect to dashboard
-            localStorage.setItem("access_token", data.token)
-            localStorage.setItem("auth_token", data.token) // Keep both for compatibility
-            localStorage.setItem("user_info", JSON.stringify(data.user_info))
-            
-            const userType = data.user_info.role || localStorage.getItem("userType") || "mentee"
-            console.log("Redirecting existing user to:", `/${userType}/dashboard`)
-            router.push(`/${userType}/dashboard`)
-            return
-          }
+        
+        // If we're still on the callback page, something went wrong
+        if (currentUrl.includes('/auth/callback')) {
+          throw new Error("Redirect failed")
         }
-
-        throw new Error(`HTTP error! status: ${response.status}`)
 
       } catch (error) {
         console.error("Error handling Google callback:", error)
