@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote } from "lucide-react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 const testimonials = [
   {
@@ -14,7 +14,6 @@ const testimonials = [
     content:
       "The mentorship I received through Unusual Consultant was game-changing. My mentor helped me navigate a career transition from frontend to full-stack development.",
     rating: 5,
-    industry: "Technology",
   },
   {
     id: 2,
@@ -25,7 +24,6 @@ const testimonials = [
     content:
       "I was able to increase my salary by 40% after working with my mentor on negotiation strategies and leadership skills. Highly recommend!",
     rating: 5,
-    industry: "Marketing",
   },
   {
     id: 3,
@@ -36,7 +34,6 @@ const testimonials = [
     content:
       "The design mentorship program helped me build a portfolio that landed me my dream job. The feedback was invaluable.",
     rating: 5,
-    industry: "Design",
   },
   {
     id: 4,
@@ -47,7 +44,6 @@ const testimonials = [
     content:
       "My mentor guided me through complex machine learning projects and helped me develop the confidence to lead data initiatives.",
     rating: 5,
-    industry: "Data Science",
   },
   {
     id: 5,
@@ -58,7 +54,6 @@ const testimonials = [
     content:
       "The financial modeling expertise I gained through mentorship was crucial for my promotion to director level.",
     rating: 5,
-    industry: "Finance",
   },
   {
     id: 6,
@@ -69,19 +64,21 @@ const testimonials = [
     content:
       "Learning about organizational psychology and change management from my mentor transformed how I approach HR challenges.",
     rating: 5,
-    industry: "Human Resources",
   },
 ]
 
 export function TestimonialsSection() {
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % Math.ceil(testimonials.length / 3))
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % Math.ceil(testimonials.length / 3))
+  }
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) =>
+      prev === 0 ? Math.ceil(testimonials.length / 3) - 1 : prev - 1
+    )
+  }
 
   const getVisibleTestimonials = () => {
     const startIndex = currentIndex * 3
@@ -89,79 +86,87 @@ export function TestimonialsSection() {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-blue-50 to-blue-100">
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Success Stories</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Hear from professionals who transformed their careers with our mentorship platform
-          </p>
+        {/* === Heading + Arrows === */}
+        <div className="flex justify-between items-center mb-12">
+          <div>
+            <h2 className="text-4xl font-bold text-black"><span className="text-[#0073CF]">Success</span> Stories</h2>
+            <p className="text-lg text-black mt-2">
+              Hear from professionals who transformed their careers with our mentorship platform
+            </p>
+          </div>
+
+          {/* Arrows */}
+          <div className="flex gap-3 text-xl font-bold text-white">
+            <button
+              onClick={prevSlide}
+              className="w-8 h-8 rounded-full bg-[#0073CF] flex items-center justify-center hover:bg-[#005fa3] transition-colors"
+            >
+              &lt;
+            </button>
+            <button
+              onClick={nextSlide}
+              className="w-8 h-8 rounded-full bg-[#0073CF] flex items-center justify-center hover:bg-[#005fa3] transition-colors"
+            >
+              &gt;
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        {/* === Testimonials Grid === */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {getVisibleTestimonials().map((testimonial) => (
-            <Card key={testimonial.id} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Quote className="h-8 w-8 text-blue-500 mr-2" />
-                  <div className="flex">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
+            <Card
+              key={testimonial.id}
+              className="border-0 bg-white shadow-[0_8px_24px_#9F9D9D20] hover:shadow-[0_8px_32px_#9F9D9D30] transition-all duration-300 rounded-[32px]"
+            >
+              <CardContent className="p-8 flex flex-col justify-between h-full">
+               
+
+                {/* Quote */}
+                <Quote className="h-8 w-8 text-gray-400 rotate-180 mb-2" />
+                   {/* Stars above testimonial */}
+                   <div className="flex mb-4">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                  ))}
                 </div>
 
-                <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.content}"</p>
+                {/* Content */}
+                <p className="text-black mb-6 leading-relaxed">“{testimonial.content}”</p>
 
-                <div className="flex items-center">
+                {/* Author */}
+                <div className="flex items-center mt-auto">
                   <img
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full mr-4 object-cover"
                   />
                   <div>
-                    <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <h4 className="font-semibold text-black">{testimonial.name}</h4>
+                    <p className="text-sm text-black">{testimonial.role}</p>
                     <p className="text-sm font-medium text-blue-600">{testimonial.company}</p>
                   </div>
-                </div>
-
-                <div className="mt-4">
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    {testimonial.industry}
-                  </span>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        {/* Pagination dots */}
-        <div className="flex justify-center space-x-2">
-          {Array.from({ length: Math.ceil(testimonials.length / 3) }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                index === currentIndex ? "bg-blue-600" : "bg-gray-300"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Overall stats */}
+        {/* === Stats Section === */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-          <div className="text-center">
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
             <div className="text-4xl font-bold text-blue-600 mb-2">4.9/5</div>
-            <div className="text-gray-600">Average Rating</div>
+            <div className="text-black">Average Rating</div>
           </div>
-          <div className="text-center">
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center">
             <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
-            <div className="text-gray-600">Success Stories</div>
+            <div className="text-black">Success Stories</div>
           </div>
-          <div className="text-center">
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
             <div className="text-4xl font-bold text-blue-600 mb-2">95%</div>
-            <div className="text-gray-600">Would Recommend</div>
+            <div className="text-black">Would Recommend</div>
           </div>
         </div>
       </div>

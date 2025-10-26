@@ -1,8 +1,16 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { XAxis, YAxis, ResponsiveContainer, LineChart, Line, BarChart, Bar } from "recharts"
+import {
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  Tooltip,
+} from "recharts"
 
 const monthlyGrowth = [
   { month: "Jan", clicks: 12500, sessions: 450, courses: 120, goals: 89 },
@@ -35,109 +43,92 @@ const successMetrics = [
   { metric: "Job Satisfaction", percentage: 92 },
 ]
 
-// Function to get color based on percentage (red to green transition)
 const getPercentageColor = (percentage: number) => {
-  if (percentage <= 25) return "#EF4444" // Red
-  if (percentage <= 50) return "#F59E0B" // Orange
-  if (percentage <= 75) return "#EAB308" // Yellow
-  return "#10B981" // Green
+  if (percentage <= 25) return "#EF4444"
+  if (percentage <= 50) return "#F59E0B"
+  if (percentage <= 75) return "#EAB308"
+  return "#10B981"
+}
+
+// Safe tooltip without Redux
+const SafeTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload || !payload.length) return null
+  return (
+    <div className="bg-white p-3 border rounded shadow-lg">
+      <p className="font-medium mb-2">{label}</p>
+      {payload.map((entry: any, index: number) => (
+        <p key={index} className="text-sm" style={{ color: entry.color }}>
+          {entry.dataKey}: {entry.value}
+        </p>
+      ))}
+    </div>
+  )
 }
 
 export function StatsSection() {
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Platform Statistics</h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            See how our platform is growing and helping professionals achieve their goals
-          </p>
-        </div>
+    <section className="relative -mt-32 pb-20">
+      <div className="max-w-[1159px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+        {/* Header */}
+        <div className="text-left mb-16">
+  <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+    Platform <span className="text-[#0073CF]">Statistics</span>
+  </h2>
+  <p className="text-xl text-gray-600 max-w-3xl">
+    See how our platform is growing and helping professionals achieve their goals
+  </p>
+</div>
 
+        {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Monthly Growth Chart */}
-          <Card className="shadow-lg">
-            <CardContent className="p-4 sm:p-6">
-              <h3 className="text-xl font-semibold mb-4">Monthly Growth Metrics</h3>
-              <div className="overflow-hidden">
-                <ChartContainer
-                  config={{
-                    clicks: { label: "Platform Clicks", color: "#3B82F6" },
-                    sessions: { label: "Sessions Booked", color: "#10B981" },
-                    courses: { label: "Courses Enrolled", color: "#F59E0B" },
-                    goals: { label: "Goals Achieved", color: "#8B5CF6" },
-                  }}
-                  className="h-[300px] w-full"
-                >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyGrowth} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line type="monotone" dataKey="clicks" stroke="var(--color-clicks)" strokeWidth={3} />
-                      <Line type="monotone" dataKey="sessions" stroke="var(--color-sessions)" strokeWidth={3} />
-                      <Line type="monotone" dataKey="courses" stroke="var(--color-courses)" strokeWidth={3} />
-                      <Line type="monotone" dataKey="goals" stroke="var(--color-goals)" strokeWidth={3} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
+          <Card>
+  <CardContent className="p-4 sm:p-6">
+    <h3 className="text-xl font-semibold mb-4">Monthly Growth Metrics</h3>
+    <ResponsiveContainer width="100%" height={300}>
+      <LineChart
+        data={monthlyGrowth}
+        margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+      >
+        <XAxis dataKey="month" stroke="#000" />
+        <YAxis stroke="#000" />
+        <Tooltip content={<SafeTooltip />} />
+        <Line type="monotone" dataKey="clicks" stroke="#000" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="sessions" stroke="#000" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="courses" stroke="#000" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="goals" stroke="#000" strokeWidth={2.5} />
+      </LineChart>
+    </ResponsiveContainer>
+  </CardContent>
+</Card>
+
 
           {/* Performance KPIs */}
-          <Card className="shadow-lg">
+          <Card>
             <CardContent className="p-4 sm:p-6">
               <h3 className="text-xl font-semibold mb-4">Key Performance Indicators</h3>
-              <div className="overflow-hidden">
-                <ChartContainer
-                  config={{
-                    "Mentor Response Rate": { label: "Mentor Response Rate", color: "#3B82F6" },
-                    "Session Completion": { label: "Session Completion", color: "#10B981" },
-                    "User Satisfaction": { label: "User Satisfaction", color: "#F59E0B" },
-                    "Platform Uptime": { label: "Platform Uptime", color: "#8B5CF6" },
-                    "Course Completion": { label: "Course Completion", color: "#EF4444" },
-                    "Goal Achievement": { label: "Goal Achievement", color: "#06B6D4" },
-                  }}
-                  className="h-[300px] w-full"
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={performanceKPIs}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
                 >
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={performanceKPIs} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <XAxis dataKey="category" angle={-45} textAnchor="end" height={80} interval={0} />
-                      <YAxis domain={[0, 100]} />
-                      <ChartTooltip
-                        content={({ active, payload, label }) => {
-                          if (active && payload && payload.length) {
-                            return (
-                              <div className="bg-white p-3 border rounded shadow-lg">
-                                <p className="font-medium mb-2">{label}</p>
-                                {payload.map((entry, index) => (
-                                  <p key={index} className="text-sm" style={{ color: entry.color }}>
-                                    {entry.dataKey}: {entry.value}%
-                                  </p>
-                                ))}
-                              </div>
-                            )
-                          }
-                          return null
-                        }}
-                      />
-                      <Bar dataKey="Mentor Response Rate" stackId="a" fill="var(--color-mentor-response-rate)" />
-                      <Bar dataKey="Session Completion" stackId="a" fill="var(--color-session-completion)" />
-                      <Bar dataKey="User Satisfaction" stackId="a" fill="var(--color-user-satisfaction)" />
-                      <Bar dataKey="Platform Uptime" stackId="b" fill="var(--color-platform-uptime)" />
-                      <Bar dataKey="Course Completion" stackId="b" fill="var(--color-course-completion)" />
-                      <Bar dataKey="Goal Achievement" stackId="b" fill="var(--color-goal-achievement)" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </ChartContainer>
-              </div>
+                  <XAxis dataKey="category" angle={-45} textAnchor="end" height={80} />
+                  <YAxis domain={[0, 100]} />
+                  <Tooltip content={<SafeTooltip />} />
+                  <Bar dataKey="Mentor Response Rate" stackId="a" fill="var(--color-mentor-response-rate)" />
+                  <Bar dataKey="Session Completion" stackId="a" fill="var(--color-session-completion)" />
+                  <Bar dataKey="User Satisfaction" stackId="a" fill="var(--color-user-satisfaction)" />
+                  <Bar dataKey="Platform Uptime" stackId="b" fill="var(--color-platform-uptime)" />
+                  <Bar dataKey="Course Completion" stackId="b" fill="var(--color-course-completion)" />
+                  <Bar dataKey="Goal Achievement" stackId="b" fill="var(--color-goal-achievement)" />
+                </BarChart>
+              </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>
 
         {/* Success Metrics */}
-        <Card className="shadow-lg">
+        <Card>
           <CardContent className="p-4 sm:p-6">
             <h3 className="text-xl font-semibold mb-6 text-center">Success Metrics</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -145,13 +136,13 @@ export function StatsSection() {
                 <div key={item.metric} className="text-center">
                   <div className="relative w-28 h-28 mx-auto mb-4">
                     <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="8" fill="none" />
+                      <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="15" fill="none" />
                       <circle
                         cx="50"
                         cy="50"
                         r="40"
                         stroke={getPercentageColor(item.percentage)}
-                        strokeWidth="8"
+                        strokeWidth="13"
                         fill="none"
                         strokeDasharray={`${item.percentage * 2.51} 251`}
                         strokeLinecap="round"
@@ -170,22 +161,22 @@ export function StatsSection() {
         </Card>
 
         {/* Key Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-12">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">52K+</div>
-            <div className="text-gray-600">Monthly Clicks</div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mt-12">
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
+            <div className="text-4xl font-bold text-blue-600 mb-2">15+</div>
+            <div className="text-black">Industries Covered</div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">1950+</div>
-            <div className="text-gray-600">Sessions Booked</div>
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tl-[48px] rounded-tr-[48px]">
+            <div className="text-4xl font-bold text-blue-600 mb-2">1,610+</div>
+            <div className="text-black">Expert Mentors</div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">520+</div>
-            <div className="text-gray-600">Courses Enrolled</div>
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-tl-[48px] rounded-tr-[48px]">
+            <div className="text-4xl font-bold text-blue-600 mb-2">$125K</div>
+            <div className="text-black">Avg Salary</div>
           </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">389+</div>
-            <div className="text-gray-600">Goals Achieved</div>
+          <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-br-[48px]">
+            <div className="text-4xl font-bold text-blue-600 mb-2">+23%</div>
+            <div className="text-black">Avg Growth</div>
           </div>
         </div>
       </div>
