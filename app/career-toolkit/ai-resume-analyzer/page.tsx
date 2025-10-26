@@ -5,7 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+<<<<<<< HEAD
 import { FileText, Loader2 } from "lucide-react"
+=======
+import { FileText } from "lucide-react"
+>>>>>>> 394caf02516b55af503c9309bd636fd6db9aae9d
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
 import UploadBox from "../components/uploadbox"
 import AnalysisResults from "../components/analysis_results"
