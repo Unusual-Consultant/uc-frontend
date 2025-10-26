@@ -108,8 +108,53 @@ export function FeaturedMentors() {
   const mentorsPerView = 3
 
   useEffect(() => {
-    setLoading(false)
+    fetchMentors()
   }, [])
+
+  const fetchMentors = async () => {
+    try {
+      console.log("Fetching mentors from API...")
+      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-mentors/all/mentors?per_page=9")
+      console.log("Response status:", response.status)
+      if (response.ok) {
+        const data = await response.json()
+        console.log("Mentors data from API:", data)
+        if (data.mentors && data.mentors.length > 0) {
+          // Transform backend data to frontend format
+          const transformed = data.mentors.map((mentor: any) => ({
+            id: mentor.id,
+            name: mentor.full_name || "Mentor",
+            title: mentor.headline || mentor.bio?.split(' at ')[0] || "Expert",
+            company: mentor.company || "",
+            image: mentor.profile_picture_url || "/placeholder.svg?height=80&width=80",
+            rating: mentor.rating || 0,
+            reviews: mentor.total_sessions || 0,
+            location: mentor.location || "Remote",
+            expertise: mentor.skills || [],
+            price: mentor.hourly_rate || 1000,
+            mentees: 0,
+            available: true,
+            responseTime: "<4 hrs",
+            successRate: 95,
+            description: mentor.bio || "",
+            yearsExperience: mentor.years_experience,
+            languages: mentor.languages || [],
+          }))
+          console.log("Transformed mentors:", transformed)
+          setMentors(transformed)
+        } else {
+          console.log("No mentors in API response")
+        }
+      } else {
+        console.error("API response not OK:", response.status)
+      }
+    } catch (error) {
+      console.error("Error fetching mentors:", error)
+      // Keep using default mentors as fallback
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const nextSlide = () => setCurrentIndex((prev) => (prev + mentorsPerView) % mentors.length)
   const prevSlide = () =>

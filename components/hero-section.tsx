@@ -67,6 +67,7 @@ export function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mentors, setMentors] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [popularSkills, setPopularSkills] = useState<string[]>(["Product Management","Software Engineering","Data Science","UX Design"]);
 
   // Transform testimonial data to frontend format
   const transformTestimonial = (backendTestimonial: any) => {
@@ -150,9 +151,10 @@ export function HeroSection() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [mentorsRes, testimonialsRes] = await Promise.all([
+        const [mentorsRes, testimonialsRes, skillsRes] = await Promise.all([
           fetch("http://127.0.0.1:8000/api/v1/featured-mentors/"),
-          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/")
+          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/"),
+          fetch("http://127.0.0.1:8000/api/v1/statistics/trending-skills?limit=4")
         ]);
         
         if (mentorsRes.ok) {
@@ -165,6 +167,13 @@ export function HeroSection() {
           const testimonialsData = await testimonialsRes.json();
           const transformedTestimonials = (testimonialsData.featured_testimonials || []).map(transformTestimonial);
           setTestimonials(transformedTestimonials);
+        }
+        
+        if (skillsRes.ok) {
+          const skillsData = await skillsRes.json();
+          if (skillsData.skills && skillsData.skills.length > 0) {
+            setPopularSkills(skillsData.skills);
+          }
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -286,7 +295,7 @@ export function HeroSection() {
 
               <div className="flex flex-wrap gap-2 items-center">
   <span className="font-bold text-[15px] text-black ">Popular:</span>
-  {["Product Management","Software Engineering","Data Science","UX Design"].map((skill) => (
+  {popularSkills.map((skill) => (
     <span
       key={skill}
       className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
