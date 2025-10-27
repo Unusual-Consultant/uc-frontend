@@ -8,16 +8,39 @@ export default function SignupStep3() {
   const searchParams = useSearchParams()
   const [userName, setUserName] = useState("")
   const [isLoading, setIsLoading] = useState(true)
-  
-  const email = searchParams.get("email") || localStorage.getItem("google_email") || ""
-  const userType = searchParams.get("userType") || localStorage.getItem("userType") || "mentee"
+  const [email, setEmail] = useState("")
+  const [userType, setUserType] = useState("mentee")
   
   useEffect(() => {
+    // Safely get values from searchParams and localStorage
+    const emailParam = searchParams.get("email")
+    const userTypeParam = searchParams.get("userType")
+    const tokenParam = searchParams.get("token")
+    
+    if (emailParam) {
+      setEmail(emailParam)
+    } else if (typeof window !== "undefined") {
+      setEmail(localStorage.getItem("google_email") || "")
+    }
+    
+    if (userTypeParam) {
+      setUserType(userTypeParam)
+    } else if (typeof window !== "undefined") {
+      setUserType(localStorage.getItem("userType") || "mentee")
+    }
+    
+    // Store token if provided (from Google OAuth)
+    if (tokenParam && typeof window !== "undefined") {
+      localStorage.setItem("access_token", tokenParam)
+      localStorage.setItem("auth_token", tokenParam)
+      console.log("Token stored from URL:", tokenParam)
+    }
+    
     // Extract first name from email or use a default
     const name = email.split("@")[0] || "User"
     setUserName(name.charAt(0).toUpperCase() + name.slice(1))
     setIsLoading(false)
-  }, [email])
+  }, [email, searchParams])
 
   const handleFindMentors = () => {
     router.push(`/mentees/suggested-mentors`)

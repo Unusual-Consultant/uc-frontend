@@ -1,246 +1,314 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, ArrowRight, Star, MapPin, ChevronLeft, ChevronRight, Award, Verified } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { featuredMentors, testimonials } from "@/lib/data"
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  Star,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  Verified,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
+// API Configuration
+const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+
+// Types for API responses
+interface Mentor {
+  id: string;
+  mentor_id: string;
+  featured_since?: string;
+  mentor: {
+    id: string;
+    user_id: string;
+    bio?: string;
+    headline?: string;
+    location?: string;
+    rating?: number;
+    total_sessions?: number;
+    company?: string;
+    years_experience?: number;
+    current_position?: string;
+    hourly_rate?: number;
+    skills?: string[];
+    full_name?: string;
+    first_name?: string;
+    last_name?: string;
+  };
+}
+
+interface Testimonial {
+  id: string;
+  testimonial_id: string;
+  priority: number;
+  featured_at?: string;
+  expires_at?: string;
+  created_at: string;
+  testimonial: {
+    id: string;
+    content?: string;
+    rating?: number;
+    created_at: string;
+    mentee_name?: string;
+    mentee_image?: string;
+  };
+}
 
 export function HeroSection() {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [currentMentor, setCurrentMentor] = useState(0)
-  const [currentTestimonial, setCurrentTestimonial] = useState(0)
-  const [isClient, setIsClient] = useState(false) // SSG optimization
-  const [autoRotateInterval, setAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)
-  const [testimonialAutoRotateInterval, setTestimonialAutoRotateInterval] = useState<NodeJS.Timeout | null>(null)
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mentors, setMentors] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [popularSkills, setPopularSkills] = useState<string[]>(["Product Management","Software Engineering","Data Science","UX Design"]);
+
+  // Transform testimonial data to frontend format
+  const transformTestimonial = (backendTestimonial: any) => {
+    if (!backendTestimonial || !backendTestimonial.testimonial) {
+      return {
+        name: "Student",
+        content: "Great experience!",
+        rating: 5,
+        role: "Mentee",
+        company: "",
+        image: "/placeholder.svg"
+      };
+    }
+    
+    const testimonial = backendTestimonial.testimonial;
+    
+    return {
+      name: testimonial.mentee_name || "Student",
+      content: testimonial.content || "Great experience!",
+      rating: testimonial.rating || 5,
+      role: "Mentee",
+      company: "",
+      image: testimonial.mentee_image || "/placeholder.svg"
+    };
+  };
+
+  // Transform backend data to frontend format
+  const transformMentor = (backendMentor: any) => {
+    if (!backendMentor || !backendMentor.mentor) {
+      return {
+        id: "unknown",
+        name: "Mentor",
+        title: "Mentor",
+        company: "",
+        image: "/placeholder.svg?height=80&width=80",
+        rating: 0,
+        sessions: 0,
+        location: "Remote",
+        skills: ["Expert"],
+        price: 100,
+        available: true,
+      };
+    }
+    const mentor = backendMentor.mentor;
+    const bioParts = mentor.bio?.split(' at ') || [];
+    
+    // Extract name from full_name, first_name/last_name, or bio
+    let name = mentor.full_name || "Mentor";
+    if (!name || name === "Mentor") {
+      if (mentor.first_name && mentor.last_name) {
+        name = `${mentor.first_name} ${mentor.last_name}`;
+      } else if (bioParts[0]) {
+        name = bioParts[0];
+      }
+    }
+    
+    // Get skills array or use headline
+    const skills = mentor.skills && mentor.skills.length > 0 
+      ? mentor.skills 
+      : [mentor.headline || "Expert"];
+    
+    // Get hourly rate directly from backend
+    const price = mentor.hourly_rate || 1000;
+    
+    return {
+      id: backendMentor.mentor_id,
+      name: name,
+      title: bioParts[0] || mentor.headline || "Expert",
+      company: mentor.company || "",
+      image: mentor.profile_picture_url || "/placeholder.svg?height=80&width=80",
+      rating: mentor.rating || 0,
+      sessions: mentor.total_sessions || 0,
+      location: mentor.location || "Remote",
+      skills: skills,
+      price: price,
+      available: true,
+    };
+  };
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [mentorsRes, testimonialsRes, skillsRes] = await Promise.all([
+          fetch("http://127.0.0.1:8000/api/v1/featured-mentors/"),
+          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/"),
+          fetch("http://127.0.0.1:8000/api/v1/statistics/trending-skills?limit=4")
+        ]);
+        
+        if (mentorsRes.ok) {
+          const mentorsData = await mentorsRes.json();
+          const transformedMentors = (mentorsData.featured_mentors || []).map(transformMentor);
+          setMentors(transformedMentors);
+        }
+        
+        if (testimonialsRes.ok) {
+          const testimonialsData = await testimonialsRes.json();
+          const transformedTestimonials = (testimonialsData.featured_testimonials || []).map(transformTestimonial);
+          setTestimonials(transformedTestimonials);
+        }
+        
+        if (skillsRes.ok) {
+          const skillsData = await skillsRes.json();
+          if (skillsData.skills && skillsData.skills.length > 0) {
+            setPopularSkills(skillsData.skills);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        // Fallback to mock data if API fails
+        const { featuredMentors, testimonials } = await import("@/lib/data");
+        setMentors(featuredMentors);
+        setTestimonials(testimonials);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSearch = useCallback(() => {
-    try {
-      if (searchQuery.trim()) {
-        router.push(`/mentors?search=${encodeURIComponent(searchQuery)}`)
-      } else {
-        router.push("/mentors")
-      }
-    } catch (error) {
-      console.error('Error during search navigation:', error)
+    if (searchQuery.trim()) {
+      router.push(`/mentors?search=${encodeURIComponent(searchQuery)}`);
+    } else {
+      router.push("/mentors");
     }
-  }, [searchQuery, router])
-
-  const nextMentor = useCallback(() => {
-    console.log('nextMentor called', { isClient })
-    if (!isClient) {
-      console.log('nextMentor blocked - not client side')
-      return
-    }
-    try {
-      setCurrentMentor((prev) => {
-        const newIndex = (prev + 1) % featuredMentors.length
-        console.log('nextMentor: changing from', prev, 'to', newIndex)
-        return newIndex
-      })
-      // Reset auto-rotation timer
-      if (autoRotateInterval) {
-        clearInterval(autoRotateInterval)
-      }
-      // Restart auto-rotation
-      const newInterval = setInterval(() => {
-        setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
-      }, 6000)
-      setAutoRotateInterval(newInterval)
-    } catch (error) {
-      console.error('Error in nextMentor:', error)
-    }
-  }, [autoRotateInterval, isClient])
-
-  const prevMentor = useCallback(() => {
-    console.log('prevMentor called', { isClient })
-    if (!isClient) {
-      console.log('prevMentor blocked - not client side')
-      return
-    }
-    try {
-      setCurrentMentor((prev) => {
-        const newIndex = (prev - 1 + featuredMentors.length) % featuredMentors.length
-        console.log('prevMentor: changing from', prev, 'to', newIndex)
-        return newIndex
-      })
-      // Reset auto-rotation timer
-      if (autoRotateInterval) {
-        clearInterval(autoRotateInterval)
-      }
-      // Restart auto-rotation
-      const newInterval = setInterval(() => {
-        setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
-      }, 6000)
-      setAutoRotateInterval(newInterval)
-    } catch (error) {
-      console.error('Error in prevMentor:', error)
-    }
-  }, [autoRotateInterval, isClient])
-
-  const nextTestimonial = useCallback(() => {
-    console.log('nextTestimonial called', { isClient })
-    if (!isClient) {
-      console.log('nextTestimonial blocked - not client side')
-      return
-    }
-    try {
-      setCurrentTestimonial((prev) => {
-        const newIndex = (prev + 1) % testimonials.length
-        console.log('nextTestimonial: changing from', prev, 'to', newIndex)
-        return newIndex
-      })
-      // Reset auto-rotation timer
-      if (testimonialAutoRotateInterval) {
-        clearInterval(testimonialAutoRotateInterval)
-      }
-      // Restart auto-rotation
-      const newInterval = setInterval(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-      }, 6000)
-      setTestimonialAutoRotateInterval(newInterval)
-    } catch (error) {
-      console.error('Error in nextTestimonial:', error)
-    }
-  }, [testimonialAutoRotateInterval, isClient])
-
-  const prevTestimonial = useCallback(() => {
-    console.log('prevTestimonial called', { isClient })
-    if (!isClient) {
-      console.log('prevTestimonial blocked - not client side')
-      return
-    }
-    try {
-      setCurrentTestimonial((prev) => {
-        const newIndex = (prev - 1 + testimonials.length) % testimonials.length
-        console.log('prevTestimonial: changing from', prev, 'to', newIndex)
-        return newIndex
-      })
-      // Reset auto-rotation timer
-      if (testimonialAutoRotateInterval) {
-        clearInterval(testimonialAutoRotateInterval)
-      }
-      // Restart auto-rotation
-      const newInterval = setInterval(() => {
-        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-      }, 6000)
-      setTestimonialAutoRotateInterval(newInterval)
-    } catch (error) {
-      console.error('Error in prevTestimonial:', error)
-    }
-  }, [testimonialAutoRotateInterval, isClient])
+  }, [searchQuery, router]);
 
 
-  // Client-side hydration check for SSG optimization
+  const words = ["AI", "Guidance", "Mentorship", "Support"];
+  const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = up, -1 = down
+
   useEffect(() => {
-    setIsClient(true)
-  }, [])
-
-  // Auto-rotate mentors and testimonials every 6 seconds (client-side only)
-  useEffect(() => {
-    if (!isClient) return // Don't run on server
-    if (featuredMentors.length <= 1) return // No need for interval with single item
-    
-    // Start auto-rotation for mentors
-    const mentorInterval = setInterval(() => {
-      setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
-    }, 6000)
-    
-    // Start auto-rotation for testimonials
-    const testimonialInterval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-    }, 6000)
-    
-    // Store intervals for cleanup
-    setAutoRotateInterval(mentorInterval)
-    setTestimonialAutoRotateInterval(testimonialInterval)
-    
-    return () => {
-      clearInterval(mentorInterval)
-      clearInterval(testimonialInterval)
-    }
-  }, [isClient]) // Only run when client-side
+    const interval = setInterval(() => {
+      setIndex((prev) => {
+        // handle direction reversal at the ends
+        if (prev === words.length - 1) {
+          setDirection(-1);
+          return prev - 1;
+        } else if (prev === 0 && direction === -1) {
+          setDirection(1);
+          return prev + 1;
+        } else {
+          return prev + direction;
+        }
+      });
+    }, 1500); // pause time between transitions
+    return () => clearInterval(interval);
+  }, [direction, words.length]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden" style={{background: 'linear-gradient(165deg, #FFFFFF 0%, #FFFFFF 40%, #D1EAFF 55%, #B7DFFF 70%)'}}>
-      {/* Background Elements */}
+    <section
+      className="relative overflow-hidden min-h-[57.625rem]"
+      style={{
+        background:
+          "linear-gradient(165deg, #FFFFFF 0%, #FFFFFF 40%, #D1EAFF 55%, #B7DFFF 70%)",
+      }}
+    >
+      {/* Background Blobs */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-100 rounded-full filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-50 rounded-full filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-200 rounded-full filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="absolute top-[5rem] left-[2.5rem] w-[18rem] h-[18rem] bg-blue-100 rounded-full filter blur-[4rem] opacity-20 animate-blob"></div>
+        <div className="absolute top-[10rem] right-[2.5rem] w-[18rem] h-[18rem] bg-blue-50 rounded-full filter blur-[4rem] opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-[2rem] left-[5rem] w-[18rem] h-[18rem] bg-blue-200 rounded-full filter blur-[4rem] opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
-          {/* Left Column - Main Content */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                Find Unusual growth
-                <span> through </span>
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0073CF] to-[#003C6C]">
-                  Guidance
-                </span>
-              </h1>
+      <div className="relative container mx-auto max-w-[90rem] px-[1rem] sm:px-[2rem] lg:px-[4rem] py-[4rem]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[3rem] items-center min-h-[80vh]">
+          {/* Left Column */}
+          <div className="space-y-[2rem]">
+            {/* Animated Heading */}
+            <div className="space-y-[1.5rem]">
+            <h1 className="text-4xl md:text-5xl lg:text-[55px] font-bold text-gray-900 leading-tight">
+            Find Unusual growth&nbsp;
+      <span className="text-black">through&nbsp;</span>
+      <span className="relative inline-block h-[1.3em] overflow-hidden align-baseline w-[8ch]">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.span
+            key={index}
+            custom={direction}
+            initial={{ y: direction === 1 ? "100%" : "-100%", opacity: 0 }}
+            animate={{ y: "0%", opacity: 1 }}
+            exit={{ y: direction === 1 ? "-100%" : "100%", opacity: 0 }}
+            transition={{
+              duration: 0.7,
+              ease: [0.45, 0, 0.55, 1],
+            }}
+            className="absolute left-0 top-0 text-gray-900 bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
+          >
+            {words[index]}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </h1>
 
-              <p className="text-xl text-black-600 leading-relaxed">
-                AI as your frontline mentor, with human experts ready to step in
-                for deeper guidance on demand
-              </p>
-            </div>
+
+
+  <p className="text-[1.25rem] text-black leading-relaxed max-w-[36rem]">
+    AI as your frontline mentor, with human experts ready to step in
+    for deeper guidance on demand.
+  </p>
+</div>
+
 
             {/* Search Bar */}
-            <div className="space-y-4">
-              <div className="flex items-center rounded-full shadow-md border border-gray-200 mt-6 p-1 gap-2">
-                {/* Search Icon + Input */}
+            <div className="space-y-[1rem]">
+              <div className="flex items-center bg-white rounded-full shadow-lg mt-[1.5rem] p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840]">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-7" />
+                  <Search className="absolute left-[1rem] top-1/2 -translate-y-1/2 text-black h-[1.25rem] w-[1.25rem]" />
                   <Input
                     type="text"
                     placeholder="Search by skill, role, or company..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                    className="pl-12 pr-4 py-4 text-lg border-none focus:ring-0 focus:outline-none"
+                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    className="pl-[3rem] pr-[1.25rem] py-[1rem] text-[1.125rem] border-none bg-transparent text-black placeholder-black focus:ring-0 focus:outline-none rounded-full"
                   />
                 </div>
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="px-7 py-4 text-lg bg-[#0073CF] text-white hover:bg-[#005fa3] rounded-3xl"
+                  className="px-[2rem] py-[1rem] text-[1.125rem] font-medium bg-[#0073CF] text-white hover:bg-[#005fa3] rounded-full transition-all"
                 >
                   Search
                 </Button>
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm text-gray-500">Popular:</span>
-                {[
-                  "Product Management",
-                  "Software Engineering",
-                  "Data Science",
-                  "UX Design",
-                ].map((skill) => (
-                  <Badge
-                    key={skill}
-                    variant="secondary"
-                    className="cursor-pointer hover:bg-blue-100 transition-colors"
-                    onClick={() => {
-                      setSearchQuery(skill);
-                      handleSearch();
-                    }}
-                  >
-                    {skill}
-                  </Badge>
-                ))}
-              </div>
+              <div className="flex flex-wrap gap-2 items-center">
+  <span className="font-bold text-[15px] text-black ">Popular:</span>
+  {popularSkills.map((skill) => (
+    <span
+      key={skill}
+      className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
+      onClick={() => {
+        setSearchQuery(skill);
+        handleSearch();
+      }}
+    >
+      {skill}
+    </span>
+  ))}
+</div>
+
             </div>
 
             {/* CTA Buttons */}
@@ -255,272 +323,153 @@ export function HeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="px-8 py-4 text-lg rounded-3xl bg-transparent"
+                className="px-8 py-4 text-lg rounded-3xl bg-transparent border-black"
               >
-                <Link href="/onboarding/mentor">Become a Mentor</Link>
+                <Link href="/signup" >Become a Mentor</Link>
               </Button>
             </div>
           </div>
 
-          {/* Right Column - Mentor & Testimonial Cards */}
-          <div className="space-y-6">
-            {/* Featured Mentors*/}
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Meet our Mentors
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={prevMentor}
-                    disabled={!isClient}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
-                    aria-label="Previous mentor"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={nextMentor}
-                    disabled={!isClient}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
-                    aria-label="Next mentor"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+          {/* Right Column - Animated Cards */}
+          <div className="space-y-10">
+            {/* Mentors Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Meet our Mentors
+              </h3>
+              <div className="relative overflow-hidden whitespace-nowrap" role="region">
+                <div className="inline-flex gap-6 animate-scroll-left hover:[animation-play-state:paused]">
+                  {[...mentors, ...mentors].map((mentor, i) => (
+                    <Card key={`${mentor.id}-${i}`} className="min-w-[20rem] backdrop-blur-sm bg-white/80 border-0 shadow-xl"
+                    >
+                      <CardContent className="p-6">
+                        <div className="flex items-start space-x-4">
+                          <div className="relative">
+                            <Avatar className="w-16 h-16">
+                              <AvatarImage
+                                src={mentor.image || "/placeholder.svg"}
+                                alt={mentor.name}
+                              />
+                              <AvatarFallback>
+                                {(mentor.name || "M")
+                                  .split(" ")
+                                  .map((n: string) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            {mentor.available && (
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
+                            )}
+                          </div>
 
-              <div className="relative overflow-hidden" role="region" aria-label="Featured Mentors Carousel">
-                <div 
-                  className="flex transition-transform duration-1500 ease-out"
-                  style={{ 
-                    transform: isClient ? `translateX(-${currentMentor * 100}%)` : 'translateX(0%)' 
-                  }}
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  {featuredMentors.map((mentor, index) => (
-                    <div key={mentor.id} className="w-full flex-shrink-0">
-              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <div className="relative">
-                      <Avatar className="w-16 h-16">
-                        <AvatarImage
-                                  src={mentor.image || "/placeholder.svg"}
-                                  alt={mentor.name}
-                        />
-                        <AvatarFallback>
-                                  {mentor.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                              {mentor.available && (
-                        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
-                      )}
-                    </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h4 className="font-bold text-lg text-gray-900">
+                                {mentor.name}
+                              </h4>
+                              <Verified className="h-4 w-4 text-blue-500" />
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">
+                              {mentor.title}
+                            </p>
+                            <p className="text-sm font-medium text-blue-600 mb-3">
+                              {mentor.company}
+                            </p>
 
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                                <h4 className="font-bold text-lg text-gray-900">{mentor.name}</h4>
-                        <Verified className="h-4 w-4 text-blue-500" />
-                      </div>
-                              <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>
-                              <p className="text-sm font-medium text-blue-600 mb-3">{mentor.company}</p>
+                            <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
+                              <div className="flex items-center space-x-1">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                <span>{mentor.rating}</span>
+                                <span>({mentor.sessions})</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <MapPin className="h-4 w-4" />
+                                <span>{mentor.location}</span>
+                              </div>
+                            </div>
 
-                      <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
-                        <div className="flex items-center space-x-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                  <span>{mentor.rating}</span>
-                                  <span>({mentor.sessions})</span>
+                            <div className="flex flex-wrap gap-1 mb-3">
+                              {mentor.skills.map((skill: string) => (
+                                <Badge
+                                  key={skill}
+                                  variant="secondary"
+                                  className="text-xs"
+                                >
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <div className="font-bold text-xl">
+                                ${mentor.price}/hr
+                              </div>
+                              <Button
+                                size="sm"
+                                disabled={!mentor.available}
+                                className="disabled:opacity-50"
+                              >
+                                {mentor.available ? "Book Now" : "Unavailable"}
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="h-4 w-4" />
-                                  <span>{mentor.location}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 mb-3">
-                                {mentor.skills.map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                                <div className="font-bold text-xl">${mentor.price}/hr</div>
-                        <Button
-                          size="sm"
-                                  disabled={!mentor.available}
-                          className="disabled:opacity-50"
-                        >
-                                  {mentor.available ? "Book Now" : "Unavailable"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               </div>
+            </div>
+{/* testimonials */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Success Stories
+              </h3>
 
-                {/* Carousel Indicators - Only render on client */}
-                {isClient && (
-                  <div className="flex justify-center mt-4 space-x-2">
-                    {featuredMentors.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          try {
-                            setCurrentMentor(index)
-                            // Reset auto-rotation timer
-                            if (autoRotateInterval) {
-                              clearInterval(autoRotateInterval)
-                            }
-                            // Restart auto-rotation
-                            const newInterval = setInterval(() => {
-                              setCurrentMentor((prev) => (prev + 1) % featuredMentors.length)
-                            }, 6000)
-                            setAutoRotateInterval(newInterval)
-                          } catch (error) {
-                            console.error('Error in mentor indicator click:', error)
-                          }
-                        }}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          index === currentMentor
-                            ? 'bg-blue-500 w-6'
-                            : 'bg-gray-300 hover:bg-gray-400'
-                        }`}
-                        aria-label={`Go to mentor ${index + 1}`}
-                      />
-                    ))}
-                  </div>
-                )}
+              <div className="relative overflow-hidden whitespace-nowrap w-full">
+  <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
+    {[...testimonials, ...testimonials].map((t, i) => (
+      <Card 
+      key={`${t.name}-${i}`}
+      className="inline-block w-[20rem] h-auto flex-shrink-0 bg-white/80 border-0 shadow-xl rounded-2xl"
+    >
+      <CardContent className="p-4 flex flex-col space-y-2">
+        {/* Avatar + Rating */}
+        <div className="flex items-center gap-3">
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
+            <AvatarFallback>
+              {(t.name || "U").split(" ").map((n: string) => n[0]).join("")}
+            </AvatarFallback>
+          </Avatar>
+    
+          <div className="flex flex-col">
+            <div className="flex space-x-1 mb-1">
+              {[...Array(t.rating)].map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+    
+            {/* Testimonial text */}
+            <p className="text-gray-700 text-sm italic break-words whitespace-pre-wrap">
+              "{t.content}"
+            </p>
+    
+            {/* Name + Role */}
+            <div className="text-sm font-medium text-gray-900 mt-1">{t.name}</div>
+            <div className="text-xs text-gray-500">{t.role} at {t.company}</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    
+    ))}
+  </div>
+</div>
+
+
             </div>
 
-            {/* Success Stories */}
-            <div className="relative">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Success Stories
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={prevTestimonial}
-                    disabled={!isClient}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
-                    aria-label="Previous testimonial"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={nextTestimonial}
-                    disabled={!isClient}
-                    className="w-8 h-8 p-0 rounded-full bg-transparent hover:bg-blue-50 transition-colors"
-                    aria-label="Next testimonial"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="relative overflow-hidden" role="region" aria-label="Success Stories Carousel">
-                <div 
-                  className="flex transition-transform duration-1500 ease-out"
-                  style={{ 
-                    transform: isClient ? `translateX(-${currentTestimonial * 100}%)` : 'translateX(0%)' 
-                  }}
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  {testimonials.map((testimonial, index) => (
-                    <div key={index} className="w-full flex-shrink-0">
-              <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
-                <CardContent className="p-6">
-                  <div className="flex items-start space-x-4">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage
-                                src={testimonial.image || "/placeholder.svg"}
-                                alt={testimonial.name}
-                      />
-                      <AvatarFallback>
-                                {testimonial.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-1 mb-2">
-                                {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        ))}
-                      </div>
-
-                              <p className="text-gray-700 mb-3 italic">"{testimonial.content}"</p>
-
-                      <div>
-                                <p className="font-medium text-gray-900">{testimonial.name}</p>
-                        <p className="text-sm text-gray-600">
-                                  {testimonial.role} at {testimonial.company}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Carousel Indicators - Only render on client */}
-              {isClient && (
-                <div className="flex justify-center mt-4 space-x-2">
-                  {testimonials.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        try {
-                          setCurrentTestimonial(index)
-                          // Reset auto-rotation timer
-                          if (testimonialAutoRotateInterval) {
-                            clearInterval(testimonialAutoRotateInterval)
-                          }
-                          // Restart auto-rotation
-                          const newInterval = setInterval(() => {
-                            setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
-                          }, 6000)
-                          setTestimonialAutoRotateInterval(newInterval)
-                        } catch (error) {
-                          console.error('Error in testimonial indicator click:', error)
-                        }
-                      }}
-                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                        index === currentTestimonial
-                          ? 'bg-blue-500 w-6'
-                          : 'bg-gray-300 hover:bg-gray-400'
-                      }`}
-                      aria-label={`Go to testimonial ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>

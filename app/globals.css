@@ -83,3 +83,82 @@ body {
 .animate-bounce-gentle {
   animation: bounce-gentle 2s infinite;
 }
+
+
+/* height of each word line - match the inline h-[1.2em] used above */
+.word-scroller {
+  display: inline-block;
+  /* total animation time — tweak if you want longer/shorter */
+  animation: scrollWords 16s cubic-bezier(0.83, 0, 0.17, 1) infinite;
+  will-change: transform;
+}
+
+/* each word is one visible line */
+.word-scroller > span {
+  display: block;
+  height: 1.2em;   /* must match the container height */
+  line-height: 1.2em;
+  color: inherit;  /* keep same color as parent */
+  white-space: nowrap;
+  text-align: left;
+}
+
+/* keyframes: hold on each word, scroll up smoothly, hold, then reverse back */
+@keyframes scrollWords {
+  /* Start — hold on first word */
+  0%   { transform: translateY(0%); }
+  10%  { transform: translateY(0%); }
+
+  /* scroll to second word */
+  15%  { transform: translateY(-12.5%); } /* small in-between for smoothness */
+  20%  { transform: translateY(-100%); }
+  30%  { transform: translateY(-100%); }  /* hold on second word */
+
+  /* scroll to third */
+  35%  { transform: translateY(-112.5%); }
+  40%  { transform: translateY(-200%); }
+  50%  { transform: translateY(-200%); }  /* hold on third word */
+
+  /* scroll to fourth */
+  55%  { transform: translateY(-212.5%); }
+  60%  { transform: translateY(-300%); }
+  70%  { transform: translateY(-300%); }  /* hold on fourth word */
+
+  /* now reverse: back to third */
+  75%  { transform: translateY(-212.5%); }
+  80%  { transform: translateY(-200%); }
+  84%  { transform: translateY(-200%); }  /* short hold while reversing */
+
+  /* back to second */
+  88%  { transform: translateY(-112.5%); }
+  92%  { transform: translateY(-100%); }
+  94%  { transform: translateY(-100%); }
+
+  /* finally back to first and hold until loop restarts */
+  97%  { transform: translateY(-50%); }
+  100% { transform: translateY(0%); }
+}
+
+
+
+/* Left scroll (Mentors) */
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Right scroll (Success Stories) */
+@keyframes scrollRight {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-scroll-right {
+  animation: scrollRight 10s linear infinite;
+}
+
+
+.animate-scroll-left {
+  animation: scrollLeft 10s linear infinite;
+}
+
