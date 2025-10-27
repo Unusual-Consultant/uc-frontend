@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowRight, Calendar, Video, DollarSign, X, FileText, Users, MessageCircle, Briefcase, Target, Lightbulb, GraduationCap, Plus, Globe, Clock } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
 
 interface MentorStep3Props {
   onNext: (data: any) => void
@@ -144,7 +145,7 @@ export function MentorStep3Enhanced({ onNext, onBack, initialData }: MentorStep3
 
     setIsLoading(true)
     try {
-      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/step3", {
+      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/step3`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

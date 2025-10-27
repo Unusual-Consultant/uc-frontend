@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { ArrowRight, Shield, Upload, Award, FileText } from "lucide-react"
+import { API_BASE_URL } from "@/lib/api"
 
 interface MentorStep5Props {
   onNext: (data: any) => void
@@ -41,7 +42,7 @@ export function MentorStep5Enhanced({ onNext, onBack, initialData }: MentorStep5
 
     setIsLoading(true)
     try {
-      const response = await fetch("http://localhost:8000/api/v1/mentors/onboarding/step5", {
+      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/step5`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

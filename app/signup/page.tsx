@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { api } from "@/lib/api";
+import { api, API_BASE_URL } from "@/lib/api";
 import { User, GraduationCap } from "lucide-react";
 import SignupForm from "@/components/signup-form";
 
