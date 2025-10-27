@@ -196,27 +196,15 @@ export function HeroSection() {
 
 
   const words = ["AI", "Guidance", "Mentorship", "Support"];
-  const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = up, -1 = down
-
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => {
-        // handle direction reversal at the ends
-        if (prev === words.length - 1) {
-          setDirection(-1);
-          return prev - 1;
-        } else if (prev === 0 && direction === -1) {
-          setDirection(1);
-          return prev + 1;
-        } else {
-          return prev + direction;
-        }
-      });
-    }, 1500); // pause time between transitions
+      setCurrentWordIndex((prev) => (prev + 1) % words.length);
+    }, 1500);
     return () => clearInterval(interval);
-  }, [direction, words.length]);
-
+  }, [words.length]);
+  
   return (
     <section
       className="relative overflow-hidden min-h-[57.625rem]"
@@ -238,37 +226,32 @@ export function HeroSection() {
           <div className="space-y-[2rem]">
             {/* Animated Heading */}
             <div className="space-y-[1.5rem]">
-            <h1 className="text-4xl md:text-5xl lg:text-[55px] font-bold text-gray-900 leading-tight">
-            Find Unusual growth&nbsp;
-      <span className="text-black">through&nbsp;</span>
-      <span className="relative inline-block h-[1.3em] overflow-hidden align-baseline w-[8ch]">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.span
-            key={index}
-            custom={direction}
-            initial={{ y: direction === 1 ? "100%" : "-100%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 1 }}
-            exit={{ y: direction === 1 ? "-100%" : "100%", opacity: 0 }}
-            transition={{
-              duration: 0.7,
-              ease: [0.45, 0, 0.55, 1],
-            }}
-            className="absolute left-0 top-0 text-gray-900 bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
-          >
-            {words[index]}
-          </motion.span>
-        </AnimatePresence>
-      </span>
-    </h1>
+              <h1 className="text-4xl md:text-5xl lg:text-[50px] font-bold text-gray-900 leading-tight">
+                Find Unusual Growth
+                <br />
+                <span className="text-black">through </span>
+                <span className="relative inline-block h-[1.3em] overflow-hidden align-middle w-[8ch]">
+                  <motion.span
+                    key={currentWordIndex}
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "-100%" }}
+                    transition={{
+                      duration: 0.5,
+                      ease: "easeOut"
+                    }}
+                    className="absolute left-0 text-gray-900 bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
+                  >
+                    {words[currentWordIndex]}
+                  </motion.span>
+                </span>
+              </h1>
 
-
-
-  <p className="text-[1.25rem] text-black leading-relaxed max-w-[36rem]">
-    AI as your frontline mentor, with human experts ready to step in
-    for deeper guidance on demand.
-  </p>
-</div>
-
+              <p className="text-[1.25rem] text-black leading-relaxed max-w-[36rem]">
+                AI as your frontline mentor, with human experts ready to step in
+                for deeper guidance on demand.
+              </p>
+            </div>
 
             {/* Search Bar */}
             <div className="space-y-[1rem]">
@@ -294,21 +277,20 @@ export function HeroSection() {
               </div>
 
               <div className="flex flex-wrap gap-2 items-center">
-  <span className="font-bold text-[15px] text-black ">Popular:</span>
-  {popularSkills.map((skill) => (
-    <span
-      key={skill}
-      className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
-      onClick={() => {
-        setSearchQuery(skill);
-        handleSearch();
-      }}
-    >
-      {skill}
-    </span>
-  ))}
-</div>
-
+                <span className="font-bold text-[15px] text-black ">Popular:</span>
+                {popularSkills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
+                    onClick={() => {
+                      setSearchQuery(skill);
+                      handleSearch();
+                    }}
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* CTA Buttons */}
@@ -420,56 +402,53 @@ export function HeroSection() {
                 </div>
               </div>
             </div>
-{/* testimonials */}
+
+            {/* testimonials */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Success Stories
               </h3>
 
               <div className="relative overflow-hidden whitespace-nowrap w-full">
-  <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
-    {[...testimonials, ...testimonials].map((t, i) => (
-      <Card 
-      key={`${t.name}-${i}`}
-      className="inline-block w-[20rem] h-auto flex-shrink-0 bg-white/80 border-0 shadow-xl rounded-2xl"
-    >
-      <CardContent className="p-4 flex flex-col space-y-2">
-        {/* Avatar + Rating */}
-        <div className="flex items-center gap-3">
-          <Avatar className="w-12 h-12">
-            <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
-            <AvatarFallback>
-              {(t.name || "U").split(" ").map((n: string) => n[0]).join("")}
-            </AvatarFallback>
-          </Avatar>
-    
-          <div className="flex flex-col">
-            <div className="flex space-x-1 mb-1">
-              {[...Array(t.rating)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              ))}
+                <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
+                  {[...testimonials, ...testimonials].map((t, i) => (
+                    <Card 
+                      key={`${t.name}-${i}`}
+                      className="inline-block w-[20rem] h-auto flex-shrink-0 bg-white border-0 shadow-xl rounded-2xl"
+                    >
+                      <CardContent className="p-4 flex flex-col space-y-2">
+                        {/* Avatar + Rating */}
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
+                            <AvatarFallback>
+                              {(t.name || "U").split(" ").map((n: string) => n[0]).join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                    
+                          <div className="flex flex-col">
+                            <div className="flex space-x-1 mb-1">
+                              {[...Array(t.rating)].map((_, i) => (
+                                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              ))}
+                            </div>
+                    
+                            {/* Testimonial text */}
+                            <p className="text-gray-700 text-sm italic break-words whitespace-pre-wrap">
+                              "{t.content}"
+                            </p>
+                    
+                            {/* Name + Role */}
+                            <div className="text-sm font-medium text-gray-900 mt-1">{t.name}</div>
+                            <div className="text-xs text-gray-500">{t.role} at {t.company}</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             </div>
-    
-            {/* Testimonial text */}
-            <p className="text-gray-700 text-sm italic break-words whitespace-pre-wrap">
-              "{t.content}"
-            </p>
-    
-            {/* Name + Role */}
-            <div className="text-sm font-medium text-gray-900 mt-1">{t.name}</div>
-            <div className="text-xs text-gray-500">{t.role} at {t.company}</div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-    
-    ))}
-  </div>
-</div>
-
-
-            </div>
-
           </div>
         </div>
       </div>

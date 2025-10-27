@@ -270,15 +270,18 @@ export function IndustriesSection() {
 
         {/* View All Services */}
         <div className="flex justify-end mt-12 items-center gap-3">
+          {/* White pill */}
           <Button
             size="sm"
             asChild
             className="bg-white text-black px-6 py-2 rounded-full shadow-md hover:bg-[#f2f2f2] transition-colors duration-300"
           >
-            <Link href="/all-services">View All Services</Link>
+            <Link href="/all-services">View All Industries</Link>
           </Button>
-          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-            <ArrowRight className="text-black h-5 w-5" />
+
+          {/* Arrow in circle */}
+          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex items-center gap-2 group cursor-pointer">
+          <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
           </span>
         </div>
 
