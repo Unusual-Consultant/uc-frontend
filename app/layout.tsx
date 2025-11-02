@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
          >
         <AuthenticatedUserProvider>
           <Header />
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen pt-20">{children}</main>
           <Footer />
         </AuthenticatedUserProvider>
       </body>

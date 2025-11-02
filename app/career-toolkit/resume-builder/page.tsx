@@ -3,20 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Wand2 } from "lucide-react";
+import template1 from "./resume_templates/Analyst_1.jpg";
+import { Wand2, ChevronDown, Check, Download, Mail } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { ChevronDown, BookOpenText, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Switch } from "@/components/ui/switch"; // ✅ Add ShadCN switch
-import Link from "next/link";
 import { SuggestedMentorsPage } from "../components/suggested_mentors";
 
 const industryOptions = [
@@ -54,7 +52,6 @@ export default function AIResumeTemplateBuilder() {
   const [selectedRole, setSelectedRole] = useState("Select Role");
   const [selectedExperience, setSelectedExperience] = useState("Select Experience Level");
   const [includePhoto, setIncludePhoto] = useState(false);
-
   const [showTemplates, setShowTemplates] = useState(false);
   const [totalUses] = useState(5);
   const [usesRemaining, setUsesRemaining] = useState(5);
@@ -113,20 +110,14 @@ export default function AIResumeTemplateBuilder() {
     </div>
   );
 
-  // Mock resume templates
   const templates = [
-    { id: 1, image: "/template1.png", pdf: "/template1.pdf", word: "/template1.docx" },
-    { id: 2, image: "/template2.png", pdf: "/template2.pdf", word: "/template2.docx" },
-    { id: 3, image: "/template3.png", pdf: "/template3.pdf", word: "/template3.docx" },
-    { id: 4, image: "/template4.png", pdf: "/template4.pdf", word: "/template4.docx" },
-    { id: 5, image: "/template5.png", pdf: "/template5.pdf", word: "/template5.docx" },
-    { id: 6, image: "/template6.png", pdf: "/template6.pdf", word: "/template6.docx" },
+    { id: 1, image: template1, pdf: "/template1.pdf", word: "/template1.docx" },
   ];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
-      {/* ===== Header Box ===== */}
-      <div className="w-full max-w-5xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
+      {/* ===== Header ===== */}
+      <div className="w-full max-w-6xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
         <div className="flex flex-col space-y-2">
           <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
             <span className="text-[#0073CF]">AI Resume Template</span> Builder
@@ -138,9 +129,7 @@ export default function AIResumeTemplateBuilder() {
 
         <Button
           onClick={handleStart}
-          className={cn(
-            "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8 md:top-auto md:right-auto"
-          )}
+          className="bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8"
         >
           <Image
             src="/sparkle-filled.png"
@@ -154,10 +143,10 @@ export default function AIResumeTemplateBuilder() {
       </div>
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl mx-auto">
+      <Card className="w-full max-w-6xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl mx-auto">
   <CardContent className="p-8 space-y-8">
-    {/* Filters Grid */}
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 items-end">
+  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 items-start">
+
       <Dropdown
         label="Industry"
         options={industryOptions}
@@ -176,37 +165,34 @@ export default function AIResumeTemplateBuilder() {
         selected={selectedExperience}
         onSelect={setSelectedExperience}
       />
-
-      {/* ✅ Include Photo (Aligned Label) */}
-      <div className="flex flex-col justify-end space-y-2 mt-[2px]">
+      <div className="flex flex-col space-y-2">
   <Label className="text-black font-medium leading-tight">Include Photo</Label>
-  <div className="flex items-center space-x-3 mt-[2px]">
+  <div className="flex items-center space-x-3">
     <button
       onClick={() => setIncludePhoto(!includePhoto)}
-      className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-150
-        ${includePhoto ? "bg-green-500" : "bg-gray-300"}`}
+      className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors duration-150 ${
+        includePhoto ? "bg-green-500" : "bg-gray-300"
+      }`}
     >
       <span
-        className={`inline-flex h-6 w-6 transform rounded-full bg-white shadow-sm transition-all duration-150
-          ${includePhoto ? "translate-x-4" : "translate-x-0"} items-center justify-center`}
+        className={`inline-flex h-6 w-6 transform rounded-full bg-white shadow-sm transition-all duration-150 ${
+          includePhoto ? "translate-x-4" : "translate-x-0"
+        } items-center justify-center`}
       >
         <span
-          className={`text-[11px] font-bold select-none transition-all duration-150
-            ${includePhoto ? "text-green-400" : "text-gray-400"}`}
+          className={`text-[11px] font-bold select-none transition-all duration-150 ${
+            includePhoto ? "text-green-400" : "text-gray-400"
+          }`}
         >
           {includePhoto ? "✓" : "×"}
         </span>
       </span>
     </button>
-    <span className="text-sm text-gray-700">
-      {includePhoto ? "Yes" : "No"}
-    </span>
+    <span className="text-sm text-gray-700">{includePhoto ? "Yes" : "No"}</span>
   </div>
 </div>
+</div>
 
-    </div>
-
-    {/* Generate Templates Button */}
     <div className="flex justify-end">
       <Button
         onClick={handleGenerate}
@@ -219,78 +205,105 @@ export default function AIResumeTemplateBuilder() {
   </CardContent>
 </Card>
 
+
       {/* ===== Templates Section ===== */}
       {showTemplates && (
-  <Card className="w-full max-w-6xl bg-[#E8F2FD] rounded-[12px] border border-[#C5D9F2] shadow-sm p-8 mt-8">
-    <CardContent>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[10px] justify-items-center">
-        {templates.map((template) => (
-          <TemplateCard key={template.id} template={template} />
-        ))}
-      </div>
-    </CardContent>
-  </Card>
-)}
-
+        <Card className="w-full max-w-6xl bg-[#E8F2FD] rounded-[12px] border border-[#C5D9F2] shadow-sm p-8 mt-8">
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[10px] justify-items-center">
+              {templates.map((template) => (
+                <TemplateCard key={template.id} template={template} />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <SuggestedMentorsPage />
     </div>
   );
 }
 
-// === Reusable Template Card ===
-function TemplateCard({ template }: { template: { id: number; image: string; pdf: string; word: string } }) {
-    const [showDownloadOptions, setShowDownloadOptions] = useState(false);
-  
-    return (
-      <div
-        key={template.id}
-        className="relative flex flex-col items-center bg-white rounded-[24px] shadow-[0_0_15px_#C4E1FF] w-[330px] h-[450px] p-[15px_18px] transition-transform hover:scale-[1.02]"
-      >
-        <div className="relative w-full h-[380px] overflow-hidden rounded-[18px]">
-          <Image
-            src={template.image}
-            alt={`Template ${template.id}`}
-            fill
-            className="object-cover rounded-[18px]"
-          />
-        </div>
-  
-        {/* Buttons Section */}
-        <div className="flex gap-3 mt-4 relative">
-          <div className="relative">
-            <Button
-              onClick={() => setShowDownloadOptions((prev) => !prev)}
-              className="bg-white text-[#0073CF] border border-[#C4E1FF] rounded-full px-5 py-2 text-sm font-medium shadow-sm hover:bg-[#F0F8FF]"
-            >
-              Download
-            </Button>
-  
-            {showDownloadOptions && (
-              <div className="absolute top-[110%] left-0 bg-white border border-[#C4E1FF] rounded-xl shadow-md overflow-hidden z-10">
-                <Link
-                  href={template.pdf}
-                  target="_blank"
-                  className="block px-4 py-2 text-sm text-[#0073CF] hover:bg-[#F0F8FF]"
-                >
-                  Download PDF
-                </Link>
-                <Link
-                  href={template.word}
-                  target="_blank"
-                  className="block px-4 py-2 text-sm text-[#0073CF] hover:bg-[#F0F8FF]"
-                >
-                  Download Word
-                </Link>
-              </div>
-            )}
-          </div>
-  
-          <Button className="bg-white text-[#0073CF] border border-[#C4E1FF] rounded-full px-5 py-2 text-sm font-medium shadow-sm hover:bg-[#F0F8FF]">
-            Mail
-          </Button>
-        </div>
+// === Template Card ===
+function TemplateCard({
+  template,
+}: {
+  template: { id: number; image: any; pdf: string; word: string };
+}) {
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
+
+  return (
+    <div className="relative flex flex-col items-center bg-white rounded-[24px] w-[330px] h-[450px] p-[15px_18px] transition-transform hover:scale-[1.02]">
+      {/* Image with glow */}
+      <div className="relative w-full h-[380px] overflow-hidden rounded-[18px] border-[3px] border-[#C4E1FF] shadow-[0_0_20px_#C4E1FF80] transition-all">
+        <Image
+          src={template.image}
+          alt={`Template ${template.id}`}
+          fill
+          className="object-cover rounded-[15px]"
+        />
       </div>
-    );
-  }
-  
+
+      {/* Buttons */}
+      <div className="flex gap-3 mt-4 relative">
+        {/* Download Button */}
+        <div className="relative">
+  <Button
+    onClick={() => setShowDownloadOptions((prev) => !prev)}
+    className={cn(
+      "flex flex-col items-center justify-center bg-white text-black border border-[#D1D5DB] rounded-full text-[12px] font-medium shadow-[0_2px_6px_#60606040] hover:bg-[#F8F9FA] transition-all duration-200 overflow-hidden",
+      showDownloadOptions
+        ? "h-[64px] px-4 py-[4px]"
+        : "h-[28px] px-4 py-[3px]"
+    )}
+  >
+    {!showDownloadOptions ? (
+      <div className="flex items-center gap-1">
+        <Download className="w-3.5 h-3.5" />
+        Download
+      </div>
+    ) : (
+      <div className="flex flex-col items-center space-y-[2px] w-full text-[12px] font-medium">
+      <Link
+  href={template.pdf}
+  target="_blank"
+  className="flex justify-center items-center gap-1 w-full hover:text-[#0073CF] transition"
+>
+  <Image
+    src="/pdf_icon.png"  
+    alt="PDF"
+    width={14}
+    height={14}
+    className="object-contain"
+  />
+  Download PDF
+</Link>
+        <div className="w-[70%] h-[1px] bg-gray-300" />
+        <Link
+          href={template.word}
+          target="_blank"
+          className="flex justify-center items-center gap-1 w-full hover:text-[#0073CF] transition"
+        >
+            <Image
+    src="/word_icon.png"  
+    alt="PDF"
+    width={14}
+    height={14}
+    className="object-contain"
+  /> Download Word
+        </Link>
+      </div>
+    )}
+  </Button>
+</div>
+
+
+        {/* Mail Button */}
+        <Button className="flex items-center justify-center gap-1 bg-white text-black border border-[#D1D5DB] rounded-full w-[130px] h-[28px] text-[12px] font-medium shadow-[0_2px_6px_#60606040] hover:bg-[#F8F9FA] transition-all">
+    <Mail className="w-3.5 h-3.5" />
+    Send to Mail
+  </Button>
+      </div>
+    </div>
+  );
+}
