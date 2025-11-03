@@ -38,7 +38,8 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
 
   useEffect(() => {
     const fetchMentors = async () => {
-      if (!skills || skills.length === 0) {
+      // Fetch if either skills exist OR a role is provided
+      if ((!skills || skills.length === 0) && !role) {
         setMentors([])
         return
       }
@@ -46,7 +47,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
         const response = await fetch("http://127.0.0.1:8000/api/v1/mentors/ai-recommended", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ skills, desired_role: role || null, limit: 4 }),
+          body: JSON.stringify({ skills: skills || [], desired_role: role || null, limit: 4 }),
         })
         if (!response.ok) throw new Error("Failed to fetch mentors")
         const data = await response.json()
