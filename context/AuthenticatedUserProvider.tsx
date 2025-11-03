@@ -125,8 +125,18 @@ const processOAuthCallback = useCallback(async (code: string) => {
       console.log("Callback response data:", data);
 
       if (data.token && data.user_info) {
+        // ✅ Transform backend response to include camelCase fields
+        const transformedUserInfo = {
+          ...data.user_info,
+          firstName: data.user_info.first_name || data.user_info.firstName,
+          lastName: data.user_info.last_name || data.user_info.lastName,
+          name: data.user_info.first_name && data.user_info.last_name 
+            ? `${data.user_info.first_name} ${data.user_info.last_name}`.trim()
+            : data.user_info.first_name || data.user_info.firstName || data.user_info.name || data.user_info.email?.split("@")[0],
+        };
+        
         // ✅ merge token into user object
-        const userWithToken = { ...data.user_info, token: data.token };
+        const userWithToken = { ...transformedUserInfo, token: data.token };
 
         // ✅ save both in localStorage
         localStorage.setItem("auth_token", data.token);
@@ -184,7 +194,18 @@ const processOAuthCallback = useCallback(async (code: string) => {
       const response = await makeAuthenticatedRequest('/auth/me');
       if (response.ok) {
         const userInfo = await response.json();
-        setUser(userInfo);
+        // Transform snake_case to camelCase and add name field
+        const transformedUser = {
+          ...userInfo,
+          firstName: userInfo.first_name || userInfo.firstName,
+          lastName: userInfo.last_name || userInfo.lastName,
+          name: userInfo.first_name && userInfo.last_name 
+            ? `${userInfo.first_name} ${userInfo.last_name}`.trim()
+            : userInfo.first_name || userInfo.firstName || userInfo.name || userInfo.email?.split("@")[0],
+        };
+        // Store both original and transformed
+        localStorage.setItem("user_info", JSON.stringify(transformedUser));
+        setUser(transformedUser);
         setIsAuthenticated(true);
       } else {
         logout();
@@ -199,7 +220,16 @@ const processOAuthCallback = useCallback(async (code: string) => {
         if (authToken && userInfo) {
           try {
             const userData = JSON.parse(userInfo);
-            setUser(userData);
+            // Transform if needed (in case it's raw backend response)
+            const transformedUser = {
+              ...userData,
+              firstName: userData.first_name || userData.firstName,
+              lastName: userData.last_name || userData.lastName,
+              name: userData.first_name && userData.last_name 
+                ? `${userData.first_name} ${userData.last_name}`.trim()
+                : userData.first_name || userData.firstName || userData.name || userData.email?.split("@")[0],
+            };
+            setUser(transformedUser);
             setToken(authToken);
             setIsAuthenticated(true);
           } catch {
@@ -213,12 +243,34 @@ const processOAuthCallback = useCallback(async (code: string) => {
   }, [makeAuthenticatedRequest, logout]);
 
   useEffect(() => {
+    // Check if token is in URL (from Google OAuth redirect)
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenParam = urlParams.get("token");
+      
+      if (tokenParam && !localStorage.getItem("auth_token")) {
+        // Token from URL - store it and fetch user info
+        localStorage.setItem("auth_token", tokenParam);
+        getCurrentUser();
+        return;
+      }
+    }
+
     if (hasValidToken()) {
       const authToken = localStorage.getItem("auth_token")!;
       const userInfo = localStorage.getItem("user_info")!;
       try {
         const userData = JSON.parse(userInfo);
-        setUser(userData);
+        // Transform if needed (in case it's raw backend response)
+        const transformedUser = {
+          ...userData,
+          firstName: userData.first_name || userData.firstName,
+          lastName: userData.last_name || userData.lastName,
+          name: userData.first_name && userData.last_name 
+            ? `${userData.first_name} ${userData.last_name}`.trim()
+            : userData.first_name || userData.firstName || userData.name || userData.email?.split("@")[0],
+        };
+        setUser(transformedUser);
         setToken(authToken);
         setIsAuthenticated(true);
       } catch {
@@ -234,7 +286,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
         setIsAuthenticated(false);
       }
     }
-  }, []); 
+  }, [getCurrentUser]); 
 
   useEffect(() => {
     const code = searchParams.get("code");

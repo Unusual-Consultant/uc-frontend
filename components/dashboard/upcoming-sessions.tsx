@@ -3,12 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Calendar, MoreVertical } from "lucide-react"
+import { Clock, Calendar, MoreVertical, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 interface Session {
-  id: number
+  id: string | number
   mentorName: string
   mentorTitle: string
   sessionType: string
@@ -16,42 +17,179 @@ interface Session {
   time: string
   duration: string
   price: string
-  status: "confirmed" | "pending" | "processing"
+  status: "confirmed" | "pending" | "processing" | "cancelled" | "rescheduled"
+  meetingLink?: string
+  notes?: string
 }
 
-interface UpcomingSessionsProps {
-  sessions: Session[]
-}
+export function UpcomingSessions() {
+  const { makeAuthenticatedRequest } = useAuthenticatedUser()
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [timeLeft, setTimeLeft] = useState<{ [key: string | number]: string }>({})
 
-export function UpcomingSessions({ sessions }: UpcomingSessionsProps) {
-  const [timeLeft, setTimeLeft] = useState<{ [key: number]: string }>({})
+  // Fetch upcoming sessions from backend
+  useEffect(() => {
+    const fetchUpcomingSessions = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, showing empty state")
+          setSessions([])
+          setIsLoading(false)
+          return
+        }
 
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/upcoming-sessions`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch sessions: ${response.status}`)
+        }
+
+        const data: Array<{
+          id: string
+          mentorName: string
+          mentorTitle: string
+          sessionType: string
+          date: string
+          time: string
+          duration: string
+          price: string
+          status: string
+          meetingLink?: string
+          notes?: string
+        }> = await response.json()
+
+        // Transform backend data to match frontend format
+        const transformedSessions: Session[] = data.map((session) => ({
+          id: session.id,
+          mentorName: session.mentorName,
+          mentorTitle: session.mentorTitle,
+          sessionType: session.sessionType,
+          date: session.date, // Already formatted as "Today", "Tomorrow", etc. by backend
+          time: session.time,
+          duration: session.duration,
+          price: session.price,
+          status: (session.status as Session["status"]) || "pending",
+          meetingLink: session.meetingLink,
+          notes: session.notes
+        }))
+
+        setSessions(transformedSessions)
+      } catch (err) {
+        console.error("Error fetching upcoming sessions:", err)
+        setError("Failed to load sessions")
+        setSessions([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUpcomingSessions()
+  }, [makeAuthenticatedRequest])
+
+  // Calculate time left for sessions happening today
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date()
-      const newTimeLeft: { [key: number]: string } = {}
+      const newTimeLeft: { [key: string | number]: string } = {}
 
       sessions.forEach((session) => {
-        if (session.date === "Today") {
-          const sessionTime = new Date()
-          sessionTime.setHours(16, 0, 0, 0) // 4:00 PM
-          const diff = sessionTime.getTime() - now.getTime()
+        if (session.date === "Today" && session.time) {
+          // Parse time (e.g., "4:00 PM" or "16:00")
+          const timeMatch = session.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i)
+          if (timeMatch) {
+            let hours = parseInt(timeMatch[1])
+            const minutes = parseInt(timeMatch[2])
+            const ampm = timeMatch[3]?.toUpperCase()
 
-          if (diff > 0) {
-            const hours = Math.floor(diff / (1000 * 60 * 60))
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-            newTimeLeft[session.id] = `${hours}h ${minutes}m`
-          } else {
-            newTimeLeft[session.id] = "Starting soon"
+            // Convert to 24-hour format
+            if (ampm === "PM" && hours !== 12) hours += 12
+            if (ampm === "AM" && hours === 12) hours = 0
+
+            const sessionTime = new Date()
+            sessionTime.setHours(hours, minutes, 0, 0)
+            const diff = sessionTime.getTime() - now.getTime()
+
+            if (diff > 0) {
+              const hoursLeft = Math.floor(diff / (1000 * 60 * 60))
+              const minutesLeft = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+              newTimeLeft[session.id] = `${hoursLeft}h ${minutesLeft}m`
+            } else {
+              newTimeLeft[session.id] = "Starting soon"
+            }
           }
         }
       })
 
       setTimeLeft(newTimeLeft)
-    }, 60000)
+    }, 60000) // Update every minute
 
     return () => clearInterval(interval)
   }, [sessions])
+
+  if (isLoading) {
+    return (
+      <Card className="border-0 bg-transparent shadow-none">
+        <CardHeader className="pl-2">
+          <CardTitle className="flex items-center space-x-2">
+            <Image
+              src="/ph_video-light.png"
+              alt="upcoming sessions"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+            <span className="text-[#003b6b]">Upcoming</span>
+            <span className="text-text-primary"> Sessions</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <span className="ml-3 text-gray-600">Loading sessions...</span>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card className="border-0 bg-transparent shadow-none">
+        <CardHeader className="pl-2">
+          <CardTitle className="flex items-center space-x-2">
+            <Image
+              src="/ph_video-light.png"
+              alt="upcoming sessions"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
+            <span className="text-[#003b6b]">Upcoming</span>
+            <span className="text-text-primary"> Sessions</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p className="text-red-600 mb-2">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Retry
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   if (sessions.length === 0) {
     return (
@@ -163,12 +301,23 @@ export function UpcomingSessions({ sessions }: UpcomingSessionsProps) {
                     {session.price}
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button
-                      size="sm"
-                      className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
-                    >
-                      Join
-                    </Button>
+                    {session.meetingLink ? (
+                      <Button
+                        size="sm"
+                        className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
+                        onClick={() => window.open(session.meetingLink, '_blank')}
+                      >
+                        Join
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
+                        disabled
+                      >
+                        Join
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"

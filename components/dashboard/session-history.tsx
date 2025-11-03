@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -12,8 +12,10 @@ import {
   Clock,
   CheckCircle,
   Bell,
+  Loader2,
 } from "lucide-react"
 import { ReviewForm } from "@/components/reviews/review-form"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 interface Session {
   id: string
@@ -31,53 +33,6 @@ interface Session {
   canReview: boolean
   daysLeft?: number
 }
-
-const mockSessions: Session[] = [
-  {
-    id: "1",
-    mentorName: "David Kim",
-    mentorTitle: "Ex-Netflix Data Scientist",
-    mentorImage: "",
-    sessionType: "Mock Interview",
-    date: "2 days ago",
-    duration: "60 mins",
-    price: "₹1600",
-    status: "completed",
-    hasReview: true,
-    rating: 5,
-    reviewText:
-      "Excellent session! David provided detailed feedback on my technical skills and helped me prepare for system design questions.",
-    canReview: false,
-  },
-  {
-    id: "2",
-    mentorName: "Priya Patel",
-    mentorTitle: "Senior PM at Amazon",
-    mentorImage: "/placeholder.svg?height=40&width=40",
-    sessionType: "Resume Review",
-    date: "1 week ago",
-    duration: "30 mins",
-    price: "₹800",
-    status: "completed",
-    hasReview: false,
-    canReview: true,
-    daysLeft: 3,
-  },
-  {
-    id: "3",
-    mentorName: "Rahul Sharma",
-    mentorTitle: "Product Lead at Flipkart",
-    mentorImage: "",
-    sessionType: "Career Strategy",
-    date: "2 weeks ago",
-    duration: "45 mins",
-    price: "₹1200",
-    status: "completed",
-    hasReview: false,
-    canReview: false,
-    daysLeft: 0,
-  },
-]
 
 // Avatar with initials fallback
 function MentorAvatar({ name, image }: { name: string; image?: string }) {
@@ -107,24 +62,132 @@ function MentorAvatar({ name, image }: { name: string; image?: string }) {
 }
 
 export function SessionHistory() {
+  const { makeAuthenticatedRequest } = useAuthenticatedUser()
   const [showReviewForm, setShowReviewForm] = useState<string | null>(null)
-  const [sessions, setSessions] = useState(mockSessions)
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Fetch session history from backend
+  useEffect(() => {
+    const fetchSessionHistory = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, showing empty state")
+          setSessions([])
+          setIsLoading(false)
+          return
+        }
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/session-history?limit=20`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch session history: ${response.status}`)
+        }
+
+        const data: Array<{
+          id: string
+          mentorName: string
+          mentorTitle: string
+          mentorImage?: string
+          sessionType: string
+          date: string
+          duration: string
+          price: string
+          status: string
+          hasReview: boolean
+          rating?: number
+          reviewText?: string
+          canReview: boolean
+          daysLeft?: number
+        }> = await response.json()
+
+        // Transform backend data to match frontend format
+        const transformedSessions: Session[] = data.map((session) => ({
+          id: session.id,
+          mentorName: session.mentorName,
+          mentorTitle: session.mentorTitle,
+          mentorImage: session.mentorImage,
+          sessionType: session.sessionType,
+          date: session.date,
+          duration: session.duration,
+          price: session.price,
+          status: (session.status as Session["status"]) || "completed",
+          hasReview: session.hasReview,
+          rating: session.rating,
+          reviewText: session.reviewText,
+          canReview: session.canReview,
+          daysLeft: session.daysLeft,
+        }))
+
+        setSessions(transformedSessions)
+      } catch (err) {
+        console.error("Error fetching session history:", err)
+        setError("Failed to load session history")
+        setSessions([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSessionHistory()
+  }, [makeAuthenticatedRequest])
 
   const handleReviewSubmit = async (sessionId: string, reviewData: any) => {
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === sessionId
-          ? {
-            ...session,
-            hasReview: true,
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/mentee-dashboard/submit-review`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sessionId: sessionId,
             rating: reviewData.rating,
-            reviewText: reviewData.review,
-            canReview: false,
-          }
-          : session,
-      ),
-    )
-    setShowReviewForm(null)
+            review: reviewData.review,
+            tags: reviewData.tags || [],
+            sessionSpecific: reviewData.sessionSpecific || {
+              punctuality: 0,
+              communication: 0,
+              expertise: 0,
+              helpfulness: 0,
+            },
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || "Failed to submit review")
+      }
+
+      // Update the session in the list to reflect the new review
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === sessionId
+            ? {
+                ...session,
+                hasReview: true,
+                rating: reviewData.rating,
+                reviewText: reviewData.review,
+                canReview: false,
+              }
+            : session,
+        ),
+      )
+      
+      setShowReviewForm(null)
+    } catch (err) {
+      console.error("Error submitting review:", err)
+      alert(err instanceof Error ? err.message : "Failed to submit review. Please try again.")
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -203,8 +266,29 @@ export function SessionHistory() {
         </p>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <span className="ml-3 text-gray-600">Loading session history...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="text-center py-8">
+          <p className="text-red-600 mb-2">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
       {/* Sessions */}
-      {sessions.length === 0 ? (
+      {!isLoading && !error && sessions.length === 0 ? (
         <div className="text-center py-8">
           <Image
             src="/calendar.png"

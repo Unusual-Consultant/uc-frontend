@@ -2,23 +2,80 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, IndianRupee } from "lucide-react"
+import { Users, IndianRupee, Loader2 } from "lucide-react"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Wallet} from "lucide-react"
 import { Gift} from "lucide-react"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 
 export function PromotionsBanner() {
+  const { makeAuthenticatedRequest } = useAuthenticatedUser()
   const [copied, setCopied] = useState(false)
-  const referralCode = "APOORV2024"
-  const referralEarnings = 2500
-  const referralCount = 5
+  const [referralCode, setReferralCode] = useState("")
+  const [referralEarnings, setReferralEarnings] = useState(0)
+  const [referralCount, setReferralCount] = useState(0)
+  const [perReferralAmount, setPerReferralAmount] = useState(500)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchReferralStats = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, showing default values")
+          setReferralCode("")
+          setReferralEarnings(0)
+          setReferralCount(0)
+          setIsLoading(false)
+          return
+        }
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/referral-stats`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch referral stats: ${response.status}`)
+        }
+
+        const data: {
+          referralCode: string
+          referralCount: number
+          referralEarnings: number
+          perReferralAmount: number
+        } = await response.json()
+
+        setReferralCode(data.referralCode)
+        setReferralEarnings(data.referralEarnings)
+        setReferralCount(data.referralCount)
+        setPerReferralAmount(data.perReferralAmount)
+      } catch (err) {
+        console.error("Error fetching referral stats:", err)
+        setError("Failed to load referral stats")
+        // Set default values on error
+        setReferralCode("")
+        setReferralEarnings(0)
+        setReferralCount(0)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchReferralStats()
+  }, [makeAuthenticatedRequest])
 
   const copyReferralCode = () => {
-    navigator.clipboard.writeText(`https://unusualconsultant.com/signup?ref=${referralCode}`)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    if (referralCode) {
+      navigator.clipboard.writeText(`https://unusualconsultant.com/signup?ref=${referralCode}`)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   const handleLearnMore = () => {
@@ -53,16 +110,26 @@ export function PromotionsBanner() {
           </div>
 
           {/* Referral Code Box with dotted outline */}
-          <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[200px] text-center">
-  <p className="text-gray-500 text-[10px]">Your referral code is</p>
-  <span className="font-mono text-black text-sm font-semibold">{referralCode}</span>
-  <span
-    onClick={copyReferralCode}
-    className="text-gray-500 text-[11px] cursor-pointer hover:underline"
-  >
-    {copied ? "Copied!" : "Tap to Copy"}
-  </span>
-</div>
+          {isLoading ? (
+            <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[200px] text-center">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+            </div>
+          ) : referralCode ? (
+            <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[200px] text-center">
+              <p className="text-gray-500 text-[10px]">Your referral code is</p>
+              <span className="font-mono text-black text-sm font-semibold">{referralCode}</span>
+              <span
+                onClick={copyReferralCode}
+                className="text-gray-500 text-[11px] cursor-pointer hover:underline"
+              >
+                {copied ? "Copied!" : "Tap to Copy"}
+              </span>
+            </div>
+          ) : (
+            <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[200px] text-center">
+              <p className="text-gray-500 text-[10px]">No referral code available</p>
+            </div>
+          )}
 
         </CardContent>
       </Card>
@@ -98,7 +165,7 @@ export function PromotionsBanner() {
     <CardContent className="p-8 text-center flex flex-col items-center">
       <div className="flex items-center gap-3 mb-3">
         <Gift className="h-8 w-8 text-purple-600" />
-        <span className="text-2xl font-bold text-purple-600">₹500</span>
+        <span className="text-2xl font-bold text-purple-600">₹{perReferralAmount}</span>
       </div>
       <p className="text-base font-medium text-gray-600">Per Referral</p>
     </CardContent>
@@ -144,7 +211,7 @@ export function PromotionsBanner() {
     <div className="flex-1 text-center md:text-center">
       <h4 className="text-lg md:text-xl font-bold mb-1">Limited Time: Double Rewards!</h4>
       <p className="text-sm md:text-base font-semibold mb-3">
-        Earn ₹1000 credits per referral this month only
+        Earn ₹{perReferralAmount * 2} credits per referral this month only
       </p>
       <span className="px-7 py-1.5 bg-red-100 text-red-600 font-semibold text-sm rounded-xl">
         2x credits

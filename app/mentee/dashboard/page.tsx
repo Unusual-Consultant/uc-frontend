@@ -1,5 +1,7 @@
 "use client"
 
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { SuggestedMentorsCarousel } from "@/components/dashboard/suggested-mentors-carousel"
 import { ActionPanel } from "@/components/dashboard/action-panel"
@@ -10,71 +12,107 @@ import { ProgressTracker } from "@/components/dashboard/progress-tracker"
 import { PromotionsBanner } from "@/components/dashboard/promotions-banner"
 import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 import { ProfileProgressCircle } from "@/components/dashboard/profile-progress-circle"
+import { Loader2 } from "lucide-react"
 
-const upcomingSessionsData = [
-  {
-    id: 1,
-    mentorName: "Sarah Johnson",
-    mentorTitle: "Senior PM at Google",
-    sessionType: "Career Strategy Call",
-    date: "Today",
-    time: "4:00 PM",
-    duration: "45 mins",
-    price: "₹1500",
-    status: "confirmed",
-  },
-  {
-    id: 2,
-    mentorName: "Michael Chen",
-    mentorTitle: "Ex-Amazon PM",
-    sessionType: "Resume Review",
-    date: "Tomorrow",
-    time: "10:00 AM",
-    duration: "30 mins",
-    price: "₹800",
-    status: "pending",
-  },{
-    id: 3,
-    mentorName: "Brady Ackerman",
-    mentorTitle: "Ex-Amazon PM",
-    sessionType: "Mock Interview",
-    date: "Tomorrow",
-    time: "10:00 AM",
-    duration: "30 mins",
-    price: "₹800",
-    status: "processing",
-  },
-]
-
-const recentActivityData = [
-  {
-    id: 1,
-    type: "session_completed",
-    title: "Completed mock interview with David Kim",
-    time: "2 days ago",
-    rating: 5,
-  },
-  {
-    id: 2,
-    type: "goal_progress",
-    title: "Updated career goal progress - 75% complete",
-    time: "3 days ago",
-  },
-  {
-    id: 3,
-    type: "mentor_match",
-    title: "3 new mentor matches found",
-    time: "1 week ago",
-  },
-]
 export default function MenteeDashboardPage() {
-  const { user } = useAuthenticatedUser()
+  const router = useRouter()
+  const { user, isAuthenticated, makeAuthenticatedRequest } = useAuthenticatedUser()
+  const [targetRole, setTargetRole] = useState<string | null>(null)
+  const [progressPercentage, setProgressPercentage] = useState(0)
+  const [isLoadingHeader, setIsLoadingHeader] = useState(true)
+
+  // Handle token from URL (Google OAuth redirect)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const tokenParam = urlParams.get("token")
+    
+    if (tokenParam && !localStorage.getItem("auth_token")) {
+      // Token in URL but not in localStorage - store it
+      localStorage.setItem("auth_token", tokenParam)
+      // Remove token from URL
+      router.replace("/mentee/dashboard")
+      // Let AuthenticatedUserProvider process the token
+      return
+    }
+  }, [router])
+
+  // Redirect to login if not authenticated (but wait a bit for token processing)
+  useEffect(() => {
+    // Give AuthenticatedUserProvider time to process token
+    const timeout = setTimeout(() => {
+      const token = localStorage.getItem("auth_token")
+      if (!token || (!isAuthenticated && !user)) {
+        router.push("/login")
+      }
+    }, 1000) // Wait 1 second for auth processing
+    
+    return () => clearTimeout(timeout)
+  }, [isAuthenticated, user, router])
+
+  // Get user name - now properly transformed in AuthenticatedUserProvider
   const userName =
     user?.firstName ||
-    user?.first_name ||
-    user?.username ||
     user?.name ||
+    user?.username ||
+    user?.email?.split("@")[0] ||
     "User"
+
+  useEffect(() => {
+    const fetchDashboardHeader = async () => {
+      // Don't fetch if not authenticated
+      const token = localStorage.getItem("auth_token")
+      if (!token || !isAuthenticated || !user) {
+        setIsLoadingHeader(false)
+        return
+      }
+
+      try {
+        setIsLoadingHeader(true)
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/dashboard-header`
+        )
+
+        if (!response.ok) {
+          // If unauthorized, redirect to login
+          if (response.status === 401 || response.status === 403) {
+            router.push("/login")
+            return
+          }
+          throw new Error(`Failed to fetch dashboard header: ${response.status}`)
+        }
+
+        const data: {
+          targetRole: string | null
+          progressPercentage: number
+        } = await response.json()
+
+        setTargetRole(data.targetRole)
+        setProgressPercentage(data.progressPercentage)
+      } catch (err) {
+        console.error("Error fetching dashboard header:", err)
+        // Don't set default values - leave as 0 or null
+        setTargetRole(null)
+        setProgressPercentage(0)
+      } finally {
+        setIsLoadingHeader(false)
+      }
+    }
+
+    fetchDashboardHeader()
+  }, [makeAuthenticatedRequest, isAuthenticated, user, router])
+
+  // Show loading state or redirect if not authenticated
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -94,8 +132,8 @@ export default function MenteeDashboardPage() {
   <div className="relative z-10 container mx-auto px-4 flex items-center space-x-8 -translate-y-10 md:-translate-y-24">
     {/* Profile Circle */}
     <ProfileProgressCircle
-      progress={30}
-      imageSrc={userName.profile_picture_url || "/default_pfp.png"}
+      progress={Math.round(progressPercentage)}
+      imageSrc={user?.profile_picture_url || "/default_pfp.png"}
       size={120}
     />
 
@@ -107,12 +145,20 @@ export default function MenteeDashboardPage() {
       <p className="text-lg md:text-2xl text-black-200 drop-shadow">
         Welcome to your career dashboard
       </p>
-      <p className="mt-2 text-black font-semibold drop-shadow">
-        {/* need to ftch from db mentee, fill taget role in a form */}
-        🎯 Target Role: Product Manager 
-       </p>
-
-      <p className="mt-1 text-blue-400 font-medium drop-shadow">{30}% progress to Goal</p>
+      {targetRole && (
+        <p className="mt-2 text-black font-semibold drop-shadow">
+          🎯 Target Role: {targetRole}
+        </p>
+      )}
+      {isLoadingHeader ? (
+        <p className="mt-1 text-blue-400 font-medium drop-shadow">
+          Loading...
+        </p>
+      ) : (
+        <p className="mt-1 text-blue-400 font-medium drop-shadow">
+          {Math.round(progressPercentage)}% progress to Goal
+        </p>
+      )}
     </div>
   </div>
 </section>
@@ -122,14 +168,14 @@ export default function MenteeDashboardPage() {
       <div className="-mt-45 md:-mt-60 container mx-auto px-4 py-2 space-y-8 relative z-20">
         <SuggestedMentorsCarousel />
         <ActionPanel />
-        <UpcomingSessions sessions={upcomingSessionsData} />
+        <UpcomingSessions />
 
         
           <CareerToolkitSection />
           {/* <ProgressTracker /> */}
         
 
-        <SessionHistory activities={recentActivityData} />
+        <SessionHistory />
         <PromotionsBanner />
       </div>
     </div>

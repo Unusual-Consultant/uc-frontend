@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Star, ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react"
+import { Star, ArrowRight, ChevronLeft, ChevronRight, MapPin, Loader2 } from "lucide-react"
 import Image from "next/image"
 import {
   Dialog,
@@ -14,8 +14,32 @@ import {
 } from "@/components/ui/dialog"
 import {QuickBook } from "@/components/dashboard/quickbook"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
+interface Mentor {
+  id: number | string
+  name: string
+  role: string
+  location: string
+  company: string
+  rating: number
+  reviews: number
+  price: number
+  tags: string[]
+  image: string
+  expertise: string
+  experience?: string
+  responseTime?: string
+  totalMentees?: number
+  successRate?: string
+  availability?: {
+    sessions?: string[]
+    days_of_week?: number[]
+    times?: string[]
+  }
+}
 
+// Fallback static mentors for when API fails
 export const mentors = [
   {
     id: 1,
@@ -163,26 +187,138 @@ const timezones = ["IST", "GMT", "EST", "PST"]
 
 
 export function SuggestedMentorsCarousel() {
+  const { user, makeAuthenticatedRequest } = useAuthenticatedUser()
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [selectedMentor, setSelectedMentor] = useState<any>(null)
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null)
+  const [mentorsList, setMentorsList] = useState<Mentor[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [userGoal, setUserGoal] = useState<string>("Product Manager")
   const itemsPerView = 2
+
+  // Fetch mentors from backend
+  useEffect(() => {
+    const fetchMentors = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        // Check if user is authenticated
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, using fallback mentors")
+          setMentorsList(mentors.slice(0, 6))
+          setIsLoading(false)
+          return
+        }
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/suggested-mentors?limit=6`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch mentors: ${response.status}`)
+        }
+
+        const data: Array<{
+          id: string
+          name: string
+          role: string
+          location: string
+          company: string
+          rating: number
+          reviews: number
+          price: number
+          tags: string[]
+          image: string
+          expertise: string
+        }> = await response.json()
+
+        // Transform backend data to match frontend format
+        const transformedMentors: Mentor[] = data.map((mentor, index) => ({
+          id: mentor.id,
+          name: mentor.name,
+          role: mentor.role,
+          location: mentor.location,
+          company: mentor.company,
+          rating: mentor.rating,
+          reviews: mentor.reviews,
+          price: mentor.price,
+          tags: mentor.tags || [],
+          image: mentor.image || "/default_pfp.png",
+          expertise: mentor.expertise || mentor.role,
+          // Add default values for fields not provided by backend
+          experience: `${Math.floor(Math.random() * 10) + 5} yrs Experience`, // Mock until backend provides
+          responseTime: `${Math.floor(Math.random() * 5) + 1} hrs`, // Mock until backend provides
+          totalMentees: mentor.reviews * 20, // Estimate based on reviews
+          successRate: `${Math.floor(Math.random() * 15) + 85}%`, // Mock until backend provides
+          availability: {
+            sessions: ["career", "resume", "mock"],
+            days_of_week: [1, 2, 3],
+            times: ["4:00 PM", "6:00 PM", "3:00 PM"]
+          }
+        }))
+
+        setMentorsList(transformedMentors.length > 0 ? transformedMentors : mentors.slice(0, 6))
+      } catch (err) {
+        console.error("Error fetching suggested mentors:", err)
+        setError("Failed to load mentors")
+        // Fallback to static mentors
+        setMentorsList(mentors.slice(0, 6))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchMentors()
+  }, [makeAuthenticatedRequest])
+
+  // Fetch user goal separately if needed
+  useEffect(() => {
+    const fetchUserGoal = async () => {
+      try {
+        const token = localStorage.getItem("auth_token")
+        if (!token || !user) return
+
+        // Try to get goal from user object or make separate call
+        // For now, we'll use a default or check user_info in localStorage
+        const userInfo = localStorage.getItem("user_info")
+        if (userInfo) {
+          try {
+            const userData = JSON.parse(userInfo)
+            // If goal is in user data, use it
+            if (userData.goal?.name) {
+              setUserGoal(userData.goal.name)
+            }
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching user goal:", err)
+      }
+    }
+
+    fetchUserGoal()
+  }, [user])
 
   const nextSlide = () =>
     setCurrentIndex((prev) =>
-      prev + itemsPerView >= mentors.length ? 0 : prev + itemsPerView
+      prev + itemsPerView >= mentorsList.length ? 0 : prev + itemsPerView
     )
 
   const prevSlide = () =>
     setCurrentIndex((prev) =>
       prev - itemsPerView < 0
-        ? Math.max(0, mentors.length - itemsPerView)
+        ? Math.max(0, mentorsList.length - itemsPerView)
         : prev - itemsPerView
     )
 
-  const visibleMentors = mentors.slice(
+  const visibleMentors = mentorsList.slice(
     currentIndex,
     currentIndex + itemsPerView
   )
+
 
   return (
     <section className="w-full py-8 px-4 md:px-8 relative bg-transparent">
@@ -205,31 +341,51 @@ export function SuggestedMentorsCarousel() {
             <span className="text-text-primary"> for you</span>
           </h2>
           <p className="text-sm text-gray-500 mt-2">
-            Based on your Goal: Product Manager
+            Based on your Goal: {userGoal}
           </p>
         </div>
       </div>
 
       {/* Carousel */}
       <div className="relative">
-        {/* Arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute -left-12 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all z-20"
-        >
-          <ChevronLeft className="h-4 w-4 text-black" />
-        </button>
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <span className="ml-3 text-gray-600">Loading mentors...</span>
+          </div>
+        ) : error && mentorsList.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-red-600 mb-4">{error}</p>
+            <p className="text-gray-600">Please try refreshing the page</p>
+          </div>
+        ) : mentorsList.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600">No mentors available at the moment</p>
+          </div>
+        ) : (
+          <>
+            {/* Arrows */}
+            {mentorsList.length > itemsPerView && (
+              <>
+                <button
+                  onClick={prevSlide}
+                  className="absolute -left-12 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all z-20"
+                >
+                  <ChevronLeft className="h-4 w-4 text-black" />
+                </button>
 
-        <button
-          onClick={nextSlide}
-          className="absolute -right-12 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all z-20"
-        >
-          <ChevronRight className="h-4 w-4 text-black" />
-        </button>
+                <button
+                  onClick={nextSlide}
+                  className="absolute -right-12 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all z-20"
+                >
+                  <ChevronRight className="h-4 w-4 text-black" />
+                </button>
+              </>
+            )}
 
-        {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {visibleMentors.map((mentor) => (
+            {/* Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {visibleMentors.map((mentor) => (
             <Card
               key={mentor.id}
               className="bg-white/90 shadow-md hover:shadow-2xl rounded-2xl transition-all transform hover:-translate-y-1"
@@ -297,8 +453,10 @@ export function SuggestedMentorsCarousel() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Quick Book Modal */}
