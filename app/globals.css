@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "@fontsource/mulish";
 
 /* Root CSS variables */
 @layer base {
@@ -72,6 +73,7 @@
 /* Optional: body default styling */
 body {
   @apply bg-background text-foreground;
+  font-family: "Mulish"
 }
 
 /* Custom animations */
@@ -162,3 +164,12 @@ body {
   animation: scrollLeft 10s linear infinite;
 }
 
+
+
+
+
+@layer utilities {
+  .perspective {
+    perspective: 1000px;
+  }
+}
