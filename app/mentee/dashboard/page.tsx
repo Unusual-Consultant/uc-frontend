@@ -20,6 +20,7 @@ export default function MenteeDashboardPage() {
   const [targetRole, setTargetRole] = useState<string | null>(null)
   const [progressPercentage, setProgressPercentage] = useState(0)
   const [isLoadingHeader, setIsLoadingHeader] = useState(true)
+  const [showProgressTracker, setShowProgressTracker] = useState(false)
 
   // Handle token from URL (Google OAuth redirect)
   useEffect(() => {
@@ -155,7 +156,10 @@ export default function MenteeDashboardPage() {
           Loading...
         </p>
       ) : (
-        <p className="mt-1 text-blue-400 font-medium drop-shadow">
+        <p
+          onClick={() => setShowProgressTracker(!showProgressTracker)}
+          className="mt-1 text-blue-400 font-medium drop-shadow cursor-pointer hover:underline transition-all"
+        >
           {Math.round(progressPercentage)}% progress to Goal
         </p>
       )}
@@ -163,9 +167,17 @@ export default function MenteeDashboardPage() {
   </div>
 </section>
 
+      {/* Progress Tracker Card - appears when progress text is clicked */}
+      {showProgressTracker && (
+        <div className="w-full relative z-20 -mt-40 md:-mt-52 mb-8">
+          <div className="container mx-auto px-4 pt-6 pb-6">
+            <ProgressTracker />
+          </div>
+        </div>
+      )}
 
-      {/* ✅ Dashboard content overlaps naturally */}
-      <div className="-mt-45 md:-mt-60 container mx-auto px-4 py-2 space-y-8 relative z-20">
+      {/* ✅ Dashboard content - adjusts position based on tracker visibility */}
+      <div className={`container mx-auto px-4 py-2 space-y-8 relative z-20 ${showProgressTracker ? '' : '-mt-45 md:-mt-60'}`}>
         <SuggestedMentorsCarousel />
         <ActionPanel />
         <UpcomingSessions />
