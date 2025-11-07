@@ -1,29 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Slider } from "@/components/ui/slider"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X, Filter } from "lucide-react"
+import "@fontsource/mulish";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { Briefcase, Verified } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  X,
+  Filter,
+  BadgeCheck,
+  DollarSign,
+  Layers,
+  Clock,
+  Star,
+  Package,
+  Users,
+  Timer,
+  SortDesc,
+} from "lucide-react";
+
+import { Switch } from "@/components/ui/switch";
 
 interface MentorFiltersProps {
-  onFiltersChange?: (filters: any) => void
+  onFiltersChange?: (filters: any) => void;
 }
 
 export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
-  const [priceRange, setPriceRange] = useState([50, 200])
-  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([])
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([])
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([])
-  const [experienceLevel, setExperienceLevel] = useState<string[]>([])
-  const [availability, setAvailability] = useState<string[]>([])
-  const [verifiedOnly, setVerifiedOnly] = useState(false)
-  const [sortBy, setSortBy] = useState("relevance")
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [isVerified, setIsVerified] = useState(false);
+  const [sortBy, setSortBy] = useState("relevance");
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(2000);
+  const [sessionType, setSessionType] = useState<string[]>([]);
+  const [packages, setPackages] = useState<string[]>([]);
+  const [mentorRatings, setMentorRatings] = useState<string[]>([]);
+  const [responseTime, setResponseTime] = useState<string[]>([]);
+  const [selectedIndustries, setSelectedIndustries] = useState<string[]>([]);
+  const [experienceLevel, setExperienceLevel] = useState<string[]>([]);
 
   const industries = [
     "Technology",
@@ -41,49 +63,34 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     "Media",
     "Legal",
     "Real Estate",
-  ]
-
-  const skills = [
-    "Leadership",
-    "Product Management",
-    "Software Engineering",
-    "Data Science",
-    "UX/UI Design",
-    "Digital Marketing",
-    "Business Strategy",
-    "Project Management",
-    "Sales",
-    "Customer Success",
-    "DevOps",
-    "Machine Learning",
-    "Analytics",
-    "Content Strategy",
-    "Brand Management",
-    "Operations",
-  ]
-
-  const languages = [
-    "English",
-    "Spanish",
-    "French",
-    "German",
-    "Chinese",
-    "Japanese",
-    "Portuguese",
-    "Italian",
-    "Russian",
-    "Arabic",
-    "Hindi",
-  ]
-
+  ];
+  const sessionTypes = ["1:1 Session", "Group Session"];
+  const packageOptions = [
+    "1:1 Mentoring",
+    "Resume Review",
+    "Mock Interview",
+    "Career Guidance",
+    "Portfolio Review",
+  ];
   const experienceLevels = [
     "Entry Level (0-2 years)",
     "Mid Level (3-5 years)",
     "Senior Level (6-10 years)",
     "Executive Level (10+ years)",
-  ]
+  ];
 
-  const availabilityOptions = ["Available Today", "Available This Week", "Available Next Week", "Flexible Schedule"]
+  const ratingOptions = [
+    "4★ & Above",
+    "3★ & Above",
+    "2★ & Above",
+    "1★ & Above",
+  ];
+  const responseOptions = [
+    "< 1 Hour",
+    "< 24 Hours",
+    "Within 3 Days",
+    "Within a Week",
+  ];
 
   const sortOptions = [
     { value: "relevance", label: "Relevance" },
@@ -91,272 +98,356 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     { value: "price-high", label: "Price: High to Low" },
     { value: "rating", label: "Highest Rated" },
     { value: "experience", label: "Most Experienced" },
-    { value: "reviews", label: "Most Reviews" },
-  ]
+  ];
 
   const clearAllFilters = () => {
-    setPriceRange([50, 200])
-    setSelectedIndustries([])
-    setSelectedSkills([])
-    setSelectedLanguages([])
-    setExperienceLevel([])
-    setAvailability([])
-    setVerifiedOnly(false)
-    setSortBy("relevance")
-  }
+    setPriceRange([0, 1000]);
+    setIsVerified(false);
+    setSortBy("relevance");
+    setMinPrice(0);
+    setMaxPrice(2000);
+    setSessionType([]);
+    setPackages([]);
+    setMentorRatings([]);
+    setResponseTime([]);
+  };
 
   const getActiveFiltersCount = () => {
     return (
-      selectedIndustries.length +
-      selectedSkills.length +
-      selectedLanguages.length +
-      experienceLevel.length +
-      availability.length +
-      (verifiedOnly ? 1 : 0)
-    )
-  }
+      sessionType.length +
+      packages.length +
+      mentorRatings.length +
+      responseTime.length +
+      (isVerified ? 1 : 0)
+    );
+  };
+  
+  const toggleVerified = () => {
+    setIsVerified((prev) => !prev);
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Sort and Verified Toggle */}
-      <Card>
-        <CardHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
-              Filters & Sort
-            </CardTitle>
-            {getActiveFiltersCount() > 0 && (
-              <Button variant="ghost" size="sm" onClick={clearAllFilters}>
-                <X className="h-4 w-4 mr-1" />
-                Clear All
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Sort By */}
-          <div>
-            <Label className="text-sm font-medium mb-2 block">Sort By</Label>
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="space-y-8 font-['Mulish']">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-[24px] font-[700] flex items-center gap-2">
+          <Filter className="h-6 w-6 text-black" />
+          Filters
+        </h2>
+        {getActiveFiltersCount() > 0 && (
+          <Button variant="ghost" size="sm" onClick={clearAllFilters}>
+            <X className="h-4 w-4 mr-1" />
+            Clear All
+          </Button>
+        )}
+      </div>
 
-          {/* Verified Mentors Only */}
-          <div className="flex items-center justify-between">
-            <Label htmlFor="verified" className="text-sm font-medium">
-              Verified Mentors Only
-            </Label>
-            <Switch id="verified" checked={verifiedOnly} onCheckedChange={setVerifiedOnly} />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Verified Mentors Row */}
+      <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-3 bg-white shadow-sm w-full max-w-[400px]">
+      {/* Text */}
+      <span className="text-[16px] font-[600] font-[Mulish] text-gray-800">
+        Verified Mentors only
+      </span>
+
+      {/* Twitter-style Switch */}
+      <button
+        onClick={toggleVerified}
+        className="relative flex items-center justify-center w-[70px] h-[32px] rounded-full border-2 border-[#0073CF] bg-white transition-all duration-300 overflow-hidden"
+      >
+        {/* Toggle background */}
+        <div
+          className={`absolute inset-0 rounded-full transition-all duration-300 ${
+            isVerified ? "bg-[#0073CF]" : "bg-white"
+          }`}
+        />
+
+        {/* Verified badge as toggle thumb */}
+        <div
+          className={`absolute top-1/2 transform -translate-y-1/2 transition-all duration-300 ${
+            isVerified ? "translate-x-[18px]" : "-translate-x-[18px]"
+          }`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            className={`w-6 h-6 transition-all duration-300 ${
+              isVerified ? "fill-white" : "fill-[#0073CF]"
+            }`}
+          >
+            <path d="M22 9.54a2.1 2.1 0 0 0-1.36-1.88 2.12 2.12 0 0 1-1.26-1.63 2.09 2.09 0 0 0-2.55-1.76 2.09 2.09 0 0 1-1.9-.57 2.07 2.07 0 0 0-2.94 0 2.09 2.09 0 0 1-1.9.57 2.09 2.09 0 0 0-2.55 1.76 2.12 2.12 0 0 1-1.26 1.63A2.1 2.1 0 0 0 2 9.54a2.09 2.09 0 0 0 1.26 1.87 2.13 2.13 0 0 1 1.26 1.63 2.1 2.1 0 0 0 2.55 1.76 2.09 2.09 0 0 1 1.9.57 2.07 2.07 0 0 0 2.94 0 2.09 2.09 0 0 1 1.9-.57 2.1 2.1 0 0 0 2.55-1.76 2.13 2.13 0 0 1 1.26-1.63A2.1 2.1 0 0 0 22 9.54Z" />
+            <path
+              d="M10.75 12.75 9 11l1.06-1.06.69.69 2.19-2.19L14 9.5l-3.25 3.25z"
+              fill={isVerified ? "#0073CF" : "white"}
+            />
+          </svg>
+        </div>
+      </button>
+
+    </div>
+
+      {/* Sort By */}
+      <Card className="border border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+      <SortDesc className="h-5 w-5 text-black" />
+      Sort By
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <Select value={sortBy} onValueChange={setSortBy}>
+      <SelectTrigger className="border border-[#C7C7C7] rounded-md bg-white focus:ring-2 focus:ring-[#87CEEB]/40 transition-all">
+        <SelectValue placeholder="Select sort option" />
+      </SelectTrigger>
+
+      {/* Dropdown content (non-transparent, styled) */}
+      <SelectContent className="bg-white border border-[#C7C7C7] shadow-lg rounded-md mt-1">
+        {sortOptions.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value}
+            className="cursor-pointer hover:bg-[#E0F4FF] transition-colors"
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </CardContent>
+</Card>
+
 
       {/* Price Range */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Price Range (per hour)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Slider value={priceRange} onValueChange={setPriceRange} max={500} min={25} step={25} className="mb-4" />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}+</span>
-          </div>
-        </CardContent>
-      </Card>
+      <Card className="border border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <DollarSign className="h-5 w-5 text-black" />
+          Set Price Range (per hour)
+        </CardTitle>
+      </CardHeader>
 
-      {/* Industries */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Industry</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {industries.map((industry) => (
-              <div key={industry} className="flex items-center space-x-2">
-                <Checkbox
-                  id={industry}
-                  checked={selectedIndustries.includes(industry)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedIndustries([...selectedIndustries, industry])
-                    } else {
-                      setSelectedIndustries(selectedIndustries.filter((i) => i !== industry))
-                    }
-                  }}
-                />
-                <label htmlFor={industry} className="text-sm cursor-pointer">
-                  {industry}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <CardContent className="space-y-4">
+        {/* Dual Range Slider */}
+        <Slider
+          value={priceRange}
+          onValueChange={(val) => {
+            setPriceRange(val);
+            setMinPrice(val[0]);
+            setMaxPrice(val[1]);
+          }}
+          min={0}
+          max={2000}
+          step={100}
+          className="relative w-full"
+        />
 
-      {/* Skills */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Skills</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-48 overflow-y-auto">
-            {skills.map((skill) => (
-              <div key={skill} className="flex items-center space-x-2">
-                <Checkbox
-                  id={skill}
-                  checked={selectedSkills.includes(skill)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedSkills([...selectedSkills, skill])
-                    } else {
-                      setSelectedSkills(selectedSkills.filter((s) => s !== skill))
-                    }
-                  }}
-                />
-                <label htmlFor={skill} className="text-sm cursor-pointer">
-                  {skill}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Labels */}
+        <div className="flex justify-between text-sm text-gray-600 font-medium">
+          <span>Free</span>
+          <span>₹1000</span>
+          <span>₹2000+</span>
+        </div>
 
-      {/* Experience Level */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Experience Level</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {experienceLevels.map((level) => (
-              <div key={level} className="flex items-center space-x-2">
-                <Checkbox
-                  id={level}
-                  checked={experienceLevel.includes(level)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setExperienceLevel([...experienceLevel, level])
-                    } else {
-                      setExperienceLevel(experienceLevel.filter((l) => l !== level))
-                    }
-                  }}
-                />
-                <label htmlFor={level} className="text-sm cursor-pointer">
-                  {level}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Numeric Inputs */}
+        <div className="flex items-center gap-3">
+          <input
+            type="number"
+            placeholder="Min ₹"
+            value={minPrice}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              setMinPrice(value);
+              setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
+            }}
+            className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
+          />
+          <input
+            type="number"
+            placeholder="Max ₹"
+            value={maxPrice}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              setMaxPrice(value);
+              setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
+            }}
+            className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
+          />
+        </div>
+      </CardContent>
+    </Card>
 
-      {/* Languages */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Languages</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {languages.map((language) => (
-              <div key={language} className="flex items-center space-x-2">
-                <Checkbox
-                  id={language}
-                  checked={selectedLanguages.includes(language)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedLanguages([...selectedLanguages, language])
-                    } else {
-                      setSelectedLanguages(selectedLanguages.filter((l) => l !== language))
-                    }
-                  }}
-                />
-                <label htmlFor={language} className="text-sm cursor-pointer">
-                  {language}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Availability */}
-      <Card>
+      {/* Industry */}
+      <Card className="border border-[#C7C7C7]">
         <CardHeader>
-          <CardTitle>Availability</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Layers className="h-5 w-5 text-black" />
+            Industry
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {availabilityOptions.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={option}
-                  checked={availability.includes(option)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setAvailability([...availability, option])
-                    } else {
-                      setAvailability(availability.filter((a) => a !== option))
-                    }
-                  }}
-                />
-                <label htmlFor={option} className="text-sm cursor-pointer">
-                  {option}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Active Filters Summary */}
-      {getActiveFiltersCount() > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Filters ({getActiveFiltersCount()})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {selectedIndustries.map((industry) => (
-                <Badge key={industry} variant="secondary" className="text-xs">
-                  {industry}
-                  <X
-                    className="h-3 w-3 ml-1 cursor-pointer"
-                    onClick={() => setSelectedIndustries(selectedIndustries.filter((i) => i !== industry))}
-                  />
-                </Badge>
-              ))}
-              {selectedSkills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="text-xs">
-                  {skill}
-                  <X
-                    className="h-3 w-3 ml-1 cursor-pointer"
-                    onClick={() => setSelectedSkills(selectedSkills.filter((s) => s !== skill))}
-                  />
-                </Badge>
-              ))}
-              {verifiedOnly && (
-                <Badge variant="secondary" className="text-xs">
-                  Verified Only
-                  <X className="h-3 w-3 ml-1 cursor-pointer" onClick={() => setVerifiedOnly(false)} />
-                </Badge>
-              )}
+        <CardContent className="space-y-2">
+          {industries.map((industry) => (
+            <div key={industry} className="flex items-center space-x-2">
+              <Checkbox
+                id={industry}
+                checked={selectedIndustries.includes(industry)}
+                onCheckedChange={(checked) => {
+                  if (checked)
+                    setSelectedIndustries([...selectedIndustries, industry]);
+                  else
+                    setSelectedIndustries(
+                      selectedIndustries.filter((i) => i !== industry)
+                    );
+                }}
+              />
+              <label htmlFor={industry} className="text-sm cursor-pointer">
+                {industry}
+              </label>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Session Type */}
+      <Card className="border border-[#C7C7C7] rounded-lg">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Users className="h-5 w-5 text-black" />
+            Session Type
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {sessionTypes.map((type) => (
+            <div key={type} className="flex items-center space-x-2">
+              <Checkbox
+                id={type}
+                checked={sessionType.includes(type)}
+                onCheckedChange={(checked) => {
+                  if (checked)
+                    setSessionType([...sessionType, type]);
+                  else
+                    setSessionType(sessionType.filter((t) => t !== type));
+                }}
+              />
+              <label htmlFor={type} className="text-sm cursor-pointer">
+                {type}
+              </label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card className="border border-[#C7C7C7]">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Briefcase className="h-5 w-5 text-black" />
+            Experience Level
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {experienceLevels.map((level) => (
+            <div key={level} className="flex items-center space-x-2">
+              <Checkbox
+                id={level}
+                checked={experienceLevel.includes(level)}
+                onCheckedChange={(checked) => {
+                  if (checked)
+                    setExperienceLevel([...experienceLevel, level]);
+                  else
+                    setExperienceLevel(
+                      experienceLevel.filter((l) => l !== level)
+                    );
+                }}
+              />
+              <label htmlFor={level} className="text-sm cursor-pointer">
+                {level}
+              </label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Packages */}
+      <Card className="border border-[#C7C7C7] rounded-lg">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Package className="h-5 w-5 text-black" />
+            Packages
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {packageOptions.map((pkg) => (
+            <div key={pkg} className="flex items-center space-x-2">
+              <Checkbox
+                id={pkg}
+                checked={packages.includes(pkg)}
+                onCheckedChange={(checked) => {
+                  if (checked) setPackages([...packages, pkg]);
+                  else setPackages(packages.filter((p) => p !== pkg));
+                }}
+              />
+              <label htmlFor={pkg} className="text-sm cursor-pointer">
+                {pkg}
+              </label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Mentor Rating */}
+      <Card className="border border-[#C7C7C7] rounded-lg">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Star className="h-5 w-5 text-black" />
+            Mentor Rating
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {ratingOptions.map((rating) => (
+            <div key={rating} className="flex items-center space-x-2">
+              <Checkbox
+                id={rating}
+                checked={mentorRatings.includes(rating)}
+                onCheckedChange={(checked) => {
+                  if (checked) setMentorRatings([...mentorRatings, rating]);
+                  else setMentorRatings(mentorRatings.filter((r) => r !== rating));
+                }}
+              />
+              <label htmlFor={rating} className="text-sm cursor-pointer">
+                {rating}
+              </label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Response Time */}
+      <Card className="border border-[#C7C7C7] rounded-lg">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+            <Timer className="h-5 w-5 text-black" />
+            Response Time
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {responseOptions.map((option) => (
+            <div key={option} className="flex items-center space-x-2">
+              <Checkbox
+                id={option}
+                checked={responseTime.includes(option)}
+                onCheckedChange={(checked) => {
+                  if (checked)
+                    setResponseTime([...responseTime, option]);
+                  else
+                    setResponseTime(responseTime.filter((r) => r !== option));
+                }}
+              />
+              <label htmlFor={option} className="text-sm cursor-pointer">
+                {option}
+              </label>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }

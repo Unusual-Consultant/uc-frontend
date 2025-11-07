@@ -2,8 +2,11 @@
 
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export function ActionPanel() {
+  const router = useRouter();
+
   const cards = [
     {
       img: "/get_resume_reviwed.png",
@@ -29,8 +32,8 @@ export function ActionPanel() {
       img: "/plan_career.png",
       alt: "Plan Career",
       title: "Stay updated on your mentorship discussions",
-      buttonText: "View Message",
-      href: "/plan-career",
+      buttonText: "View Messages",
+      href: "/quickactions/messages", 
       bg: "#5DAEFF",
       textColor: "white",
       buttonTextColor: "#5DAEFF",
@@ -49,7 +52,6 @@ export function ActionPanel() {
 
   return (
     <div className="space-y-4">
-      {/* Heading */}
       <div className="flex items-center gap-2 mb-2">
         <Image
           src="/quick_Access_icon.png"
@@ -64,22 +66,14 @@ export function ActionPanel() {
         </h2>
       </div>
 
-      {/* Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
         {cards.map((card, index) => (
-          <div
-            key={index}
-            className="group perspective relative w-full h-[250px]"
-          >
+          <div key={index} className="group perspective relative w-full h-[350px]">
             <div className="relative w-full h-full transition-transform duration-700 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
               
               {/* Front Side */}
               <Card className="absolute inset-0 rounded-2xl shadow-lg overflow-hidden [backface-visibility:hidden]">
-                <img
-                  src={card.img}
-                  alt={card.alt}
-                  className="w-full h-full object-cover"
-                />
+                <img src={card.img} alt={card.alt} className="w-full h-full object-cover" />
               </Card>
 
               {/* Back Side */}
@@ -89,7 +83,7 @@ export function ActionPanel() {
               >
                 <h3 className="text-lg font-semibold mb-4">{card.title}</h3>
                 <button
-                  onClick={() => (window.location.href = card.href)}
+                  onClick={() => router.push(card.href)} // ✅ navigate using router
                   className="bg-white px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition"
                   style={{ color: card.buttonTextColor }}
                 >
