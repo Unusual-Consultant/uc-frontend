@@ -115,12 +115,12 @@ export function SessionHistory() {
       prev.map((session) =>
         session.id === sessionId
           ? {
-            ...session,
-            hasReview: true,
-            rating: reviewData.rating,
-            reviewText: reviewData.review,
-            canReview: false,
-          }
+              ...session,
+              hasReview: true,
+              rating: reviewData.rating,
+              reviewText: reviewData.review,
+              canReview: false,
+            }
           : session,
       ),
     )
@@ -149,31 +149,6 @@ export function SessionHistory() {
         )
       default:
         return <Badge variant="secondary">{status}</Badge>
-    }
-  }
-
-  if (showReviewForm) {
-    const session = sessions.find((s) => s.id === showReviewForm)
-    if (session) {
-      return (
-        <div className="space-y-6">
-          <Button
-            variant="outline"
-            onClick={() => setShowReviewForm(null)}
-            className="mb-4 rounded-full"
-          >
-            ← Back to Session History
-          </Button>
-          <ReviewForm
-            mentorName={session.mentorName}
-            sessionType={session.sessionType}
-            onSubmit={(reviewData) =>
-              handleReviewSubmit(session.id, reviewData)
-            }
-            onCancel={() => setShowReviewForm(null)}
-          />
-        </div>
-      )
     }
   }
 
@@ -213,12 +188,8 @@ export function SessionHistory() {
             height={48}
             className="mx-auto mb-4"
           />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No sessions yet
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Your completed sessions will appear here
-          </p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No sessions yet</h3>
+          <p className="text-gray-600 mb-4">Your completed sessions will appear here</p>
           <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2">
             Book Your First Session
           </Button>
@@ -228,43 +199,32 @@ export function SessionHistory() {
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition p-4"
+              className="rounded-lg border border-gray-200 shadow-md hover:shadow-lg transition p-4 bg-white"
             >
               <div className="flex items-start space-x-4">
-                <MentorAvatar
-                  name={session.mentorName}
-                  image={session.mentorImage}
-                />
+                <MentorAvatar name={session.mentorName} image={session.mentorImage} />
+
                 <div className="flex-1">
+                  {/* Session Info */}
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {session.sessionType}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        with {session.mentorName}
-                      </p>
-                      <p className="text-sm text-blue-600">
-                        {session.mentorTitle}
-                      </p>
+                      <h3 className="font-semibold text-gray-900">{session.sessionType}</h3>
+                      <p className="text-sm text-gray-600">with {session.mentorName}</p>
+                      <p className="text-sm text-blue-600">{session.mentorTitle}</p>
                     </div>
                     <div className="text-right">
                       {getStatusBadge(session.status)}
-                      <div className="text-sm text-gray-500 mt-1">
-                        {session.date}
-                      </div>
+                      <div className="text-sm text-gray-500 mt-1">{session.date}</div>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
                     <span>{session.duration}</span>
                     <span>•</span>
-                    <span className="font-medium text-green-600">
-                      {session.price}
-                    </span>
+                    <span className="font-medium text-green-600">{session.price}</span>
                   </div>
 
-                  {/* Review Status */}
+                  {/* Review Section */}
                   {session.hasReview ? (
                     <div className="mb-4">
                       <div className="flex items-center space-x-2 mb-2">
@@ -286,33 +246,53 @@ export function SessionHistory() {
                       </p>
                     </div>
                   ) : session.canReview ? (
-                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <Bell className="h-4 w-4 text-yellow-600" />
-                          <span className="text-sm font-medium text-yellow-800">
-                            Review Pending
-                          </span>
-                          {session.daysLeft && session.daysLeft > 0 && (
-                            <Badge variant="outline" className="text-xs">
-                              {session.daysLeft} days left
-                            </Badge>
-                          )}
+                    <>
+                      {/* Yellow review box */}
+                      <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Bell className="h-4 w-4 text-yellow-600" />
+                            <span className="text-sm font-medium text-yellow-800">
+                              Review Pending
+                            </span>
+                            {session.daysLeft && session.daysLeft > 0 && (
+                              <Badge variant="outline" className="text-xs">
+                                {session.daysLeft} days left
+                              </Badge>
+                            )}
+                          </div>
+                          <Button
+                            size="sm"
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-full px-4 py-1"
+                            onClick={() =>
+                              setShowReviewForm(
+                                showReviewForm === session.id ? null : session.id,
+                              )
+                            }
+                          >
+                            <StarIcon className="h-3 w-3 mr-1" />
+                            {showReviewForm === session.id ? "Close" : "Write Review"}
+                          </Button>
                         </div>
-                        <Button
-                          size="sm"
-                          className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-full px-4 py-1"
-                          onClick={() => setShowReviewForm(session.id)}
-                        >
-                          <StarIcon className="h-3 w-3 mr-1" />
-                          Write Review
-                        </Button>
+                        <p className="text-xs text-yellow-700 mt-2">
+                          Help other mentees by sharing your experience with this mentor
+                        </p>
                       </div>
-                      <p className="text-xs text-yellow-700 mt-2">
-                        Help other mentees by sharing your experience with this
-                        mentor
-                      </p>
-                    </div>
+
+                      {/* ReviewForm below yellow box */}
+                      {showReviewForm === session.id && (
+                        <div className="mt-3 border-t border-gray-200 pt-4 py-10">
+                          <ReviewForm
+                            mentorName={session.mentorName}
+                            sessionType={session.sessionType}
+                            onSubmit={(reviewData) =>
+                              handleReviewSubmit(session.id, reviewData)
+                            }
+                            onCancel={() => setShowReviewForm(null)}
+                          />
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
                       <div className="flex items-center space-x-2">
@@ -324,15 +304,17 @@ export function SessionHistory() {
                     </div>
                   )}
 
+                  {/* Buttons */}
                   <div className="flex space-x-2">
-                    {/* Book Again pill */}
                     <Button className="bg-green-700 hover:bg-green-800 text-white rounded-full px-4 py-1 flex items-center">
                       <RotateCcw className="h-3 w-3 mr-1" />
                       Book Again
                     </Button>
 
-                    {/* Message pill */}
-                    <Button className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center" variant={"outline"}>
+                    <Button
+                      className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center"
+                      variant={"outline"}
+                    >
                       <MessageCircle className="h-3 w-3 mr-1" />
                       Message
                     </Button>
