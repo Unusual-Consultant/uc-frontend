@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from "recharts"
 import AnimatedCornerIcons from "./animated_smart_buddy"
+import { API_BASE_URL } from "@/lib/api"
 
 // These will be replaced by API data
 const monthlyGrowthFallback = [
@@ -123,13 +124,13 @@ export function StatsSection() {
   const fetchStats = async () => {
     try {
       // Fetch overview stats
-      const overviewResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      const overviewResponse = await fetch(`${API_BASE_URL}/statistics/overview`)
       if (!overviewResponse.ok) throw new Error("Failed to fetch overview stats")
       const overviewData = await overviewResponse.json()
       setStatsData(overviewData)
 
       // Fetch monthly growth
-      const monthlyResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/monthly?months=6")
+      const monthlyResponse = await fetch(`${API_BASE_URL}/statistics/monthly?months=6`)
       if (monthlyResponse.ok) {
         const monthlyData = await monthlyResponse.json()
         console.log("Monthly data from API:", monthlyData)
@@ -141,7 +142,7 @@ export function StatsSection() {
       }
 
       // Fetch KPIs
-      const kpisResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/kpis")
+      const kpisResponse = await fetch(`${API_BASE_URL}/statistics/kpis`)
       if (kpisResponse.ok) {
         const kpisData = await kpisResponse.json()
         console.log("KPIs data from API:", kpisData)
@@ -166,7 +167,7 @@ export function StatsSection() {
       }
 
       // Fetch success metrics
-      const successResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/success-metrics")
+      const successResponse = await fetch(`${API_BASE_URL}/statistics/success-metrics`)
       if (successResponse.ok) {
         const successData = await successResponse.json()
         console.log("Success metrics data from API:", successData)
@@ -267,8 +268,8 @@ export function StatsSection() {
                  <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
                    <defs>
                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                       <stop offset="0%" stop-color="#003C6C" />
-                       <stop offset="100%" stop-color="#06B6D4" />
+                       <stop offset="0%" stopColor="#003C6C" />
+                       <stop offset="100%" stopColor="#06B6D4" />
                      </linearGradient>
                    </defs>
                    <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="15" fill="none" />

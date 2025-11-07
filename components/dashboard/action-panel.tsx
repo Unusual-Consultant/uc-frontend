@@ -4,10 +4,22 @@ import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+interface ActionCard {
+  img: string;
+  alt: string;
+  title: string;
+  buttonText: string;
+  href: string | null;
+  bg: string;
+  textColor: string;
+  buttonTextColor: string;
+  openChatbot?: boolean;
+}
+
 export function ActionPanel() {
   const router = useRouter();
 
-  const cards = [
+  const cards: ActionCard[] = [
     {
       img: "/get_resume_reviwed.png",
       alt: "Resume Review",
@@ -43,10 +55,11 @@ export function ActionPanel() {
       alt: "Ask AI",
       title: "Get instant career advice",
       buttonText: "Chat Now",
-      href: "/ask-ai",
+      href: null, // No navigation, will open chatbot
       bg: "#3FC6A6",
       textColor: "white",
       buttonTextColor: "#3FC6A6",
+      openChatbot: true, // Flag to indicate this should open chatbot
     },
   ];
 
@@ -83,7 +96,14 @@ export function ActionPanel() {
               >
                 <h3 className="text-lg font-semibold mb-4">{card.title}</h3>
                 <button
-                  onClick={() => router.push(card.href)} // ✅ navigate using router
+                  onClick={() => {
+                    if (card.openChatbot) {
+                      // Dispatch custom event to open chatbot
+                      window.dispatchEvent(new CustomEvent("openChatbot"))
+                    } else if (card.href) {
+                      router.push(card.href)
+                    }
+                  }}
                   className="bg-white px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition"
                   style={{ color: card.buttonTextColor }}
                 >

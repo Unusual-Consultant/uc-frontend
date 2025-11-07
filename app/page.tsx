@@ -4,7 +4,6 @@ import { OfferingsSection } from "@/components/offerings-section"
 import { IndustriesSection } from "@/components/industries-section"
 import { FeaturedMentors } from "@/components/featured-mentors"
 import { TestimonialsSection } from "@/components/testimonials-section"
-import { ChatBot } from "@/components/chat-bot"
 
 export default function HomePage() {
   return (
@@ -15,7 +14,6 @@ export default function HomePage() {
       <IndustriesSection />
       <FeaturedMentors />
       <TestimonialsSection />
-      <ChatBot />
     </div>
   )
 }

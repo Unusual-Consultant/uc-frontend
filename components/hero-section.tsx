@@ -18,8 +18,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// API Configuration
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL } from "@/lib/api";
 
 // Types for API responses
 interface Mentor {
@@ -152,9 +151,9 @@ export function HeroSection() {
     const fetchData = async () => {
       try {
         const [mentorsRes, testimonialsRes, skillsRes] = await Promise.all([
-          fetch("http://127.0.0.1:8000/api/v1/featured-mentors/"),
-          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/"),
-          fetch("http://127.0.0.1:8000/api/v1/statistics/trending-skills?limit=4")
+          fetch(`${API_BASE_URL}/featured-mentors/`),
+          fetch(`${API_BASE_URL}/featured-testimonials/`),
+          fetch(`${API_BASE_URL}/statistics/trending-skills?limit=4`)
         ]);
         
         if (mentorsRes.ok) {

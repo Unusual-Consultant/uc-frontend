@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MessageCircle, X, Send, Bot, User } from "lucide-react"
+import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react"
+import { sendChatMessage } from "@/lib/api"
 
 interface Message {
   id: number
@@ -24,9 +25,29 @@ export function ChatBot() {
     },
   ])
   const [inputMessage, setInputMessage] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [conversationId, setConversationId] = useState<string | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const sendMessage = () => {
-    if (!inputMessage.trim()) return
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  // Listen for custom event to open chatbot
+  useEffect(() => {
+    const handleOpenChatbot = () => {
+      setIsOpen(true)
+    }
+
+    window.addEventListener("openChatbot", handleOpenChatbot)
+    return () => {
+      window.removeEventListener("openChatbot", handleOpenChatbot)
+    }
+  }, [])
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return
 
     const userMessage: Message = {
       id: messages.length + 1,
@@ -35,41 +56,43 @@ export function ChatBot() {
       timestamp: new Date(),
     }
 
+    const messageText = inputMessage
     setMessages((prev) => [...prev, userMessage])
     setInputMessage("")
+    setIsLoading(true)
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      // Get auth token if available
+      const authToken = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null
+
+      // Send message to backend
+      const response = await sendChatMessage(messageText, conversationId || undefined, authToken)
+
+      // Store conversation ID
+      if (response.conversation_id) {
+        setConversationId(response.conversation_id)
+      }
+
+      // Add bot response
       const botResponse: Message = {
         id: messages.length + 2,
-        text: getBotResponse(inputMessage),
+        text: response.response,
         sender: "bot",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, botResponse])
-    }, 1000)
-  }
-
-  const getBotResponse = (message: string): string => {
-    const lowerMessage = message.toLowerCase()
-
-    if (lowerMessage.includes("mentor") || lowerMessage.includes("find")) {
-      return "I can help you find the perfect mentor! What field or skill are you looking to develop? You can also browse our mentor directory or use our advanced search filters."
+    } catch (error) {
+      console.error("Error sending message:", error)
+      const errorResponse: Message = {
+        id: messages.length + 2,
+        text: "I'm sorry, I'm having trouble connecting right now. Please try again in a moment.",
+        sender: "bot",
+        timestamp: new Date(),
+      }
+      setMessages((prev) => [...prev, errorResponse])
+    } finally {
+      setIsLoading(false)
     }
-
-    if (lowerMessage.includes("price") || lowerMessage.includes("cost")) {
-      return "Our mentors set their own rates, typically ranging from $50-$300 per hour. You can filter mentors by price range to find options that fit your budget."
-    }
-
-    if (lowerMessage.includes("book") || lowerMessage.includes("session")) {
-      return "Booking a session is easy! Just visit a mentor's profile, check their availability, and select a time that works for you. Payment is processed securely through our platform."
-    }
-
-    if (lowerMessage.includes("become") || lowerMessage.includes("mentor")) {
-      return "Interested in becoming a mentor? That's great! You can apply through our mentor onboarding process. We'll review your experience and help you set up your profile."
-    }
-
-    return "Thanks for your question! I'm here to help with anything related to mentorship, finding mentors, booking sessions, or navigating our platform. Feel free to ask me anything!"
   }
 
   return (
@@ -112,11 +135,23 @@ export function ChatBot() {
                       <div className="flex items-start gap-2">
                         {message.sender === "bot" && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
                         {message.sender === "user" && <User className="h-4 w-4 mt-0.5 flex-shrink-0" />}
-                        <p className="text-sm">{message.text}</p>
+                        <p className="text-sm whitespace-pre-line">{message.text}</p>
                       </div>
                     </div>
                   </div>
                 ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] p-3 rounded-lg bg-gray-100 text-gray-900">
+                      <div className="flex items-center gap-2">
+                        <Bot className="h-4 w-4 flex-shrink-0" />
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span className="text-sm text-gray-500">Thinking...</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
               </div>
 
               {/* Input */}
@@ -125,12 +160,17 @@ export function ChatBot() {
                   <Input
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                    onKeyPress={(e) => e.key === "Enter" && !isLoading && sendMessage()}
                     placeholder="Ask me anything..."
                     className="flex-1"
+                    disabled={isLoading}
                   />
-                  <Button onClick={sendMessage} size="sm">
-                    <Send className="h-4 w-4" />
+                  <Button onClick={sendMessage} size="sm" disabled={isLoading}>
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>

@@ -1,30 +1,84 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Trophy, CheckCircle, Clock, TrendingUp } from "lucide-react"
+import { Trophy, CheckCircle, Clock, TrendingUp, Loader2 } from "lucide-react"
 import Image from "next/image"
-
-const progressData = {
-  currentLevel: 2,
-  totalPoints: 750,
-  nextLevelPoints: 1000,
-  pointsToNextLevel: 250,
-  completedSteps: [
-    { id: 1, title: "Profile Setup", points: 100 },
-    { id: 2, title: "First Session booked", points: 150 },
-    { id: 3, title: "Resume Review", points: 200 },
-    { id: 4, title: "Mock Interview", points: 300 },
-  ],
-  nextSteps: [
-    { id: 5, title: "System Design Session", points: 250 },
-    { id: 6, title: "Behavioral Interview prep", points: 200 },
-    { id: 7, title: "Final Resume Review", points: 150 },
-  ],
-  avgTimeToGoal: "4-6 months",
-}
+import { fetchProgressTracker, ProgressTrackerResponse } from "@/lib/api"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
 
 export function ProgressTracker() {
-  const progressPercentage = (progressData.totalPoints / progressData.nextLevelPoints) * 100
+  const { user } = useAuthenticatedUser()
+  const [progressData, setProgressData] = useState<ProgressTrackerResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const loadProgressData = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const authToken = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null
+        if (!authToken) {
+          setError("Please sign in to view progress")
+          return
+        }
+
+        const data = await fetchProgressTracker(authToken)
+        if (data) {
+          setProgressData(data)
+        } else {
+          setError("Failed to load progress data")
+        }
+      } catch (err) {
+        console.error("Error loading progress tracker:", err)
+        setError(err instanceof Error ? err.message : "Failed to load progress")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadProgressData()
+  }, [user])
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-6xl mx-auto">
+        <Card className="rounded-[16px] shadow-lg overflow-hidden border-0">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+              <span className="ml-3 text-gray-600">Loading progress...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (error || !progressData) {
+    return (
+      <div className="w-full max-w-6xl mx-auto">
+        <Card className="rounded-[16px] shadow-lg overflow-hidden border-0">
+          <CardContent className="p-6">
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">{error || "Failed to load progress"}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              >
+                Retry
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  const progressPercentage = progressData.progressPercentage
+  const pointsToNextLevel = progressData.nextLevelPoints - progressData.totalPoints
 
   return (
     <div className="w-full max-w-6xl mx-auto">
@@ -63,7 +117,7 @@ export function ProgressTracker() {
                 
                 <div className="text-right">
                   <span className="text-sm font-medium text-gray-600">
-                    {progressData.pointsToNextLevel} points to Level {progressData.currentLevel + 1}
+                    {pointsToNextLevel} points to Level {progressData.currentLevel + 1}
                   </span>
                 </div>
               </div>
@@ -75,7 +129,7 @@ export function ProgressTracker() {
                   Completed Steps
                 </h4>
                 <div className="space-y-2">
-                  {progressData.completedSteps.map((step) => (
+                  {progressData.completedSteps.filter(step => step.completed).map((step) => (
                     <div
                       key={step.id}
                       className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-100"
@@ -97,7 +151,7 @@ export function ProgressTracker() {
                   Next Steps
                 </h4>
                 <div className="space-y-2">
-                  {progressData.nextSteps.map((step) => (
+                  {progressData.nextSteps.filter(step => !step.completed).map((step) => (
                     <div
                       key={step.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
@@ -116,7 +170,7 @@ export function ProgressTracker() {
               <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
                 <TrendingUp className="h-4 w-4 text-red-500" />
                 <span className="text-sm font-medium text-gray-600">
-                  Avg time to reach Goal: {progressData.avgTimeToGoal}
+                  Avg time to reach Goal: 4-6 months
                 </span>
               </div>
             </div>

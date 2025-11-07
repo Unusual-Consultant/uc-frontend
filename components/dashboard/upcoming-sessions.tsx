@@ -3,13 +3,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Calendar, MoreVertical, Loader2 } from "lucide-react"
+import { Clock, Calendar, MoreVertical, Loader2, Eye, CalendarClock, X, FileText } from "lucide-react"
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import RescheduleForm from "./reshedule_form"
+import { cancelBooking } from "@/lib/api"
 
 interface Session {
   id: string | number
+  mentorId?: string
   mentorName: string
   mentorTitle: string
   sessionType: string
@@ -28,6 +38,23 @@ export function UpcomingSessions() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [timeLeft, setTimeLeft] = useState<{ [key: string | number]: string }>({})
+  const [expandedSession, setExpandedSession] = useState<string | number | null>(null)
+  const [rescheduleSessionId, setRescheduleSessionId] = useState<string | number | null>(null)
+  const [cancelSessionId, setCancelSessionId] = useState<string | number | null>(null)
+  const [paymentSessionId, setPaymentSessionId] = useState<string | number | null>(null)
+
+  // Handle Escape key to close modals
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setCancelSessionId(null)
+        setPaymentSessionId(null)
+        setRescheduleSessionId(null)
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
 
   // Fetch upcoming sessions from backend
   useEffect(() => {
@@ -54,6 +81,7 @@ export function UpcomingSessions() {
 
         const data: Array<{
           id: string
+          mentorId?: string
           mentorName: string
           mentorTitle: string
           sessionType: string
@@ -69,6 +97,7 @@ export function UpcomingSessions() {
         // Transform backend data to match frontend format
         const transformedSessions: Session[] = data.map((session) => ({
           id: session.id,
+          mentorId: session.mentorId,
           mentorName: session.mentorName,
           mentorTitle: session.mentorTitle,
           sessionType: session.sessionType,
@@ -220,6 +249,7 @@ export function UpcomingSessions() {
   }
 
   return (
+    <>
     <Card className="border-0 bg-transparent shadow-none">
       <CardHeader className="pl-2">
         <CardTitle className="flex items-center space-x-2">
@@ -236,10 +266,15 @@ export function UpcomingSessions() {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {sessions.map((session) => (
+          {sessions.map((session) => {
+            const isRescheduling = rescheduleSessionId === session.id
+            
+            return (
             <div
               key={session.id}
-              className="relative rounded-lg p-6 shadow-lg hover:shadow-xl transition-shadow bg-white"
+              className={`relative rounded-lg p-6 shadow-lg hover:shadow-xl transition-all bg-white overflow-visible ${
+                isRescheduling ? "border border-blue-300 shadow-xl" : ""
+              }`}
             >
               {/* Payment Status Image at Top Right */}
               <div className="absolute top-2 right-2 w-16 h-16"> 
@@ -255,7 +290,7 @@ export function UpcomingSessions() {
               <div className="flex items-start justify-between">
                 {/* Left side - Session info */}
                 <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 rounded-full shadow flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-full shadow flex items-center justify-center bg-gray-100">
                     <span className="text-gray-800 font-medium text-base">
                       {session.mentorName
                         .split(" ")
@@ -301,38 +336,233 @@ export function UpcomingSessions() {
                     {session.price}
                   </div>
                   <div className="flex items-center space-x-2">
-                    {session.meetingLink ? (
-                      <Button
-                        size="sm"
-                        className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
-                        onClick={() => window.open(session.meetingLink, '_blank')}
-                      >
-                        Join
-                      </Button>
-                    ) : (
-                      <Button
-                        size="sm"
-                        className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
-                        disabled
-                      >
-                        Join
-                      </Button>
-                    )}
                     <Button
-                      variant="outline"
                       size="sm"
-                      className="rounded-full h-8 w-8 p-0"
+                      className="rounded-full bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 h-8 text-xs"
+                      onClick={() => {
+                        if (session.meetingLink) {
+                          window.open(session.meetingLink, '_blank')
+                        } else {
+                          setPaymentSessionId(session.id)
+                        }
+                      }}
                     >
-                      <MoreVertical className="h-4 w-4" />
+                      Join Session
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full h-8 w-8 p-0"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setRescheduleSessionId(session.id)
+                          }}
+                        >
+                          <CalendarClock className="mr-2 h-4 w-4" />
+                          Re-schedule Session
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setCancelSessionId(session.id)
+                          }}
+                          className="text-red-600 focus:text-red-600"
+                        >
+                          <X className="mr-2 h-4 w-4" />
+                          Cancel Session
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
+
+              {/* Reschedule Form with animation */}
+              <div
+                className={`transition-all duration-500 ease-in-out ${
+                  isRescheduling
+                    ? "max-h-[600px] opacity-100 mt-6"
+                    : "max-h-0 opacity-0 mt-0"
+                }`}
+                style={{
+                  overflow: isRescheduling ? "visible" : "hidden",
+                }}
+              >
+                {isRescheduling && (
+                  <div className="p-4 border-t border-blue-100 bg-blue-50/50 rounded-lg pb-6">
+                    <RescheduleForm
+                      bookingId={String(session.id)}
+                      mentorId={session.mentorId || ""}
+                      durationMinutes={parseInt(session.duration.replace(/\D/g, '')) || 45}
+                      onClose={() => setRescheduleSessionId(null)}
+                      onSuccess={() => {
+                        // Refresh sessions after successful reschedule
+                        const fetchUpcomingSessions = async () => {
+                          try {
+                            const token = localStorage.getItem("auth_token")
+                            if (!token) return
+
+                            const response = await makeAuthenticatedRequest(
+                              `/mentee-dashboard/upcoming-sessions`
+                            )
+
+                            if (response.ok) {
+                              const data = await response.json()
+                              const transformedSessions: Session[] = data.map((s: any) => ({
+                                id: s.id,
+                                mentorName: s.mentorName,
+                                mentorTitle: s.mentorTitle,
+                                sessionType: s.sessionType,
+                                date: s.date,
+                                time: s.time,
+                                duration: s.duration,
+                                price: s.price,
+                                status: (s.status as Session["status"]) || "pending",
+                                meetingLink: s.meetingLink,
+                                notes: s.notes
+                              }))
+                              setSessions(transformedSessions)
+                            }
+                          } catch (err) {
+                            console.error("Error refreshing sessions:", err)
+                          }
+                        }
+                        fetchUpcomingSessions()
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </CardContent>
     </Card>
+
+    {/* Cancel Session Modal */}
+    {cancelSessionId !== null && (
+      <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div className="bg-white rounded-lg shadow-xl p-6 w-[350px] animate-fadeIn">
+          <div className="text-center space-y-3">
+            <X className="h-10 w-10 text-red-500 mx-auto" />
+            <h2 className="text-lg font-semibold">Cancel Session?</h2>
+            <p className="text-sm text-gray-500">Are you sure you want to cancel this session?</p>
+            <div className="flex justify-center gap-4 mt-4">
+              <Button variant="outline" onClick={() => setCancelSessionId(null)}>
+                Go Back
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem("auth_token")
+                    if (!token) {
+                      console.error("No auth token found")
+                      return
+                    }
+                    
+                    await cancelBooking(token, String(cancelSessionId))
+                    
+                    // Refresh sessions after successful cancel
+                    const fetchUpcomingSessions = async () => {
+                      try {
+                        const response = await makeAuthenticatedRequest(
+                          `/mentee-dashboard/upcoming-sessions`
+                        )
+                        if (response.ok) {
+                          const data = await response.json()
+                          const transformedSessions: Session[] = data.map((session: any) => ({
+                            id: session.id,
+                            mentorId: session.mentorId,
+                            mentorName: session.mentorName,
+                            mentorTitle: session.mentorTitle,
+                            sessionType: session.sessionType,
+                            date: session.date,
+                            time: session.time,
+                            duration: session.duration,
+                            price: session.price,
+                            status: (session.status as Session["status"]) || "pending",
+                            meetingLink: session.meetingLink,
+                            notes: session.notes
+                          }))
+                          setSessions(transformedSessions)
+                        }
+                      } catch (err) {
+                        console.error("Error refreshing sessions:", err)
+                      }
+                    }
+                    
+                    fetchUpcomingSessions()
+                    setCancelSessionId(null)
+                  } catch (err) {
+                    console.error("Error cancelling booking:", err)
+                    alert(err instanceof Error ? err.message : "Failed to cancel booking")
+                  }
+                }}
+              >
+                Confirm Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Payment Modal */}
+    {paymentSessionId !== null && (
+      <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div
+          className="rounded-xl shadow-xl p-6 w-[360px] animate-fadeIn text-center"
+          style={{
+            background: "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF66 100%)",
+          }}
+        >
+          <div
+            className="relative w-0 h-0 mx-auto mt-2 mb-3"
+            style={{
+              borderLeft: "20px solid transparent",
+              borderRight: "20px solid transparent",
+              borderBottom: "35px solid #007BFF",
+            }}
+          >
+            <span className="absolute top-[6px] left-[-4px] text-white text-xl font-bold">!</span>
+          </div>
+
+          <h2 className="text-lg font-semibold text-gray-900">Complete Your Payment</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            You need to complete your payment before joining this session.
+          </p>
+
+          <div className="flex justify-center gap-6 mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setPaymentSessionId(null)}
+              className="rounded-full bg-white text-gray-800 border border-gray-300 hover:bg-gray-100"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="rounded-full bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={() => {
+                // TODO: Implement payment flow
+                console.log("Payment for session:", paymentSessionId)
+                setPaymentSessionId(null)
+              }}
+            >
+              Pay Now
+            </Button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
 

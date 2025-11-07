@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -16,9 +17,17 @@ import {
 } from "lucide-react"
 import { ReviewForm } from "@/components/reviews/review-form"
 import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
+import { QuickBook } from "@/components/dashboard/quickbook"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 interface Session {
   id: string
+  mentorId?: string
   mentorName: string
   mentorTitle: string
   mentorImage?: string
@@ -61,12 +70,32 @@ function MentorAvatar({ name, image }: { name: string; image?: string }) {
   )
 }
 
+interface Mentor {
+  id: string | number
+  name: string
+  role: string
+  location: string
+  company: string
+  rating: number
+  reviews: number
+  price: number
+  tags: string[]
+  image: string
+  expertise: string
+  experience?: string
+  responseTime?: string
+  totalMentees?: number
+  successRate?: string
+}
+
 export function SessionHistory() {
+  const router = useRouter()
   const { makeAuthenticatedRequest } = useAuthenticatedUser()
   const [showReviewForm, setShowReviewForm] = useState<string | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null)
 
   // Fetch session history from backend
   useEffect(() => {
@@ -93,6 +122,7 @@ export function SessionHistory() {
 
         const data: Array<{
           id: string
+          mentorId: string
           mentorName: string
           mentorTitle: string
           mentorImage?: string
@@ -111,6 +141,7 @@ export function SessionHistory() {
         // Transform backend data to match frontend format
         const transformedSessions: Session[] = data.map((session) => ({
           id: session.id,
+          mentorId: session.mentorId,
           mentorName: session.mentorName,
           mentorTitle: session.mentorTitle,
           mentorImage: session.mentorImage,
@@ -410,13 +441,38 @@ export function SessionHistory() {
 
                   <div className="flex space-x-2">
                     {/* Book Again pill */}
-                    <Button className="bg-green-700 hover:bg-green-800 text-white rounded-full px-4 py-1 flex items-center">
+                    <Button 
+                      className="bg-green-700 hover:bg-green-800 text-white rounded-full px-4 py-1 flex items-center"
+                      onClick={() => {
+                        if (session.mentorId) {
+                          // Transform session data to mentor format for QuickBook
+                          const mentor: Mentor = {
+                            id: session.mentorId,
+                            name: session.mentorName,
+                            role: session.mentorTitle,
+                            location: "Remote", // Default, can be enhanced later
+                            company: session.mentorTitle.split(" at ")[1] || session.mentorTitle.split(" at ")[0] || "",
+                            rating: 0, // Will be fetched by QuickBook if needed
+                            reviews: 0,
+                            price: 0, // Will be fetched from session types
+                            tags: [],
+                            image: session.mentorImage || "/default_pfp.png",
+                            expertise: session.mentorTitle,
+                          }
+                          setSelectedMentor(mentor)
+                        }
+                      }}
+                    >
                       <RotateCcw className="h-3 w-3 mr-1" />
                       Book Again
                     </Button>
 
                     {/* Message pill */}
-                    <Button className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center" variant={"outline"}>
+                    <Button 
+                      className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center" 
+                      variant={"outline"}
+                      onClick={() => router.push("/quickactions/messages")}
+                    >
                       <MessageCircle className="h-3 w-3 mr-1" />
                       Message
                     </Button>
@@ -427,6 +483,23 @@ export function SessionHistory() {
           ))}
         </div>
       )}
+
+      {/* Quick Book Modal */}
+      <Dialog open={!!selectedMentor} onOpenChange={() => setSelectedMentor(null)}>
+        <DialogContent className="max-w-3xl w-full rounded-2xl overflow-hidden p-0">
+          <VisuallyHidden>
+            <DialogTitle>Book {selectedMentor?.name}</DialogTitle>
+          </VisuallyHidden>
+          {selectedMentor && (
+            <QuickBook
+              mentor={selectedMentor}
+              sessions={[]} // Empty, QuickBook will fetch from backend
+              timezones={["IST"]}
+              onClose={() => setSelectedMentor(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
