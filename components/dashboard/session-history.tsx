@@ -334,7 +334,7 @@ export function SessionHistory() {
           <p className="text-gray-600 mb-4">
             Your completed sessions will appear here
           </p>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2">
+          <Button className="bg-[#0073CF] hover:bg-blue-700 text-white rounded-full px-6 py-2">
             Book Your First Session
           </Button>
         </div>

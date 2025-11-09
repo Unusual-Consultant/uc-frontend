@@ -437,7 +437,7 @@ export function SuggestedMentorsCarousel() {
                       </span>
                       <div className="flex gap-2">
                         <Button
-                          className="bg-white text-green-600 border border-green-600 rounded-full px-3 py-1 text-sm hover:bg-green-50"
+                          className="bg-white text-black border border-black rounded-full px-3 py-1 text-sm hover:bg-green-50"
                         >
                           View Profile
                         </Button>

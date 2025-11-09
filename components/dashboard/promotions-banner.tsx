@@ -107,30 +107,34 @@ export function PromotionsBanner() {
           </div>
 
           {/* Referral Code Box */}
-          {isLoading ? (
-            <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[180px] md:w-[200px] text-center">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-            </div>
-          ) : referralCode ? (
-            <div
-              className="border-2 bg-white border-dotted border-black rounded-md py-2 px-3 flex flex-col items-center space-y-1 w-[180px] md:w-[200px] text-center cursor-pointer"
-              onClick={copyReferralCode}
-            >
-              <p className="text-[#525252] text-[11px] font-medium">
-                Your referral code is
-              </p>
-              <span className="font-mono text-black text-sm font-semibold">
-                {referralCode}
-              </span>
-              <span className="text-[#525252] text-[11px] hover:underline">
-                {copied ? "Copied!" : "Tap to Copy"}
-              </span>
-            </div>
-          ) : (
-            <div className="border-2 bg-white border-dotted border-black rounded-md p-3 flex flex-col items-center space-y-1 w-[180px] md:w-[200px] text-center">
-              <p className="text-gray-500 text-[10px]">No referral code available</p>
-            </div>
-          )}
+          <div className="relative w-[180px] md:w-[200px] p-3 flex flex-col items-center space-y-1 text-center bg-white">
+  {/* Dashed border */}
+  <div className="absolute inset-0 rounded-md pointer-events-none"
+       style={{
+         border: "2px solid",
+         borderImage: "repeating-linear-gradient(45deg, black 0 6px, transparent 6px 12px) 1",
+         borderImageSlice: 1,
+       }}
+  />
+  {/* Actual content */}
+  {isLoading ? (
+    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+  ) : referralCode ? (
+    <div
+      className="py-2 px-3 flex flex-col items-center space-y-1 cursor-pointer"
+      onClick={copyReferralCode}
+    >
+      <p className="text-[#525252] text-[11px] font-medium">Your referral code is</p>
+      <span className="font-mono text-black text-sm font-semibold">{referralCode}</span>
+      <span className="text-[#525252] text-[11px] hover:underline">
+        {copied ? "Copied!" : "Tap to Copy"}
+      </span>
+    </div>
+  ) : (
+    <p className="text-gray-500 text-[10px]">No referral code available</p>
+  )}
+</div>
+
         </CardContent>
       </Card>
 

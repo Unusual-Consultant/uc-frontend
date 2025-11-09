@@ -91,13 +91,13 @@ export function UpcomingSessions() {
   return (
     <>
       <Card className="border-0 bg-transparent shadow-none">
-        <CardHeader className="pl-2">
+        <CardHeader className="pl-0">
           <CardTitle className="flex items-center space-x-2">
             <Image
               src="/ph_video-light.png"
               alt="upcoming sessions"
-              width={24}
-              height={24}
+              width={30}
+              height={30}
               className="object-contain"
             />
             <span className="text-[#003b6b]">Upcoming</span>

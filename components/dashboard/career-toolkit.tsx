@@ -112,7 +112,7 @@ export function CareerToolkitSection() {
     <section className="w-full py-12 md:py-16 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-[1440px] mx-auto">
         {/* Section Header */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-left gap-2 mb-1">
           <Image
             src="/ep_document.png"
             alt="Career Toolkit Icon"
@@ -120,7 +120,7 @@ export function CareerToolkitSection() {
             height={34}
             className="object-contain"
           />
-          <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 ">
             <span className="text-[#003b6b]">Career</span>
             <span className="text-text-primary"> Toolkit</span>
           </h2>

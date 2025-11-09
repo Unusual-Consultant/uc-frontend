@@ -81,149 +81,132 @@ const mentors = [
   },
 ];
 
-export default function MentorCards() {
+export default function MentorCards({ showFilters }: { showFilters: boolean }) {
   return (
     <section className="py-12 font-[Mulish] bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Grid: Use auto-rows-fr so all cards in a row have equal height */}
+        <div
+          className={`grid grid-cols-1 gap-12 transition-all duration-300 ${
+            showFilters ? "md:grid-cols-2" : "md:grid-cols-3"
+          } auto-rows-fr`}
+        >
           {mentors.map((mentor) => (
             <Card
               key={mentor.id}
               className="relative border border-[#C7C7C7] rounded-xl p-4 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 overflow-hidden bg-white"
             >
-              {/* Top Banner */}
-              <div className="absolute top-0 left-0 w-full h-16 bg-[#C4E1FF] rounded-t-xl z-0" />
+              {/* Card content wrapper: flex-col + flex-1 for inner content */}
+              <div className="flex flex-col flex-1">
+                {/* Banner */}
+                <div className="absolute top-0 left-0 w-full h-20 bg-[#C4E1FF] rounded-t-xl z-0" />
 
-              {/* Badge */}
-              <div
-                className={`absolute top-3 right-3 px-3 py-1 text-xs font-semibold rounded-full flex items-center gap-1 z-20 ${
-                  mentor.badge === "Top Rated"
-                    ? "bg-yellow-200 text-yellow-800"
-                    : mentor.badge === "Expert"
-                    ? "bg-purple-200 text-purple-800"
-                    : "bg-blue-200 text-blue-800"
-                }`}
-              >
-                <Award className="w-3 h-3" />
-                {mentor.badge}
-              </div>
+                {mentor.available && (
+                  <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1 z-20">
+                    <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                      <Zap className="w-3 h-3 text-green-500 fill-green-500" />
+                    </div>
+                    Online
+                  </div>
+                )}
 
-              {/* Online Indicator */}
-              {mentor.available && (
-                <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-20">
-                  <Zap className="w-3 h-3" /> Online
-                </div>
-              )}
+                {/* Avatar + Info */}
+                <div className="flex gap-4 items-start relative z-10 mt-14 py-2">
+                  <div className="relative -mt-6">
+                    <Avatar className="w-20 h-20 border-4 border-white shadow-md">
+                      <AvatarImage src={mentor.image} alt={mentor.name} />
+                    </Avatar>
+                    <div className="absolute w-[58px] h-[23px] -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
+                      <Star className="w-3 h-3 text-yellow-400" />{" "}
+                      <span className="text-black">{mentor.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
 
-              {/* Profile Info */}
-              <div className="flex gap-4 items-start relative z-10 mt-14">
-                <div className="relative -mt-6">
-                  <Avatar className="w-20 h-20 border-4 border-white shadow-md">
-                    <AvatarImage src={mentor.image} alt={mentor.name} />
-                  </Avatar>
-                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
-                    <Star className="w-3 h-3 text-yellow-400" /> {mentor.rating.toFixed(1)}
+                  <div className="flex-1 flex flex-col mt-1 text-black">
+                    <div className="flex items-center gap-1">
+                      <h3 className="text-lg font-bold">{mentor.name}</h3>
+                    </div>
+                    <p className="text-sm">{mentor.title}</p>
+                    <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
                   </div>
                 </div>
 
-                <div className="flex-1 flex flex-col mt-1 text-black">
+                {/* Location / Experience / Favorite */}
+                <div className="mt-4 flex gap-4 font-semibold text-sm text-black items-center">
+                  <div className="flex items-center gap-1 text-[14px]">
+                    <MapPin className="w-4 h-4" /> {mentor.location}
+                  </div>
                   <div className="flex items-center gap-1">
-                    <h3 className="text-lg font-bold">{mentor.name}</h3>
-                    <Verified className="w-4 h-4 text-blue-500" />
+                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
                   </div>
-                  <p className="text-sm">{mentor.title}</p>
-                  <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
+                  <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-10">
+                    <Heart className="w-4 h-4 text-black " />
+                  </button>
                 </div>
-              </div>
 
-              {/* Info */}
-              <div className="mt-4 flex gap-6 font-semibold text-sm text-black items-center">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" /> {mentor.location}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs
-                </div>
-                <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors">
-                  <Heart className="w-5 h-5" />
-                </button>
-              </div>
+                <p className="mt-4 text-sm text-black font-[500] flex-1">{mentor.description}</p>
 
-              {/* Description */}
-              <p className="mt-4 text-sm text-gray-800">{mentor.description}</p>
-
-              {/* Stats */}
-              <div className="mt-6 flex gap-6 justify-start text-sm text-gray-700">
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold">Response</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="w-4 h-4 text-red-500" />
-                    <span>{mentor.responseTime}</span>
+                {/* Stats */}
+                <div className="mt-6 flex justify-center gap-4 text-gray-700 w-full font-[Mulish]">
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Response Time</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-4 h-4 text-red-500" />
+                      <span className="text-[13px] font-[700]">{mentor.responseTime}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold">Mentees</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Users className="w-4 h-4 text-blue-500" />
-                    <span>{mentor.mentees}</span>
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Total Mentees</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      <span className="text-[13px] font-[700]">{mentor.mentees}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Success Rate</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-[13px] font-[700]">{mentor.successRate}%</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold">Success</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>{mentor.successRate}%</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Tags */}
-              <div className="mt-6 flex flex-wrap gap-2 text-black">
-                {mentor.expertise.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2 py-1 bg-[#D1EAFF] text-[10px] rounded-full font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-
-              {/* Languages */}
-              {mentor.languages && (
-                <div className="mt-4 group cursor-pointer inline-block">
-                  <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
-                    <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
-                      <Globe className="w-3 h-3 text-blue-400" />
-                      Languages
+                {/* Expertise / Languages */}
+                <div className="mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
+                  {mentor.expertise.map((skill) => (
+                    <span key={skill} className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
+                      {skill}
                     </span>
-                    <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                      {mentor.languages.join(", ")}
-                    </span>
+                  ))}
+                </div>
+                {mentor.languages && (
+                  <div className="mt-3 group cursor-pointer inline-block font-[500]">
+                    <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
+                      <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
+                        <Globe className="w-3 h-3 text-blue-400" />
+                        Languages
+                      </span>
+                      <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        {mentor.languages.join(", ")}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Rate + Buttons */}
-              <div className="mt-8 flex items-start gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Starting from</span>
-                  <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
-                </div>
-                <div className="flex flex-col gap-2 flex-1">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full border-black rounded-full"
-                  >
-                    <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full"
-                  >
-                    Quick Book
-                  </Button>
+                {/* Buttons */}
+                <div className="mt-8 flex items-start gap-4">
+                  <div className="flex flex-col pt-7">
+                    <span className="text-sm font-semibold">Starting from</span>
+                    <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
+                  </div>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <Button variant="outline" size="sm" className="w-full border-black rounded-full">
+                      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+                    </Button>
+                    <Button size="sm" className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full">
+                      Quick Book
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>
