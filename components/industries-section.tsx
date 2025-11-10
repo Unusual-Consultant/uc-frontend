@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { API_BASE_URL } from "@/lib/api"
 
 const industriesFallback = [
   {
@@ -80,6 +81,12 @@ interface StatsData {
   }
 }
 
+interface IndustryStats {
+  industries_covered: number
+  avg_salary: number
+  avg_growth: number
+}
+
 export function IndustriesSection() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [statsData, setStatsData] = useState<StatsData | null>(null)
@@ -92,7 +99,7 @@ export function IndustriesSection() {
     growth: ind.growth,
     roles: ind.roles
   })))
-  const [industryStats, setIndustryStats] = useState<any>(null)
+  const [industryStats, setIndustryStats] = useState<IndustryStats | null>(null)
 
   useEffect(() => {
     fetchStats()
@@ -102,7 +109,7 @@ export function IndustriesSection() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      const response = await fetch(`${API_BASE_URL}/statistics/overview`)
       if (!response.ok) throw new Error("Failed to fetch statistics")
       const data = await response.json()
       setStatsData(data)
@@ -113,7 +120,7 @@ export function IndustriesSection() {
 
   const fetchIndustries = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/industries")
+      const response = await fetch(`${API_BASE_URL}/statistics/industries`)
       if (response.ok) {
         const data = await response.json()
         if (data.industries && data.industries.length > 0) {
@@ -138,7 +145,7 @@ export function IndustriesSection() {
 
   const fetchIndustryStats = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/industry-summary")
+      const response = await fetch(`${API_BASE_URL}/statistics/industry-summary`)
       if (response.ok) {
         const data = await response.json()
         setIndustryStats(data)
@@ -270,15 +277,18 @@ export function IndustriesSection() {
 
         {/* View All Services */}
         <div className="flex justify-end mt-12 items-center gap-3">
+          {/* White pill */}
           <Button
             size="sm"
             asChild
             className="bg-white text-black px-6 py-2 rounded-full shadow-md hover:bg-[#f2f2f2] transition-colors duration-300"
           >
-            <Link href="/all-services">View All Services</Link>
+            <Link href="/all-services">View All Industries</Link>
           </Button>
-          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-            <ArrowRight className="text-black h-5 w-5" />
+
+          {/* Arrow in circle */}
+          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center gap-2 group cursor-pointer">
+          <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
           </span>
         </div>
 

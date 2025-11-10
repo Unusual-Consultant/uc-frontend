@@ -1,12 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Star, MapPin, Users, Clock, Heart, Verified, MessageCircle, Calendar, Eye, Award } from "lucide-react"
-import Link from "next/link"
+import "@fontsource/mulish";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import {
+  MapPin,
+  Clock,
+  Users,
+  CheckCircle,
+  Heart,
+  Star,
+  Zap,
+  Verified,
+  Globe,
+  Award,
+} from "lucide-react";
+import Link from "next/link";
 
 const mentors = [
   {
@@ -14,21 +24,19 @@ const mentors = [
     name: "Sarah Johnson",
     title: "Senior Product Manager",
     company: "Google",
-    image: "/placeholder.svg?height=120&width=120",
+    image: "/placeholder.svg?height=80&width=80",
     rating: 4.9,
     reviews: 127,
     location: "San Francisco, CA",
-    expertise: ["Product Management", "Strategy", "Leadership", "Analytics", "Growth Hacking"],
+    expertise: ["Product Management", "Strategy", "Leadership"],
     price: 150,
     mentees: 45,
-    experience: "8+ years",
-    bio: "Passionate about helping product managers scale their impact and advance their careers through data-driven strategies.",
-    availability: "Available this week",
-    verified: true,
-    recentlyActive: true,
+    available: true,
+    responseTime: "<4 hrs",
+    successRate: 95,
+    description: "Experienced product manager with a passion for building user-centric products.",
     languages: ["English", "Spanish"],
-    responseTime: "< 2 hours",
-    successRate: 98,
+    yearsExperience: 10,
     badge: "Top Mentor",
   },
   {
@@ -36,21 +44,19 @@ const mentors = [
     name: "Michael Chen",
     title: "Senior Software Engineer",
     company: "Meta",
-    image: "/placeholder.svg?height=120&width=120",
+    image: "/placeholder.svg?height=80&width=80",
     rating: 4.8,
     reviews: 89,
     location: "Seattle, WA",
-    expertise: ["React", "Node.js", "System Design", "Architecture", "TypeScript"],
+    expertise: ["React", "Node.js", "System Design"],
     price: 120,
     mentees: 32,
-    experience: "6+ years",
-    bio: "Full-stack engineer with expertise in building scalable web applications and mentoring junior developers.",
-    availability: "Available next week",
-    verified: true,
-    recentlyActive: false,
-    languages: ["English", "Chinese"],
-    responseTime: "< 4 hours",
-    successRate: 95,
+    available: false,
+    responseTime: "<6 hrs",
+    successRate: 90,
+    description: "Full-stack engineer specializing in scalable applications.",
+    languages: ["English", "Mandarin"],
+    yearsExperience: 8,
     badge: "Expert",
   },
   {
@@ -58,390 +64,155 @@ const mentors = [
     name: "Emily Rodriguez",
     title: "UX Design Lead",
     company: "Apple",
-    image: "/placeholder.svg?height=120&width=120",
+    image: "/placeholder.svg?height=80&width=80",
     rating: 4.9,
     reviews: 156,
     location: "Cupertino, CA",
-    expertise: ["UX Design", "Design Systems", "User Research", "Prototyping"],
+    expertise: ["UX Design", "Design Systems", "Research"],
     price: 180,
     mentees: 67,
-    experience: "10+ years",
-    bio: "Design leader passionate about creating intuitive user experiences and mentoring the next generation of designers.",
-    availability: "Available today",
-    verified: true,
-    recentlyActive: true,
-    languages: ["English", "Spanish"],
-    responseTime: "< 1 hour",
-    successRate: 99,
+    available: true,
+    responseTime: "<3 hrs",
+    successRate: 97,
+    description: "UX leader guiding product teams to create intuitive and engaging experiences.",
+    languages: ["English", "French"],
+    yearsExperience: 12,
     badge: "Top Rated",
   },
-  {
-    id: 4,
-    name: "David Kim",
-    title: "Data Science Manager",
-    company: "Netflix",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.7,
-    reviews: 73,
-    location: "Los Angeles, CA",
-    expertise: ["Data Science", "Machine Learning", "Python", "Analytics"],
-    price: 140,
-    mentees: 28,
-    experience: "7+ years",
-    bio: "Data science expert helping professionals transition into ML and advance their analytical careers.",
-    availability: "Available this week",
-    verified: false,
-    recentlyActive: true,
-    languages: ["English", "Korean"],
-    responseTime: "< 6 hours",
-    successRate: 92,
-    badge: "Rising Star",
-  },
-  {
-    id: 5,
-    name: "Lisa Wang",
-    title: "Marketing Director",
-    company: "Spotify",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.8,
-    reviews: 94,
-    location: "New York, NY",
-    expertise: ["Digital Marketing", "Growth", "Analytics", "Strategy"],
-    price: 130,
-    mentees: 41,
-    experience: "9+ years",
-    bio: "Marketing leader with expertise in growth strategies and digital transformation.",
-    availability: "Available next week",
-    verified: true,
-    recentlyActive: false,
-    languages: ["English", "Chinese"],
-    responseTime: "< 3 hours",
-    successRate: 96,
-    badge: "Expert",
-  },
-  {
-    id: 6,
-    name: "James Wilson",
-    title: "Engineering Manager",
-    company: "Uber",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.9,
-    reviews: 112,
-    location: "Austin, TX",
-    expertise: ["Engineering Leadership", "Team Management", "Architecture", "Scaling"],
-    price: 160,
-    mentees: 53,
-    experience: "12+ years",
-    bio: "Engineering leader focused on building high-performing teams and scalable systems.",
-    availability: "Available this week",
-    verified: true,
-    recentlyActive: true,
-    languages: ["English"],
-    responseTime: "< 2 hours",
-    successRate: 97,
-    badge: "Top Mentor",
-  },
-  {
-    id: 7,
-    name: "Anna Martinez",
-    title: "VP of Engineering",
-    company: "Slack",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.9,
-    reviews: 203,
-    location: "San Francisco, CA",
-    expertise: ["Leadership", "Engineering Management", "Strategy", "Culture"],
-    price: 200,
-    mentees: 78,
-    experience: "15+ years",
-    bio: "Executive leader with deep experience in scaling engineering organizations and building culture.",
-    availability: "Available today",
-    verified: true,
-    recentlyActive: true,
-    languages: ["English", "Spanish"],
-    responseTime: "< 1 hour",
-    successRate: 99,
-    badge: "Executive",
-  },
-  {
-    id: 8,
-    name: "Robert Taylor",
-    title: "Principal Designer",
-    company: "Figma",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.8,
-    reviews: 145,
-    location: "San Francisco, CA",
-    expertise: ["Product Design", "Design Systems", "Leadership", "Strategy"],
-    price: 170,
-    mentees: 62,
-    experience: "11+ years",
-    bio: "Principal designer with expertise in design systems and product strategy at scale.",
-    availability: "Available this week",
-    verified: true,
-    recentlyActive: true,
-    languages: ["English"],
-    responseTime: "< 2 hours",
-    successRate: 98,
-    badge: "Top Rated",
-  },
-  {
-    id: 9,
-    name: "Jennifer Lee",
-    title: "Head of Growth",
-    company: "Notion",
-    image: "/placeholder.svg?height=120&width=120",
-    rating: 4.9,
-    reviews: 167,
-    location: "San Francisco, CA",
-    expertise: ["Growth Marketing", "Product Marketing", "Analytics", "Strategy"],
-    price: 185,
-    mentees: 71,
-    experience: "13+ years",
-    bio: "Growth expert with proven track record of scaling products from startup to enterprise.",
-    availability: "Available next week",
-    verified: true,
-    recentlyActive: false,
-    languages: ["English", "Korean"],
-    responseTime: "< 3 hours",
-    successRate: 97,
-    badge: "Growth Expert",
-  },
-]
+];
 
-interface MentorGridProps {
-  searchQuery?: string
-}
-
-export function MentorGrid({ searchQuery }: MentorGridProps) {
-  const [hoveredMentor, setHoveredMentor] = useState<number | null>(null)
-  const [favorites, setFavorites] = useState<number[]>([])
-
-  const toggleFavorite = (mentorId: number) => {
-    setFavorites((prev) => (prev.includes(mentorId) ? prev.filter((id) => id !== mentorId) : [...prev, mentorId]))
-  }
-
-  // Filter mentors based on search query
-  const filteredMentors = searchQuery
-    ? mentors.filter(
-        (mentor) =>
-          mentor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          mentor.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          mentor.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          mentor.expertise.some((skill) => skill.toLowerCase().includes(searchQuery.toLowerCase())),
-      )
-    : mentors
-
-  if (filteredMentors.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <div className="max-w-md mx-auto">
-          <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-            <Users className="h-12 w-12 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No mentors found</h3>
-          <p className="text-gray-600 mb-6">
-            We couldn't find any mentors matching your criteria. Try adjusting your filters or search terms.
-          </p>
-          <div className="space-y-2">
-            <Button variant="outline" onClick={() => window.location.reload()}>
-              Clear Filters
-            </Button>
-            <p className="text-sm text-gray-500">
-              Or{" "}
-              <Link href="/mentors" className="text-blue-600 hover:underline">
-                browse all mentors
-              </Link>
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
+export default function MentorCards({ showFilters }: { showFilters: boolean }) {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="text-gray-600">
-            {filteredMentors.length} mentor{filteredMentors.length !== 1 ? "s" : ""} found
-            {searchQuery && (
-              <span className="ml-2 text-sm">
-                for "<span className="font-medium">{searchQuery}</span>"
-              </span>
-            )}
-          </p>
-        </div>
-      </div>
+    <section className="py-12 font-[Mulish] bg-gray-50">
+      <div className="container mx-auto px-4">
+        {/* Grid: Use auto-rows-fr so all cards in a row have equal height */}
+        <div
+          className={`grid grid-cols-1 gap-12 transition-all duration-300 ${
+            showFilters ? "md:grid-cols-2" : "md:grid-cols-3"
+          } auto-rows-fr`}
+        >
+          {mentors.map((mentor) => (
+            <Card
+              key={mentor.id}
+              className="relative border border-[#C7C7C7] rounded-xl p-4 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 overflow-hidden bg-white"
+            >
+              {/* Card content wrapper: flex-col + flex-1 for inner content */}
+              <div className="flex flex-col flex-1">
+                {/* Banner */}
+                <div className="absolute top-0 left-0 w-full h-20 bg-[#C4E1FF] rounded-t-xl z-0" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredMentors.map((mentor) => (
-          <Card
-            key={mentor.id}
-            className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-md hover:scale-[1.02]"
-            onMouseEnter={() => setHoveredMentor(mentor.id)}
-            onMouseLeave={() => setHoveredMentor(null)}
-          >
-            <CardContent className="p-6">
-              <div className="text-center space-y-4">
-                {/* Profile Image */}
-                <div className="relative mx-auto">
-                  <Avatar className="w-24 h-24 mx-auto">
-                    <AvatarImage src={mentor.image || "/placeholder.svg"} alt={mentor.name} />
-                    <AvatarFallback className="text-lg">
-                      {mentor.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  {mentor.recentlyActive && (
-                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full" />
-                  )}
-
-                  {/* Favorite Button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleFavorite(mentor.id)
-                    }}
-                    className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white shadow-md hover:shadow-lg"
-                  >
-                    <Heart
-                      className={`h-4 w-4 ${
-                        favorites.includes(mentor.id) ? "fill-red-500 text-red-500" : "text-gray-400"
-                      }`}
-                    />
-                  </Button>
-                </div>
-
-                {/* Badge */}
-                <div className="flex justify-center">
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    <Award className="h-3 w-3 mr-1" />
-                    {mentor.badge}
-                  </Badge>
-                </div>
-
-                {/* Name and Title */}
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-1">
-                    <h3 className="font-bold text-xl text-gray-900">{mentor.name}</h3>
-                    {mentor.verified && <Verified className="h-5 w-5 text-blue-500" />}
+                {mentor.available && (
+                  <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1 z-20">
+                    <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
+                      <Zap className="w-3 h-3 text-green-500 fill-green-500" />
+                    </div>
+                    Online
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">{mentor.title}</p>
-                  <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
-                </div>
+                )}
 
-                {/* Rating and Stats */}
-                <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-medium">{mentor.rating}</span>
-                    <span>({mentor.reviews})</span>
+                {/* Avatar + Info */}
+                <div className="flex gap-4 items-start relative z-10 mt-14 py-2">
+                  <div className="relative -mt-6">
+                    <Avatar className="w-20 h-20 border-4 border-white shadow-md">
+                      <AvatarImage src={mentor.image} alt={mentor.name} />
+                    </Avatar>
+                    <div className="absolute w-[58px] h-[23px] -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
+                      <Star className="w-3 h-3 text-yellow-400" />{" "}
+                      <span className="text-black">{mentor.rating.toFixed(1)}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4" />
-                    <span>{mentor.mentees} mentees</span>
+
+                  <div className="flex-1 flex flex-col mt-1 text-black">
+                    <div className="flex items-center gap-1">
+                      <h3 className="text-lg font-bold">{mentor.name}</h3>
+                    </div>
+                    <p className="text-sm">{mentor.title}</p>
+                    <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
                   </div>
                 </div>
 
-                {/* Location */}
-                <div className="flex items-center justify-center space-x-1 text-sm text-gray-600">
-                  <MapPin className="h-4 w-4" />
-                  <span>{mentor.location}</span>
+                {/* Location / Experience / Favorite */}
+                <div className="mt-4 flex gap-4 font-semibold text-sm text-black items-center">
+                  <div className="flex items-center gap-1 text-[14px]">
+                    <MapPin className="w-4 h-4" /> {mentor.location}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
+                  </div>
+                  <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-10">
+                    <Heart className="w-4 h-4 text-black " />
+                  </button>
                 </div>
 
-                {/* Bio with hover expansion */}
-                <div>
-                  <p
-                    className={`text-sm text-gray-700 transition-all duration-300 ${
-                      hoveredMentor === mentor.id ? "line-clamp-none" : "line-clamp-2"
-                    }`}
-                  >
-                    {mentor.bio}
-                  </p>
+                <p className="mt-4 text-sm text-black font-[500] flex-1">{mentor.description}</p>
+
+                {/* Stats */}
+                <div className="mt-6 flex justify-center gap-4 text-gray-700 w-full font-[Mulish]">
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Response Time</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Clock className="w-4 h-4 text-red-500" />
+                      <span className="text-[13px] font-[700]">{mentor.responseTime}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Total Mentees</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <Users className="w-4 h-4 text-blue-500" />
+                      <span className="text-[13px] font-[700]">{mentor.mentees}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Success Rate</span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-[13px] font-[700]">{mentor.successRate}%</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Skills */}
-                <div className="flex flex-wrap justify-center gap-1">
-                  {mentor.expertise.slice(0, 3).map((skill) => (
-                    <Badge key={skill} variant="outline" className="text-xs">
+                {/* Expertise / Languages */}
+                <div className="mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
+                  {mentor.expertise.map((skill) => (
+                    <span key={skill} className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
                       {skill}
-                    </Badge>
+                    </span>
                   ))}
-                  {mentor.expertise.length > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{mentor.expertise.length - 3} more
-                    </Badge>
-                  )}
                 </div>
-
-                {/* Additional Info */}
-                <div className="flex items-center justify-center space-x-3 text-xs text-gray-500">
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-3 w-3" />
-                    <span>{mentor.responseTime}</span>
+                {mentor.languages && (
+                  <div className="mt-3 group cursor-pointer inline-block font-[500]">
+                    <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
+                      <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
+                        <Globe className="w-3 h-3 text-blue-400" />
+                        Languages
+                      </span>
+                      <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        {mentor.languages.join(", ")}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <MessageCircle className="h-3 w-3" />
-                    <span>{mentor.successRate}% success</span>
-                  </div>
-                </div>
+                )}
 
-                {/* Price and Availability */}
-                <div className="text-center">
-                  <div className="font-bold text-2xl text-gray-900">${mentor.price}/hr</div>
-                  <div
-                    className={`text-sm ${
-                      mentor.availability.includes("today")
-                        ? "text-green-600"
-                        : mentor.availability.includes("week")
-                          ? "text-blue-600"
-                          : "text-gray-600"
-                    }`}
-                  >
-                    {mentor.availability}
+                {/* Buttons */}
+                <div className="mt-8 flex items-start gap-4">
+                  <div className="flex flex-col pt-7">
+                    <span className="text-sm font-semibold">Starting from</span>
+                    <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
                   </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex space-x-2">
-                  <Button asChild className="flex-1" size="sm">
-                    <Link href={`/mentors/${mentor.id}`}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Profile
-                    </Link>
-                  </Button>
-                  <Button variant="outline" className="flex-1 bg-transparent" size="sm">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Book Now
-                  </Button>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <Button variant="outline" size="sm" className="w-full border-black rounded-full">
+                      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+                    </Button>
+                    <Button size="sm" className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full">
+                      Quick Book
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Pagination */}
-      <div className="flex justify-center items-center space-x-2 pt-8">
-        <Button variant="outline" size="sm" disabled>
-          Previous
-        </Button>
-        <div className="flex space-x-1">
-          {[1, 2, 3, 4, 5].map((page) => (
-            <Button key={page} variant={page === 1 ? "default" : "outline"} size="sm" className="w-10">
-              {page}
-            </Button>
+            </Card>
           ))}
         </div>
-        <Button variant="outline" size="sm">
-          Next
-        </Button>
       </div>
-    </div>
-  )
+    </section>
+  );
 }

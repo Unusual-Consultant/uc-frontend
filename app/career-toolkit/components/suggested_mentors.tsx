@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Star, ArrowRight, ChevronLeft, ChevronRight, MapPin } from "lucide-react"
@@ -9,56 +9,57 @@ import { QuickBook } from "@/components/dashboard/quickbook"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Image from "next/image"
 
-export const mentors = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    role: "Senior PM at Google",
-    location: "San Francisco, CA",
-    company: "Google",
-    rating: 4.9,
-    reviews: 127,
-    price: 1500,
-    tags: ["Product Strategy", "Career Growth", "Interview Prep"],
-    image: "/placeholder.svg?height=60&width=60&text=SJ",
-    expertise: "Ex-Google PM with 8+ years experience",
-    matchScore: 95
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    role: "Ex-Amazon PM",
-    location: "San Francisco, CA",
-    company: "Amazon",
-    rating: 4.8,
-    reviews: 89,
-    price: 1200,
-    tags: ["System Design", "Leadership", "Product Management"],
-    image: "/placeholder.svg?height=60&width=60&text=MC",
-    expertise: "Led 5+ product launches at Amazon",
-    matchScore: 92
-  },
-  {
-    id: 3,
-    name: "Priya Sharma",
-    role: "Data Science Manager",
-    location: "Bangalore, India",
-    company: "Microsoft",
-    rating: 4.9,
-    reviews: 156,
-    price: 1800,
-    tags: ["Data Science", "ML Engineering", "Career Transition"],
-    image: "/placeholder.svg?height=60&width=60&text=PS",
-    expertise: "Transitioned from SDE to DS Manager",
-    matchScore: 88
-  }
-]
+interface Mentor {
+  id: string
+  name: string
+  role: string
+  location: string
+  company?: string
+  rating: number
+  reviews: number
+  price: number
+  tags: string[]
+  image: string
+  expertise?: string
+  matchScore: number
+}
 
 const itemsPerView = 2
 
-export function SuggestedMentorsPage() {
+interface SuggestedMentorsProps {
+  skills: string[]
+  role?: string
+}
+
+export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedMentor, setSelectedMentor] = useState<any>(null)
+  const [mentors, setMentors] = useState<Mentor[]>([])
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      // Fetch if either skills exist OR a role is provided
+      if ((!skills || skills.length === 0) && !role) {
+        setMentors([])
+        return
+      }
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/v1/mentors/ai-recommended", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ skills: skills || [], desired_role: role || null, limit: 4 }),
+        })
+        if (!response.ok) throw new Error("Failed to fetch mentors")
+        const data = await response.json()
+        setMentors(data.mentors || [])
+        setCurrentIndex(0)
+      } catch (e) {
+        console.error("AI mentors fetch failed", e)
+        setMentors([])
+      }
+    }
+    fetchMentors()
+  }, [skills, role])
 
   const nextSlide = () =>
     setCurrentIndex((prev) =>
@@ -77,18 +78,20 @@ export function SuggestedMentorsPage() {
     currentIndex + itemsPerView
   )
 
+  if (mentors.length === 0) return null
+
   return (
     <section className="w-full py-6 relative">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex">
           <Image
-          src="/bi_stars.png"
-          alt="sparkle"
-          width={12}
-          height={12}
-          className="w-7 h-7"
-        />
+            src="/bi_stars.png"
+            alt="sparkle"
+            width={12}
+            height={12}
+            className="w-7 h-7"
+          />
           <h2 className="text-xl md:text-2xl font-bold mb-4 text-gray-900">
             AI Recommended Mentors
           </h2>
@@ -126,24 +129,22 @@ export function SuggestedMentorsPage() {
                   padding: "1rem",
                 }}
               >
-
-
                 {/* Match Pill */}
                 <div className="absolute top-6 right-4 text-[12px]">
                   <div
                     className="relative inline-block rounded-full"
                     style={{
-                      background: "linear-gradient(to right, #B8015A, #0171CD)", 
-                      padding: "1.5px", 
-                      borderRadius: "9999px", 
+                      background: "linear-gradient(to right, #B8015A, #0171CD)",
+                      padding: "1.5px",
+                      borderRadius: "9999px",
                       display: "inline-block",
                     }}
                   >
                     <div
                       className="rounded-full flex items-center justify-center gap-1 px-3 py-[4px]  font-semibold text-center"
                       style={{
-                        background: "linear-gradient(to right, #FDF1F7, #EDF6FE)", 
-                        borderRadius: "9999px", 
+                        background: "linear-gradient(to right, #FDF1F7, #EDF6FE)",
+                        borderRadius: "9999px",
                       }}
                     >
                       <Image
@@ -157,7 +158,6 @@ export function SuggestedMentorsPage() {
                     </div>
                   </div>
                 </div>
-
 
                 <CardContent className="p-3">
                   <div className="flex items-start gap-2">
@@ -182,7 +182,7 @@ export function SuggestedMentorsPage() {
                         {mentor.tags.map((tag, i) => (
                           <span
                             key={i}
-                            className="px-1.5 py-0.5 bg-[#EDF7FF] text-black text-[10px] rounded-full"
+                            className="px-1.5 py-0.5 bg-[#EDF7FF] text-black text=[10px] rounded-full"
                           >
                             {tag}
                           </span>
@@ -208,7 +208,6 @@ export function SuggestedMentorsPage() {
                             Quick Book
                           </Button>
                         </div>
-
                       </div>
                     </div>
                   </div>
