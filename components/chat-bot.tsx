@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react"
 import { sendChatMessage } from "@/lib/api"
+import AnimatedCornerIcons from "./animated_smart_buddy"
 
 interface Message {
   id: number
@@ -100,13 +101,15 @@ export function ChatBot() {
       {/* Chat Button */}
       <div className="fixed bottom-6 right-6 z-50">
         <Button
-          onClick={() => setIsOpen(!isOpen)}
-          size="lg"
-          className="rounded-full w-16 h-16 shadow-lg hover:shadow-xl transition-all duration-300"
-          title="Smart Buddy"
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
-        </Button>
+  onClick={() => setIsOpen(!isOpen)}
+  size="sm"
+  variant="ghost"
+  className="w-14 h-14  transition-all duration-300 bg-transparent hover:bg-transparent"
+  title="Smart Buddy"
+>
+  {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
+</Button>
+
       </div>
 
       {/* Chat Window */}

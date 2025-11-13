@@ -12,7 +12,6 @@ import {
   Bar,
   Tooltip,
 } from "recharts"
-import AnimatedCornerIcons from "./animated_smart_buddy"
 import { API_BASE_URL } from "@/lib/api"
 
 // These will be replaced by API data
@@ -198,7 +197,7 @@ export function StatsSection() {
     <section className="relative -mt-32 pb-20">
       
       <div className="max-w-[1000px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
-        <AnimatedCornerIcons/>
+     
         {/* Header */}
         <div className="text-left mb-16">
   <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">

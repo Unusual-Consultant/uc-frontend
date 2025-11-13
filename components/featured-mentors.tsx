@@ -247,17 +247,17 @@ export function FeaturedMentors() {
          
 
               {/* Location + Experience + Like */}
-              <div className="mt-4 flex gap-6 font-semibold text-sm text-black items-center">
-                <div className="flex items-center gap-2">
+              <div className="mt-4 flex gap-2 font-semibold text-sm text-black items-center">
+                <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4" /> {mentor.location}
                 </div>
                 {mentor.yearsExperience && (
-                  <div className="flex items-center font-semibold gap-2 text-black">
-                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs
+                  <div className="flex items-center font-semibold gap-1 text-black">
+                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
                   </div>
                 )}
-                <button className="ml-auto -mt-1 text-gray-400 hover:text-red-500 transition-colors">
-                  <Heart className="w-5 h-5" />
+                <button className="ml-auto -mt-10 text-gray-400 hover:text-red-500 transition-colors -top-2">
+                  <Heart className="w-4 h-4" />
                 </button>
               </div>
 

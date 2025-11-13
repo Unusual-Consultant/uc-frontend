@@ -16,6 +16,10 @@ module.exports = {
         "primary-foreground": "hsl(var(--primary-foreground))",
         // add more variables as needed
       },
+      fontFamily: {
+        mulish: ["var(--font-mulish)", "sans-serif"],
+        sans: ["var(--font-mulish)", "sans-serif"],
+      },
     },
   },
   plugins: [],
