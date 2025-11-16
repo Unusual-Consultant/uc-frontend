@@ -3,6 +3,15 @@
 @tailwind utilities;
 @import "@fontsource/mulish";
 
+/* Hide scrollbars utility */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
 /* Root CSS variables */
 @layer base {
   :root {
@@ -73,7 +82,7 @@
 /* Optional: body default styling */
 body {
   @apply bg-background text-foreground;
-  font-family: "Mulish"
+  font-family: "Mulish";
 }
 
 /* Custom animations */

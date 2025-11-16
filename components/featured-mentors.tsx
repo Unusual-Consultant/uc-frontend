@@ -180,7 +180,7 @@ export function FeaturedMentors() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50 w-[1255px]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -205,24 +205,44 @@ export function FeaturedMentors() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-[1050px] mx-auto">
+
           {visibleMentors.map((mentor) => (
            <Card
            key={mentor.id}
-           className="relative hover:shadow-lg transition-shadow duration-300 border rounded-xl overflow-hidden p-4 flex flex-col"
+           className="relative w-[340px] h-[662px] transition-shadow duration-300 
+                    border rounded-xl overflow-hidden p-4 flex flex-col justify-between"
+           style={{ boxShadow: "0px 4px 20px #9F9D9D40" }}
          >
+         
            {/* Top blue banner */}
-           <div className="bg-[#C4E1FF] h-16 w-full absolute top-0 left-0 z-0 rounded-t-xl" />
+           <div className="bg-[#C4E1FF] h-[80px] w-full absolute top-0 left-0 z-0 rounded-t-xl" />
          
            {/* Online badge */}
            {mentor.available && (
-             <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-10">
-               <Zap className="w-3 h-3" /> Online
-             </div>
-           )}
+  <div className="absolute top-2 left-2 bg-[#28A745] text-white text-xs px-3 py-1 rounded-full flex items-center gap-2 z-10 h-[25px]">
+    
+    {/* White Circle */}
+    <div className="w-[17px] h-[17px] rounded-full bg-white flex items-center justify-center">
+      {/* Zap Icon SVG in #28A745 */}
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="#28A745"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
+      </svg>
+    </div>
+<span className="text-[14px] font-[700]"></span>
+    Online
+  </div>
+)}
+
          
            {/* Top section: Avatar + rating */}
-           <div className="flex gap-4 items-start relative z-10 mt-14">
+           <div className="flex gap-4 items-start relative z-11 mt-16">
              {/* Avatar + rating */}
              <div className="relative -mt-6"> 
                <Avatar className="w-20 h-20 border-4 border-white shadow-md">
@@ -236,80 +256,85 @@ export function FeaturedMentors() {
              {/* Name/Title/Company */}
              <div className="flex-1 flex flex-col justify-start text-black mt-1"> 
                <div className="flex items-center gap-1">
-                 <h3 className="text-lg font-bold">{mentor.name}</h3>
+                 <h3 className=" font-[700] text-[20px]">{mentor.name}</h3>
                  <Verified className="w-4 h-4 text-blue-500" />
                </div>
-               <p className="text-sm text-black">{mentor.title}</p>
-               <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
+               <p className="font-[500] text-[14px] text-black">{mentor.title}</p>
+               <p className="font-[500] text-[14px] text-blue-600">{mentor.company}</p>
              </div>
            </div>
    
-         
-
+           <button className="ml-auto text-black hover:text-red-500 transition-colors">
+    <Heart className="w-4 h-4" />
+  </button>
               {/* Location + Experience + Like */}
-              <div className="mt-4 flex gap-2 font-semibold text-sm text-black items-center">
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> {mentor.location}
-                </div>
-                {mentor.yearsExperience && (
-                  <div className="flex items-center font-semibold gap-1 text-black">
-                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
-                  </div>
-                )}
-                <button className="ml-auto -mt-10 text-gray-400 hover:text-red-500 transition-colors -top-2">
-                  <Heart className="w-4 h-4" />
-                </button>
-              </div>
+<div className="mt-1 flex items-center font-semibold text-sm text-black text-[14px]">
+  <div className="flex items-center gap-1">
+    <MapPin className="w-4 h-4" /> {mentor.location}
+  </div>
+
+  {mentor.yearsExperience && (
+    <div className="flex items-center gap-1 ml-3">
+      <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
+    </div>
+  )}
+</div>
+
 
               {/* Description */}
-              <p className="mt-4 text-sm text-black">{mentor.description}</p>
+              <p className="mt-4 text-[14px] font-[500] text-black py-1">{mentor.description}</p>
 
               {/* Stats in vertical columns */}
-              <div className="mt-6 flex gap-6 justify-start">
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Response</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="w-4 h-4 text-red-500" />
-                    <span>{mentor.responseTime}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Mentees</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Users className="w-4 h-4 text-blue-500" />
-                    <span>{mentor.mentees}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Success</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>{mentor.successRate}%</span>
-                  </div>
-                </div>
-              </div>
+              {/* Stats Section */}
+<div className="mt-6 flex justify-between px-2 text-black">
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Response Time</span>
+    <div className="flex items-center gap-1 mt-1">
+      <Clock className="w-4 h-4 text-red-500" />
+      <span className="font-[700]">{mentor.responseTime}</span>
+    </div>
+  </div>
+
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Total Mentees</span>
+    <div className="flex items-center gap-1 mt-1">
+      <Users className="w-4 h-4 text-blue-500" />
+      <span className="font-[700]">{mentor.mentees}</span>
+    </div>
+  </div>
+
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Success Rate</span>
+    <div className="flex items-center gap-1 mt-1">
+      <CheckCircle className="w-4 h-4 text-green-500" />
+      <span className="font-[700]">{mentor.successRate}%</span>
+    </div>
+  </div>
+</div>
+
 
               {/* Tags */}
-              <div className="mt-6 flex flex-wrap gap-2 text-black">
-                {mentor.expertise.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2 py-1 bg-[#D1EAFF] text-[10px] rounded-full font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
+              <div className="mt-6 flex flex-wrap gap-2 text-black py-2">
+  {mentor.expertise.map((skill) => (
+    <span
+      key={skill}
+      className="inline-flex items-center justify-center px-3 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-medium"
+    >
+      <span className="px-2">{skill}</span>
+    </span>
+  ))}
+</div>
+
 
               {/* Languages pill */}
               {mentor.languages && mentor.languages.length > 0 && (
-  <div className="mt-4 group cursor-pointer inline-block">
-    <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
+  <div className="mt-4 group cursor-pointer inline-block ">
+    <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-[13px] font-[600] rounded-full transition-all duration-300 ease-in-out w-[154px] h-[30px]">
       
       {/* Default (before hover) */}
       <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
-        <Globe className="w-3 h-3 text-blue-400" />
-        Languages
+        <Globe className="w-4 h-4 text-blue-400" />
+       <span>{mentor.languages.length} Languages</span> 
       </span>
 
       {/* Hover (show languages, let pill expand naturally) */}
@@ -323,23 +348,35 @@ export function FeaturedMentors() {
 
 
               {/* Rate + Buttons */}
-              <div className="mt-8 flex items-start gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Starting from</span>
-                  <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
-                </div>
-                <div className="flex flex-col gap-2 flex-1">
-                  <Button variant="outline" size="sm" className="w-full border-black rounded-full">
-                    <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full"
-                  >
-                    Quick Book
-                  </Button>
-                </div>
-              </div>
+              <div className="mt-8 flex items-end gap-4 w-full">
+  {/* Price Section */}
+  <div className="flex flex-col">
+    <span className="text-[14px] font-[600] leading-none">Starting from</span>
+    <span className="text-[20px] font-[700] text-[#0073CF] leading-none mt-1">
+      ₹{mentor.price}/hr
+    </span>
+  </div>
+
+  {/* Buttons */}
+  <div className="flex flex-col gap-2 flex-1">
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full border-black rounded-full"
+    >
+      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+    </Button>
+
+    <Button
+      size="sm"
+      className="w-full bg-[#0073CF] text-white hover:bg-blue-700 rounded-full"
+    >
+      Quick Book
+    </Button>
+  </div>
+</div>
+
+
             </Card>
           ))}
         </div>
