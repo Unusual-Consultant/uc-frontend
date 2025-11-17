@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,12 +15,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Verified,
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-// API Configuration
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL } from "@/lib/api";
+
 
 // Types for API responses
 interface Mentor {
@@ -67,8 +69,10 @@ export function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");
   const [mentors, setMentors] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
-  const [popularSkills, setPopularSkills] = useState<string[]>(["Product Management","Software Engineering","Data Science","UX Design"]);
-
+  const [popularSkills, setPopularSkills] = useState<string[]>(["Product Management", "Software Engineering", "Data Science", "UX Design"]);
+  const [hovered, setHovered] = useState(false);
+  const mentorsRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
   // Transform testimonial data to frontend format
   const transformTestimonial = (backendTestimonial: any) => {
     if (!backendTestimonial || !backendTestimonial.testimonial) {
@@ -81,9 +85,9 @@ export function HeroSection() {
         image: "/placeholder.svg"
       };
     }
-    
+
     const testimonial = backendTestimonial.testimonial;
-    
+
     return {
       name: testimonial.mentee_name || "Student",
       content: testimonial.content || "Great experience!",
@@ -113,7 +117,7 @@ export function HeroSection() {
     }
     const mentor = backendMentor.mentor;
     const bioParts = mentor.bio?.split(' at ') || [];
-    
+
     // Extract name from full_name, first_name/last_name, or bio
     let name = mentor.full_name || "Mentor";
     if (!name || name === "Mentor") {
@@ -123,15 +127,15 @@ export function HeroSection() {
         name = bioParts[0];
       }
     }
-    
+
     // Get skills array or use headline
-    const skills = mentor.skills && mentor.skills.length > 0 
-      ? mentor.skills 
+    const skills = mentor.skills && mentor.skills.length > 0
+      ? mentor.skills
       : [mentor.headline || "Expert"];
-    
+
     // Get hourly rate directly from backend
     const price = mentor.hourly_rate || 1000;
-    
+
     return {
       id: backendMentor.mentor_id,
       name: name,
@@ -152,23 +156,23 @@ export function HeroSection() {
     const fetchData = async () => {
       try {
         const [mentorsRes, testimonialsRes, skillsRes] = await Promise.all([
-          fetch("http://127.0.0.1:8000/api/v1/featured-mentors/"),
-          fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/"),
-          fetch("http://127.0.0.1:8000/api/v1/statistics/trending-skills?limit=4")
+          fetch(`${API_BASE_URL}/featured-mentors/`),
+          fetch(`${API_BASE_URL}/featured-testimonials/`),
+          fetch(`${API_BASE_URL}/statistics/trending-skills?limit=4`)
         ]);
-        
+
         if (mentorsRes.ok) {
           const mentorsData = await mentorsRes.json();
           const transformedMentors = (mentorsData.featured_mentors || []).map(transformMentor);
           setMentors(transformedMentors);
         }
-        
+
         if (testimonialsRes.ok) {
           const testimonialsData = await testimonialsRes.json();
           const transformedTestimonials = (testimonialsData.featured_testimonials || []).map(transformTestimonial);
           setTestimonials(transformedTestimonials);
         }
-        
+
         if (skillsRes.ok) {
           const skillsData = await skillsRes.json();
           if (skillsData.skills && skillsData.skills.length > 0) {
@@ -185,6 +189,33 @@ export function HeroSection() {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [mentorsRes, testimonialsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/featured-mentors/`),
+          fetch(`${API_BASE_URL}/featured-testimonials/`),
+        ]);
+
+        if (mentorsRes.ok) {
+          const mentorsData = await mentorsRes.json();
+          setMentors((mentorsData.featured_mentors || []).map(transformMentor));
+        }
+
+        if (testimonialsRes.ok) {
+          const testimonialsData = await testimonialsRes.json();
+          setTestimonials(
+            (testimonialsData.featured_testimonials || []).map(
+              transformTestimonial
+            )
+          );
+        }
+      } catch (e) {
+        console.error("API error:", e);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSearch = useCallback(() => {
     if (searchQuery.trim()) {
@@ -196,26 +227,42 @@ export function HeroSection() {
 
 
   const words = ["AI", "Guidance", "Mentorship", "Support"];
-  const [index, setIndex] = useState(0);
-  const [direction, setDirection] = useState(1); // 1 = up, -1 = down
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setIndex((prev) => {
-        // handle direction reversal at the ends
-        if (prev === words.length - 1) {
-          setDirection(-1);
-          return prev - 1;
-        } else if (prev === 0 && direction === -1) {
-          setDirection(1);
-          return prev + 1;
-        } else {
-          return prev + direction;
-        }
-      });
-    }, 1500); // pause time between transitions
+      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, 3000);
     return () => clearInterval(interval);
-  }, [direction, words.length]);
+  }, [words]);
+
+  const scroll = (ref: any, direction: "left" | "right") => {
+    if (!ref.current) return;
+    const container = ref.current as HTMLDivElement;
+    const amount = 300;
+    const delta = direction === "left" ? -amount : amount;
+    const next = container.scrollLeft + delta;
+
+    // Looping behavior: if near edges, recenter around middle
+    const maxScroll = container.scrollWidth;
+    const view = container.clientWidth;
+
+    if (next < view) {
+      container.scrollLeft = maxScroll / 2; // jump to middle
+    } else if (next + view * 1.5 > maxScroll) {
+      container.scrollLeft = maxScroll / 2 - view; // jump to middle-left
+    }
+
+    container.scrollBy({ left: delta, behavior: "smooth" });
+  };
+
+  // Removed auto-centering to avoid interfering with transform animation loop
+  // useEffect(() => {
+  //   const c = mentorsRef.current;
+  //   if (c && c.scrollWidth > 0) {
+  //     c.scrollLeft = c.scrollWidth / 2 - c.clientWidth / 2;
+  //   }
+  // }, [mentors.length]);
 
   return (
     <section
@@ -232,47 +279,46 @@ export function HeroSection() {
         <div className="absolute -bottom-[2rem] left-[5rem] w-[18rem] h-[18rem] bg-blue-200 rounded-full filter blur-[4rem] opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative container mx-auto max-w-[90rem] px-[1rem] sm:px-[2rem] lg:px-[4rem] py-[4rem]">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[3rem] items-center min-h-[80vh]">
+      <div className="relative container mx-auto max-w-[90rem] px-[1rem] sm:px-[2rem] lg:px-[4rem] pt-[6rem] pb-[3rem]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-[3rem] items-start min-h-[80vh]">
           {/* Left Column */}
           <div className="space-y-[2rem]">
             {/* Animated Heading */}
-            <div className="space-y-[1.5rem]">
-            <h1 className="text-4xl md:text-5xl lg:text-[55px] font-bold text-gray-900 leading-tight">
-            Find Unusual growth&nbsp;
-      <span className="text-black">through&nbsp;</span>
-      <span className="relative inline-block h-[1.3em] overflow-hidden align-baseline w-[8ch]">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.span
-            key={index}
-            custom={direction}
-            initial={{ y: direction === 1 ? "100%" : "-100%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 1 }}
-            exit={{ y: direction === 1 ? "-100%" : "100%", opacity: 0 }}
-            transition={{
-              duration: 0.7,
-              ease: [0.45, 0, 0.55, 1],
-            }}
-            className="absolute left-0 top-0 text-gray-900 bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
-          >
-            {words[index]}
-          </motion.span>
-        </AnimatePresence>
-      </span>
-    </h1>
+            <div
+              className="space-y-[1.2rem] relative"
+              style={{
+                width: "608.22px",
+                opacity: 1,
+                transform: "rotate(0deg)",
+              }}
+            >
+              <h1 className="text-[50px] md:text-[55px] font-[800] text-gray-900 leading-tight mb-4">
+                Find Unusual Growth
+                <br />
+                <span className="text-black">through </span>
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={words[currentWordIndex]}
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -40 }}
+                    transition={{ duration: 0.5 }}
+                    className="inline-block bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
+                  >
+                    {words[currentWordIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </h1>
 
-
-
-  <p className="text-[1.25rem] text-black leading-relaxed max-w-[36rem]">
-    AI as your frontline mentor, with human experts ready to step in
-    for deeper guidance on demand.
-  </p>
-</div>
-
+              <p className="text-[1.25rem] text-black leading-relaxed max-w-[36rem]">
+                AI as your frontline mentor, with human experts ready to step in
+                for deeper guidance on demand.
+              </p>
+            </div>
 
             {/* Search Bar */}
-            <div className="space-y-[1rem]">
-              <div className="flex items-center bg-white rounded-full shadow-lg mt-[1.5rem] p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840]">
+            <div className="space-y-[1rem] mt-[1rem]">
+              <div className="flex items-center bg-white rounded-full shadow-lg p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840]">
                 <div className="relative flex-1">
                   <Search className="absolute left-[1rem] top-1/2 -translate-y-1/2 text-black h-[1.25rem] w-[1.25rem]" />
                   <Input
@@ -294,61 +340,96 @@ export function HeroSection() {
               </div>
 
               <div className="flex flex-wrap gap-2 items-center">
-  <span className="font-bold text-[15px] text-black ">Popular:</span>
-  {popularSkills.map((skill) => (
-    <span
-      key={skill}
-      className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
-      onClick={() => {
-        setSearchQuery(skill);
-        handleSearch();
-      }}
-    >
-      {skill}
-    </span>
-  ))}
-</div>
-
+                <span className="font-bold text-[15px] text-black">Popular:</span>
+                {popularSkills.map((skill) => (
+                  <span
+                    key={skill}
+                    className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
+                    onClick={() => {
+                      setSearchQuery(skill);
+                      handleSearch();
+                    }}
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                asChild
-                className="px-8 py-4 text-lg rounded-3xl bg-[#0073CF] text-white hover:bg-[#005fa3]"
-              >
-                <Link href="/mentors">Find Mentors</Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="px-8 py-4 text-lg rounded-3xl bg-transparent border-black"
-              >
-                <Link href="/signup" >Become a Mentor</Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-4 mt-[1rem]">
+              <div className="relative inline-block group">
+                <Button
+                  asChild
+                  className="w-[241px] h-[54px] rounded-[36.08px] bg-[#0073CF] text-white text-[20px] font-semibold opacity-100 hover:bg-[#005fa3] transition-all duration-300"
+                >
+                  <Link href="/mentors">Find a mentor</Link>
+                </Button>
+
+                {/* Tooltip bubble */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10">
+                  <div className="relative bg-white text-[#003C6C] text-[14px] font-medium px-5 py-3 rounded-xl shadow-[0_4px_8px_#9F9D9D40] w-[221px] text-center">
+                    Looking for guidance?
+                    {/* Small arrow */}
+                    <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-white" />
+                  </div>
+                </div>
+              </div>
+
+
+
+              {/* Wrap the button + tooltip inside a group */}
+              <div className="relative inline-block group">
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="w-[241px] h-[54px] rounded-[36.08px] text-[20px] bg-transparent border-black hover:bg-white hover:border-white transition-all duration-300"
+                >
+                  <Link href="/signup">Become a Mentor</Link>
+                </Button>
+
+                {/* Tooltip bubble */}
+                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10">
+                  <div className="relative bg-white text-[#003C6C] text-[14px] font-medium px-5 py-3 rounded-xl shadow-[0_4px_8px_#9F9D9D40] w-[293px] text-center">
+                    Want to be mentor as an expert?
+                    {/* Small arrow */}
+                    <div className="absolute -top-[7px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-r-[8px] border-b-[8px] border-l-transparent border-r-transparent border-b-white" />
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
           {/* Right Column - Animated Cards */}
-          <div className="space-y-10">
+          <div className="space-y-10 relative">
+
             {/* Mentors Section */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+            <div className="relative">
+              <h3 className=" font-[700] text-black text-[22px] mb-3">
                 Meet our Mentors
               </h3>
-              <div className="relative overflow-hidden whitespace-nowrap" role="region">
+              <div
+                ref={mentorsRef}
+                className="relative overflow-x-auto no-scrollbar whitespace-nowrap"
+                role="region"
+              >
                 <div className="inline-flex gap-6 animate-scroll-left hover:[animation-play-state:paused]">
                   {[...mentors, ...mentors].map((mentor, i) => (
-                    <Card key={`${mentor.id}-${i}`} className="min-w-[20rem] backdrop-blur-sm bg-white/80 border-0 shadow-xl"
+                    <Card
+                      key={`${mentor.id}-${i}`}
+                      className="bg-white/90 w-[522px] h-[246px] shadow-md hover:shadow-2xl rounded-2xl transition-all transform hover:-translate-y-1 border-0"
                     >
-                      <CardContent className="p-6">
-                        <div className="flex items-start space-x-4">
-                          <div className="relative">
-                            <Avatar className="w-16 h-16">
+                      <CardContent className="p-4 pt-7"> {/* Slightly increased top padding for better vertical balance */}
+                        <div className="flex items-start gap-3">
+                          {/* Avatar */}
+                          <div className="relative py-3">
+                            <Avatar className="w-[65px] h-[65px]">
                               <AvatarImage
                                 src={mentor.image || "/placeholder.svg"}
                                 alt={mentor.name}
+                                className="object-cover"
                               />
                               <AvatarFallback>
                                 {(mentor.name || "M")
@@ -357,60 +438,62 @@ export function HeroSection() {
                                   .join("")}
                               </AvatarFallback>
                             </Avatar>
-                            {mentor.available && (
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" />
-                            )}
                           </div>
 
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-lg text-gray-900">
-                                {mentor.name}
-                              </h4>
-                              <Verified className="h-4 w-4 text-blue-500" />
+                          {/* Content */}
+                          <div className="flex-1 text-sm text-black py-1">
+                            {/* Name, Title, Company */}
+                            <div className="space-y-0 mb-2">
+                              <h3 className="font-[700] text-[20px] text-base">{mentor.name}</h3>
+                              <p className="font-[600] text-[16px]">{mentor.title}</p>
+                              <p className="font-[700] text-[16px] text-[#0073CF]">{mentor.company}</p>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
-                              {mentor.title}
-                            </p>
-                            <p className="text-sm font-medium text-blue-600 mb-3">
-                              {mentor.company}
-                            </p>
 
-                            <div className="flex items-center space-x-4 mb-3 text-sm text-gray-600">
-                              <div className="flex items-center space-x-1">
+                            {/* Rating + Location */}
+                            <div className="flex items-center gap-3 mb-3">
+                              <div className="flex items-center gap-1 text[500] text-[14px]">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                                 <span>{mentor.rating}</span>
-                                <span>({mentor.sessions})</span>
+                                <span className=" text-black">({mentor.sessions})</span>
                               </div>
-                              <div className="flex items-center space-x-1">
-                                <MapPin className="h-4 w-4" />
-                                <span>{mentor.location}</span>
+                              <div className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4 text-black" />
+                                <span className="text-[14px] font-[500] text-black">{mentor.location}</span>
                               </div>
                             </div>
 
-                            <div className="flex flex-wrap gap-1 mb-3">
+                            {/* Skills */}
+                            <div className="flex flex-wrap gap-2 mb-4">
                               {mentor.skills.map((skill: string) => (
-                                <Badge
+                                <span
                                   key={skill}
-                                  variant="secondary"
-                                  className="text-xs"
+                                  className="w-[110px] h-[23px] rounded-[17.46px] bg-[#D1EAFF66] text-black text-xs font-medium flex items-center justify-center px-[4.36px] py-[5.67px]"
                                 >
                                   {skill}
-                                </Badge>
+                                </span>
                               ))}
                             </div>
 
-                            <div className="flex items-center justify-between">
-                              <div className="font-bold text-xl">
-                                ${mentor.price}/hr
+
+                            {/* Footer */}
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="font-[800] text-[20px] ">${mentor.price}/hr</span>
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-[120px] h-[38px] rounded-[30px] border border-black text-black text-[14px] font-[600] hover:bg-gray-100 transition-all duration-200"
+                                >
+                                  View Profile
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  disabled={!mentor.available}
+                                  className="w-[120px] h-[38px] rounded-[30px] bg-[#0073CF] text-white text-[14px] font-[600] flex items-center justify-center gap-2 hover:bg-[#005fa3] disabled:opacity-50 transition-all duration-200"
+                                >
+                                  {mentor.available ? "Quick Book" : "Unavailable"}
+                                </Button>
                               </div>
-                              <Button
-                                size="sm"
-                                disabled={!mentor.available}
-                                className="disabled:opacity-50"
-                              >
-                                {mentor.available ? "Book Now" : "Unavailable"}
-                              </Button>
                             </div>
                           </div>
                         </div>
@@ -419,57 +502,97 @@ export function HeroSection() {
                   ))}
                 </div>
               </div>
+              {/* Mentor arrows positioned just below the mentors row */}
+              <div className="absolute -bottom-8 right-0 flex gap-2 z-10">
+                <button
+                  onClick={() => scroll(mentorsRef, "left")}
+                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
+                  aria-label="Scroll mentors left"
+                >
+                  <ChevronLeft size={12} />
+                </button>
+                <button
+                  onClick={() => scroll(mentorsRef, "right")}
+                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
+                  aria-label="Scroll mentors right"
+                >
+                  <ChevronRight size={12} />
+                </button>
+              </div>
             </div>
-{/* testimonials */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+
+            {/* testimonials */}
+            <div className="relative py-1">
+              <h3 className=" font-[700] text-black text-[22px] mb-3">
                 Success Stories
               </h3>
 
-              <div className="relative overflow-hidden whitespace-nowrap w-full">
-  <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
-    {[...testimonials, ...testimonials].map((t, i) => (
-      <Card 
-      key={`${t.name}-${i}`}
-      className="inline-block w-[20rem] h-auto flex-shrink-0 bg-white/80 border-0 shadow-xl rounded-2xl"
-    >
-      <CardContent className="p-4 flex flex-col space-y-2">
-        {/* Avatar + Rating */}
-        <div className="flex items-center gap-3">
-          <Avatar className="w-12 h-12">
-            <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
-            <AvatarFallback>
-              {(t.name || "U").split(" ").map((n: string) => n[0]).join("")}
-            </AvatarFallback>
-          </Avatar>
-    
-          <div className="flex flex-col">
-            <div className="flex space-x-1 mb-1">
-              {[...Array(t.rating)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              ))}
+              <div ref={testimonialsRef} className="relative overflow-x-auto no-scrollbar whitespace-nowrap w-full">
+                <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
+                  {[...testimonials, ...testimonials].map((t, i) => (
+                    <Card
+                      key={`${t.name}-${i}`}
+                      className="inline-block w-[522px] h-[213px] flex-shrink-0 bg-white/90 border-0 shadow-md hover:shadow-2xl rounded-2xl transition-all transform hover:-translate-y-1"
+                    >
+                      <CardContent className="p-5 flex flex-col justify-between h-full">
+                        {/* Top Section — Avatar + Text */}
+                        <div className="flex items-start gap-4">
+                          <Avatar className="w-14 h-14 flex-shrink-0">
+                            <AvatarImage src={t.image || "/placeholder.svg"} alt={t.name} />
+                            <AvatarFallback>
+                              {(t.name || "U")
+                                .split(" ")
+                                .map((n: string) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          <div className="flex-1">
+                            {/* Rating */}
+                            <div className="flex space-x-1 mb-1 mt-[8px]"> {/* Lowered stars */}
+                              {[...Array(t.rating)].map((_, i) => (
+                                <Star key={i} className="h-[19px] w-[19px] fill-yellow-400 text-yellow-400" />
+                              ))}
+                            </div>
+
+                            {/* Testimonial text */}
+                            <p className="text-black text-[16px] font-[600] italic leading-snug break-words whitespace-pre-wrap mt-[4px]"> {/* Lowered paragraph */}
+                              “{t.content}”
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Bottom Section — Name + Role */}
+                        <div className="mt-3 ml-[70px]">
+                          <div className="text-[18px] font-[800] text-black">{t.name}</div>
+                          <div className="text-[16px] text-black font-[600]">
+                            {t.role} at {t.company}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+
+                  ))}
+                </div>
+              </div>
+              <div className="absolute -bottom-6 right-0 flex gap-2 z-10">
+                <button
+                  onClick={() => scroll(testimonialsRef, "left")}
+                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
+                  aria-label="Scroll testimonials left"
+                >
+                  <ChevronLeft size={12} />
+                </button>
+                <button
+                  onClick={() => scroll(testimonialsRef, "right")}
+                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
+                  aria-label="Scroll testimonials right"
+                >
+                  <ChevronRight size={12} />
+                </button>
+              </div>
             </div>
-    
-            {/* Testimonial text */}
-            <p className="text-gray-700 text-sm italic break-words whitespace-pre-wrap">
-              "{t.content}"
-            </p>
-    
-            {/* Name + Role */}
-            <div className="text-sm font-medium text-gray-900 mt-1">{t.name}</div>
-            <div className="text-xs text-gray-500">{t.role} at {t.company}</div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-    
-    ))}
-  </div>
-</div>
-
-
-            </div>
-
           </div>
         </div>
       </div>

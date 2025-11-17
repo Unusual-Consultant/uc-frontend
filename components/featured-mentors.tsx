@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import {
+  ArrowRight,
   MapPin,
   Clock,
   Users,
@@ -14,6 +15,7 @@ import {
   Languages,
   Zap,
   Verified,
+  Globe
 } from "lucide-react"
 import Link from "next/link"
 
@@ -178,170 +180,224 @@ export function FeaturedMentors() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-gray-50 w-[1255px]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Meet Our <span className="text-[#0073CF]">Mentors</span>
             </h2>
-            <p className="text-gray-600">Connect with top industry professionals</p>
+            <p className="text-gray-600">Connect with industry experts who have been in your shoes and can guide you to success</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-3 text-xl font-bold text-white">
             <Button
-              variant="outline"
-              size="sm"
               onClick={prevSlide}
-              className="w-10 h-10 p-0 rounded-full"
+              className="w-8 h-8 rounded-full bg-[#0073CF] flex items-center justify-center hover:bg-[#005fa3] transition-colors"
             >
               &lt;
             </Button>
             <Button
-              variant="outline"
-              size="sm"
               onClick={nextSlide}
-              className="w-10 h-10 p-0 rounded-full"
+              className="w-8 h-8 rounded-full bg-[#0073CF] flex items-center justify-center hover:bg-[#005fa3] transition-colors"
             >
               &gt;
             </Button>
           </div>
         </div>
-  
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-[1050px] mx-auto">
+
           {visibleMentors.map((mentor) => (
-            <Card
-              key={mentor.id}
-              className="relative hover:shadow-lg transition-shadow duration-300 border rounded-xl overflow-hidden p-4 flex flex-col"
-            >
-              {/* Top blue banner */}
-              <div className="bg-[#C4E1FF] h-16 w-full absolute top-0 left-0 z-0 rounded-t-xl" />
-  
-              {/* Online badge */}
-              {mentor.available && (
-                <div className="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 z-10">
-                  <Zap className="w-3 h-3" /> Online
-                </div>
-              )}
-  
-              {/* Top section: Avatar + rating */}
-              <div className="flex gap-4 items-start mt-6 relative z-10">
-                {/* Avatar + rating */}
-                <div className="relative">
-                  <Avatar className="w-20 h-20 border-4 border-white shadow-md">
-                    <AvatarImage src={mentor.image} alt={mentor.name} />
-                  </Avatar>
-                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
-                    <Star className="w-3 h-3 text-yellow-400" /> {mentor.rating.toFixed(1)}
-                  </div>
-                </div>
-  
-                {/* Name/Title/Company */}
-                <div className="flex-1 flex flex-col justify-start text-black">
-                  <div className="flex items-center gap-1">
-                    <h3 className="text-lg font-bold">{mentor.name}</h3>
-                    <Verified className="w-4 h-4 text-blue-500" />
-                  </div>
-                  <p className="text-sm text-gray-600">{mentor.title}</p>
-                  <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
-                </div>
-              </div>
-  
+           <Card
+           key={mentor.id}
+           className="relative w-[340px] h-[662px] transition-shadow duration-300 
+                    border rounded-xl overflow-hidden p-4 flex flex-col justify-between"
+           style={{ boxShadow: "0px 4px 20px #9F9D9D40" }}
+         >
+         
+           {/* Top blue banner */}
+           <div className="bg-[#C4E1FF] h-[80px] w-full absolute top-0 left-0 z-0 rounded-t-xl" />
+         
+           {/* Online badge */}
+           {mentor.available && (
+  <div className="absolute top-2 left-2 bg-[#28A745] text-white text-xs px-3 py-1 rounded-full flex items-center gap-2 z-10 h-[25px]">
+    
+    {/* White Circle */}
+    <div className="w-[17px] h-[17px] rounded-full bg-white flex items-center justify-center">
+      {/* Zap Icon SVG in #28A745 */}
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 24 24"
+        fill="#28A745"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
+      </svg>
+    </div>
+<span className="text-[14px] font-[700]"></span>
+    Online
+  </div>
+)}
+
+         
+           {/* Top section: Avatar + rating */}
+           <div className="flex gap-4 items-start relative z-11 mt-16">
+             {/* Avatar + rating */}
+             <div className="relative -mt-6"> 
+               <Avatar className="w-20 h-20 border-4 border-white shadow-md">
+                 <AvatarImage src={mentor.image} alt={mentor.name} />
+               </Avatar>
+               <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
+                 <Star className="w-3 h-3 text-yellow-400" /> {mentor.rating.toFixed(1)}
+               </div>
+             </div>
+         
+             {/* Name/Title/Company */}
+             <div className="flex-1 flex flex-col justify-start text-black mt-1"> 
+               <div className="flex items-center gap-1">
+                 <h3 className=" font-[700] text-[20px]">{mentor.name}</h3>
+                 <Verified className="w-4 h-4 text-blue-500" />
+               </div>
+               <p className="font-[500] text-[14px] text-black">{mentor.title}</p>
+               <p className="font-[500] text-[14px] text-blue-600">{mentor.company}</p>
+             </div>
+           </div>
+   
+           <button className="ml-auto text-black hover:text-red-500 transition-colors">
+    <Heart className="w-4 h-4" />
+  </button>
               {/* Location + Experience + Like */}
-              <div className="mt-4 flex gap-6 text-sm text-gray-700 items-center">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4" /> {mentor.location}
-                </div>
-                {mentor.yearsExperience && (
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs
-                  </div>
-                )}
-                <button className="ml-auto -mt-1 text-gray-400 hover:text-red-500 transition-colors">
-                  <Heart className="w-5 h-5" />
-                </button>
-              </div>
-  
+<div className="mt-1 flex items-center font-semibold text-sm text-black text-[14px]">
+  <div className="flex items-center gap-1">
+    <MapPin className="w-4 h-4" /> {mentor.location}
+  </div>
+
+  {mentor.yearsExperience && (
+    <div className="flex items-center gap-1 ml-3">
+      <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
+    </div>
+  )}
+</div>
+
+
               {/* Description */}
-              <p className="mt-4 text-sm text-gray-700">{mentor.description}</p>
-  
+              <p className="mt-4 text-[14px] font-[500] text-black py-1">{mentor.description}</p>
+
               {/* Stats in vertical columns */}
-              <div className="mt-6 flex gap-6 justify-start">
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Response</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="w-4 h-4 text-red-500" />
-                    <span>{mentor.responseTime}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Mentees</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Users className="w-4 h-4 text-blue-500" />
-                    <span>{mentor.mentees}</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center text-sm text-gray-700">
-                  <span className="font-semibold">Success</span>
-                  <div className="flex items-center gap-1 mt-1">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span>{mentor.successRate}%</span>
-                  </div>
-                </div>
-              </div>
-  
+              {/* Stats Section */}
+<div className="mt-6 flex justify-between px-2 text-black">
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Response Time</span>
+    <div className="flex items-center gap-1 mt-1">
+      <Clock className="w-4 h-4 text-red-500" />
+      <span className="font-[700]">{mentor.responseTime}</span>
+    </div>
+  </div>
+
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Total Mentees</span>
+    <div className="flex items-center gap-1 mt-1">
+      <Users className="w-4 h-4 text-blue-500" />
+      <span className="font-[700]">{mentor.mentees}</span>
+    </div>
+  </div>
+
+  <div className="flex flex-col items-center text-[12px]">
+    <span className="font-[600] whitespace-nowrap">Success Rate</span>
+    <div className="flex items-center gap-1 mt-1">
+      <CheckCircle className="w-4 h-4 text-green-500" />
+      <span className="font-[700]">{mentor.successRate}%</span>
+    </div>
+  </div>
+</div>
+
+
               {/* Tags */}
-              <div className="mt-6 flex flex-wrap gap-2">
-                {mentor.expertise.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2 py-1 bg-[#D1EAFF] text-[10px] rounded-full font-medium"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-  
+              <div className="mt-6 flex flex-wrap gap-2 text-black py-2">
+  {mentor.expertise.map((skill) => (
+    <span
+      key={skill}
+      className="inline-flex items-center justify-center px-3 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-medium"
+    >
+      <span className="px-2">{skill}</span>
+    </span>
+  ))}
+</div>
+
+
               {/* Languages pill */}
               {mentor.languages && mentor.languages.length > 0 && (
-                <div className="mt-4 relative group cursor-pointer">
-                  <span className="px-2 py-1 bg-gray-300 text-xs rounded-full transition-all group-hover:px-4 group-hover:py-2">
-                    Languages
-                    <span className="absolute left-0 top-0 hidden group-hover:flex bg-white border shadow-md p-1 rounded-md text-xs ml-1 z-10">
-                      {mentor.languages.join(", ")}
-                    </span>
-                  </span>
-                </div>
-              )}
-  
+  <div className="mt-4 group cursor-pointer inline-block ">
+    <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-[13px] font-[600] rounded-full transition-all duration-300 ease-in-out w-[154px] h-[30px]">
+      
+      {/* Default (before hover) */}
+      <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
+        <Globe className="w-4 h-4 text-blue-400" />
+       <span>{mentor.languages.length} Languages</span> 
+      </span>
+
+      {/* Hover (show languages, let pill expand naturally) */}
+      <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+        {mentor.languages.join(", ")}
+      </span>
+    </div>
+  </div>
+)}
+
+
+
               {/* Rate + Buttons */}
-              <div className="mt-6 flex items-start gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold">Starting from</span>
-                  <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
-                </div>
-                <div className="flex flex-col gap-2 flex-1">
-                  <Button variant="outline" size="sm" className="w-full border-black rounded-full">
-                    <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full"
-                  >
-                    Quick Book
-                  </Button>
-                </div>
-              </div>
+              <div className="mt-8 flex items-end gap-4 w-full">
+  {/* Price Section */}
+  <div className="flex flex-col">
+    <span className="text-[14px] font-[600] leading-none">Starting from</span>
+    <span className="text-[20px] font-[700] text-[#0073CF] leading-none mt-1">
+      ₹{mentor.price}/hr
+    </span>
+  </div>
+
+  {/* Buttons */}
+  <div className="flex flex-col gap-2 flex-1">
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full border-black rounded-full"
+    >
+      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+    </Button>
+
+    <Button
+      size="sm"
+      className="w-full bg-[#0073CF] text-white hover:bg-blue-700 rounded-full"
+    >
+      Quick Book
+    </Button>
+  </div>
+</div>
+
+
             </Card>
           ))}
         </div>
-  
-        <div className="text-center mt-8">
-          <Button asChild variant="outline" size="lg">
+
+        <div className="flex justify-end mt-12 items-center gap-3">
+          {/* White pill */}
+          <Button
+            size="sm"
+            asChild
+            className="bg-white text-black px-6 py-2 rounded-full shadow-md hover:bg-[#f2f2f2] transition-colors duration-300"
+          >
             <Link href="/mentors">View All Mentors</Link>
           </Button>
+
+          {/* Arrow in circle */}
+          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex items-center gap-2 group cursor-pointer">
+          <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
+          </span>
         </div>
       </div>
     </section>
   )
-  
+
 }

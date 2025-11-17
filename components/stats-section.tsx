@@ -12,6 +12,7 @@ import {
   Bar,
   Tooltip,
 } from "recharts"
+import { API_BASE_URL } from "@/lib/api"
 
 // These will be replaced by API data
 const monthlyGrowthFallback = [
@@ -46,12 +47,9 @@ const successMetricsFallback = [
 ]
 
 const getPercentageColor = (percentage: number) => {
-  if (percentage <= 25) return "#EF4444"
-  if (percentage <= 50) return "#F59E0B"
-  if (percentage <= 75) return "#EAB308"
-  return "#10B981"
-}
 
+  return "url(#progressGradient)";
+}
 // Safe tooltip without Redux
 const SafeTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload || !payload.length) return null
@@ -125,13 +123,13 @@ export function StatsSection() {
   const fetchStats = async () => {
     try {
       // Fetch overview stats
-      const overviewResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/overview")
+      const overviewResponse = await fetch(`${API_BASE_URL}/statistics/overview`)
       if (!overviewResponse.ok) throw new Error("Failed to fetch overview stats")
       const overviewData = await overviewResponse.json()
       setStatsData(overviewData)
 
       // Fetch monthly growth
-      const monthlyResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/monthly?months=6")
+      const monthlyResponse = await fetch(`${API_BASE_URL}/statistics/monthly?months=6`)
       if (monthlyResponse.ok) {
         const monthlyData = await monthlyResponse.json()
         console.log("Monthly data from API:", monthlyData)
@@ -143,7 +141,7 @@ export function StatsSection() {
       }
 
       // Fetch KPIs
-      const kpisResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/kpis")
+      const kpisResponse = await fetch(`${API_BASE_URL}/statistics/kpis`)
       if (kpisResponse.ok) {
         const kpisData = await kpisResponse.json()
         console.log("KPIs data from API:", kpisData)
@@ -168,7 +166,7 @@ export function StatsSection() {
       }
 
       // Fetch success metrics
-      const successResponse = await fetch("http://127.0.0.1:8000/api/v1/statistics/success-metrics")
+      const successResponse = await fetch(`${API_BASE_URL}/statistics/success-metrics`)
       if (successResponse.ok) {
         const successData = await successResponse.json()
         console.log("Success metrics data from API:", successData)
@@ -197,7 +195,9 @@ export function StatsSection() {
 
   return (
     <section className="relative -mt-32 pb-20">
-      <div className="max-w-[1159px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+      
+      <div className="max-w-[1000px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+     
         {/* Header */}
         <div className="text-left mb-16">
   <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -222,10 +222,10 @@ export function StatsSection() {
         <XAxis dataKey="month" stroke="#000" />
         <YAxis stroke="#000" />
         <Tooltip content={<SafeTooltip />} />
-        <Line type="monotone" dataKey="clicks" stroke="#000" strokeWidth={2.5} />
-        <Line type="monotone" dataKey="sessions" stroke="#000" strokeWidth={2.5} />
-        <Line type="monotone" dataKey="courses" stroke="#000" strokeWidth={2.5} />
-        <Line type="monotone" dataKey="goals" stroke="#000" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="clicks" stroke="blue" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="sessions" stroke="blue" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="courses" stroke="green" strokeWidth={2.5} />
+        <Line type="monotone" dataKey="goals" stroke="green" strokeWidth={2.5} />
       </LineChart>
     </ResponsiveContainer>
   </CardContent>
@@ -262,28 +262,34 @@ export function StatsSection() {
             <h3 className="text-xl font-semibold mb-6 text-center">Success Metrics</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {successMetrics.map((item) => (
-                <div key={item.metric} className="text-center">
-                  <div className="relative w-28 h-28 mx-auto mb-4">
-                    <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="15" fill="none" />
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="40"
-                        stroke={getPercentageColor(item.percentage)}
-                        strokeWidth="13"
-                        fill="none"
-                        strokeDasharray={`${item.percentage * 2.51} 251`}
-                        strokeLinecap="round"
-                        className="transition-all duration-1000 ease-out"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-gray-900">{item.percentage}%</span>
-                    </div>
-                  </div>
-                  <p className="font-medium text-blue-900 text-lg">{item.metric}</p>
-                </div>
+               <div key={item.metric} className="text-center">
+               <div className="relative w-28 h-28 mx-auto mb-4">
+                 <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+                   <defs>
+                     <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                       <stop offset="0%" stopColor="#003C6C" />
+                       <stop offset="100%" stopColor="#06B6D4" />
+                     </linearGradient>
+                   </defs>
+                   <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="15" fill="none" />
+                   <circle
+                     cx="50"
+                     cy="50"
+                     r="40"
+                     stroke={getPercentageColor(item.percentage)}
+                     strokeWidth="13"
+                     fill="none"
+                     strokeDasharray={`${item.percentage * 2.51} 251`}
+                     strokeLinecap="round"
+                     className="transition-all duration-1000 ease-out"
+                   />
+                 </svg>
+                 <div className="absolute inset-0 flex items-center justify-center">
+                   <span className="text-2xl font-bold text-[#003C6C]">{item.percentage}%</span>
+                 </div>
+               </div>
+               <p className="font-medium text-blue-900 font-semibold text-lg">{item.metric}</p>
+             </div>
               ))}
             </div>
           </CardContent>

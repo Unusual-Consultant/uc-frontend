@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { Download, Bot } from 'lucide-react'
+import { Bot, Loader2 } from 'lucide-react'
+import { useAuthenticatedUser } from '@/context/AuthenticatedUserProvider'
 
 interface CareerResource {
   id: string
@@ -19,66 +20,99 @@ interface CareerResource {
 }
 
 export function CareerToolkitSection() {
-  const [resources] = useState<CareerResource[]>([
-    {
-      id: '1',
-      title: 'Resume Template',
-      description: 'ATS-friendly resume template used by top performers.',
-      downloads: '11.7k downloads',
-      type: 'template',
-      isFree: true,
-      image: '/resume_template.png',
-      icon: '/docicon.png',
-      backgroundColor: 'bg-[#5fb8b7]',
-    },
-    {
-      id: '2',
-      title: 'Interview Checklist',
-      description: 'Complete prep checklist for PM interviews.',
-      downloads: '829k downloads',
-      type: 'checklist',
-      isFree: true,
-      image: '/interview_checklist.png',
-      icon: '/tickicon.png',
-      backgroundColor: 'bg-[#f57d7a]',
-    },
-    {
-      id: '3',
-      title: 'Career Roadmap Generator',
-      description: 'Personalized path to your dream role.',
-      downloads: '2.1k daily users',
-      type: 'generator',
-      isAI: true,
-      image: '/roadmap.png',
-      icon: '/roadmap.svg',
-      backgroundColor: 'bg-[#C8BAFE]',
-    },
-    {
-      id: '4',
-      title: 'AI Resume Analyzer',
-      description: 'Get instant feedback on your resume.',
-      downloads: '2.1k daily users',
-      type: 'ai-tool',
-      isAI: true,
-      image: '/resumeanalyzer.png',
-      icon: '/brainicon.png',
-      backgroundColor: 'bg-[#21abba]',
-    },
-  ])
+  const { makeAuthenticatedRequest } = useAuthenticatedUser()
+  const [resources, setResources] = useState<CareerResource[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleDownload = (resourceId: string) => {
-    console.log('Download resource:', resourceId)
-  }
+  useEffect(() => {
+    const fetchCareerResources = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, showing empty state")
+          setResources([])
+          setIsLoading(false)
+          return
+        }
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/career-resources`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch career resources: ${response.status}`)
+        }
+
+        const data: Array<{
+          id: string
+          title: string
+          description: string
+          downloads: string
+          type: string
+          isFree: boolean
+          isAI: boolean
+          image: string
+          icon: string
+          backgroundColor: string
+        }> = await response.json()
+
+        // Transform backend data to match frontend format
+        const transformedResources: CareerResource[] = data.map((resource) => ({
+          id: resource.id,
+          title: resource.title,
+          description: resource.description,
+          downloads: resource.downloads,
+          type: resource.type as CareerResource['type'],
+          isFree: resource.isFree,
+          isAI: resource.isAI,
+          image: resource.image,
+          icon: resource.icon,
+          backgroundColor: resource.backgroundColor,
+        }))
+
+        setResources(transformedResources)
+      } catch (err) {
+        console.error("Error fetching career resources:", err)
+        setError("Failed to load career resources")
+        setResources([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCareerResources()
+  }, [makeAuthenticatedRequest])
 
   const handleTryAI = (resourceId: string) => {
-    console.log('Try AI tool:', resourceId)
+    console.log('Try resource:', resourceId)
+    // Navigate to the appropriate career toolkit page based on resource type
+    const resource = resources.find(r => r.id === resourceId)
+    if (!resource) return
+    
+    // Map resource types to routes
+    const routeMap: Record<string, string> = {
+      'template': '/career-toolkit/resume-builder',
+      'checklist': '/career-toolkit/ai-interview-checklist',
+      'generator': '/career-toolkit/ai-roadmap',
+      'analyzer': '/career-toolkit/ai-resume-analyzer',
+      'ai-tool': '/career-toolkit/ai-resume-analyzer'
+    }
+    
+    const route = routeMap[resource.type]
+    if (route && typeof window !== 'undefined') {
+      window.location.href = route
+    }
   }
 
   return (
     <section className="w-full py-12 md:py-16 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-[1440px] mx-auto">
         {/* Section Header */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-left gap-2 mb-1">
           <Image
             src="/ep_document.png"
             alt="Career Toolkit Icon"
@@ -86,7 +120,7 @@ export function CareerToolkitSection() {
             height={34}
             className="object-contain"
           />
-          <h2 className="text-xl md:text-2xl font-bold text-gray-800">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 ">
             <span className="text-[#003b6b]">Career</span>
             <span className="text-text-primary"> Toolkit</span>
           </h2>
@@ -96,8 +130,30 @@ export function CareerToolkitSection() {
           Free resources to accelerate your career
         </p>
 
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <span className="ml-3 text-gray-600">Loading career resources...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="text-center py-12">
+            <p className="text-red-600 mb-2">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+
         {/* Resources Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full">
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full">
           {resources.map((resource) => (
             <div
               key={resource.id}
@@ -152,28 +208,19 @@ export function CareerToolkitSection() {
                     {resource.downloads}
                   </span>
 
-                  {resource.isFree ? (
-                    <Button
-                      className="px-4 h-10 rounded-full bg-blue-600 text-white flex items-center gap-2"
-                      onClick={() => handleDownload(resource.id)}
-                    >
-                      <Download className="h-5 w-5" />
-                      Download
-                    </Button>
-                  ) : (
-                    <Button
-                      className="px-4 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center gap-2"
-                      onClick={() => handleTryAI(resource.id)}
-                    >
-                      <Bot className="h-5 w-5" />
-                      Try
-                    </Button>
-                  )}
+                  <Button
+                    className="px-4 h-10 rounded-full bg-blue-600 text-white font-bold text-sm flex items-center gap-2"
+                    onClick={() => handleTryAI(resource.id)}
+                  >
+                    <Bot className="h-5 w-5" />
+                    Try
+                  </Button>
                 </div>
               </div>
             </div>
           ))}
         </div>
+        )}
       </div>
     </section>
   )

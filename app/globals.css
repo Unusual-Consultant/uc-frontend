@@ -1,6 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "@fontsource/mulish";
+
+/* Hide scrollbars utility */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 
 /* Root CSS variables */
 @layer base {
@@ -72,6 +82,7 @@
 /* Optional: body default styling */
 body {
   @apply bg-background text-foreground;
+  font-family: "Mulish";
 }
 
 /* Custom animations */
@@ -154,11 +165,35 @@ body {
 }
 
 .animate-scroll-right {
-  animation: scrollRight 10s linear infinite;
+  animation: scrollRight 15s linear infinite;
 }
 
 
 .animate-scroll-left {
-  animation: scrollLeft 10s linear infinite;
+  animation: scrollLeft 15s linear infinite;
 }
 
+
+
+
+
+@layer utilities {
+  .perspective {
+    perspective: 1000px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}

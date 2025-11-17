@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -12,11 +13,21 @@ import {
   Clock,
   CheckCircle,
   Bell,
+  Loader2,
 } from "lucide-react"
 import { ReviewForm } from "@/components/reviews/review-form"
+import { useAuthenticatedUser } from "@/context/AuthenticatedUserProvider"
+import { QuickBook } from "@/components/dashboard/quickbook"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 interface Session {
   id: string
+  mentorId?: string
   mentorName: string
   mentorTitle: string
   mentorImage?: string
@@ -31,53 +42,6 @@ interface Session {
   canReview: boolean
   daysLeft?: number
 }
-
-const mockSessions: Session[] = [
-  {
-    id: "1",
-    mentorName: "David Kim",
-    mentorTitle: "Ex-Netflix Data Scientist",
-    mentorImage: "",
-    sessionType: "Mock Interview",
-    date: "2 days ago",
-    duration: "60 mins",
-    price: "₹1600",
-    status: "completed",
-    hasReview: true,
-    rating: 5,
-    reviewText:
-      "Excellent session! David provided detailed feedback on my technical skills and helped me prepare for system design questions.",
-    canReview: false,
-  },
-  {
-    id: "2",
-    mentorName: "Priya Patel",
-    mentorTitle: "Senior PM at Amazon",
-    mentorImage: "/placeholder.svg?height=40&width=40",
-    sessionType: "Resume Review",
-    date: "1 week ago",
-    duration: "30 mins",
-    price: "₹800",
-    status: "completed",
-    hasReview: false,
-    canReview: true,
-    daysLeft: 3,
-  },
-  {
-    id: "3",
-    mentorName: "Rahul Sharma",
-    mentorTitle: "Product Lead at Flipkart",
-    mentorImage: "",
-    sessionType: "Career Strategy",
-    date: "2 weeks ago",
-    duration: "45 mins",
-    price: "₹1200",
-    status: "completed",
-    hasReview: false,
-    canReview: false,
-    daysLeft: 0,
-  },
-]
 
 // Avatar with initials fallback
 function MentorAvatar({ name, image }: { name: string; image?: string }) {
@@ -106,25 +70,155 @@ function MentorAvatar({ name, image }: { name: string; image?: string }) {
   )
 }
 
+interface Mentor {
+  id: string | number
+  name: string
+  role: string
+  location: string
+  company: string
+  rating: number
+  reviews: number
+  price: number
+  tags: string[]
+  image: string
+  expertise: string
+  experience?: string
+  responseTime?: string
+  totalMentees?: number
+  successRate?: string
+}
+
 export function SessionHistory() {
+  const router = useRouter()
+  const { makeAuthenticatedRequest } = useAuthenticatedUser()
   const [showReviewForm, setShowReviewForm] = useState<string | null>(null)
-  const [sessions, setSessions] = useState(mockSessions)
+  const [sessions, setSessions] = useState<Session[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null)
+
+  // Fetch session history from backend
+  useEffect(() => {
+    const fetchSessionHistory = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+        
+        const token = localStorage.getItem("auth_token")
+        if (!token) {
+          console.warn("No auth token found, showing empty state")
+          setSessions([])
+          setIsLoading(false)
+          return
+        }
+
+        const response = await makeAuthenticatedRequest(
+          `/mentee-dashboard/session-history?limit=20`
+        )
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch session history: ${response.status}`)
+        }
+
+        const data: Array<{
+          id: string
+          mentorId: string
+          mentorName: string
+          mentorTitle: string
+          mentorImage?: string
+          sessionType: string
+          date: string
+          duration: string
+          price: string
+          status: string
+          hasReview: boolean
+          rating?: number
+          reviewText?: string
+          canReview: boolean
+          daysLeft?: number
+        }> = await response.json()
+
+        // Transform backend data to match frontend format
+        const transformedSessions: Session[] = data.map((session) => ({
+          id: session.id,
+          mentorId: session.mentorId,
+          mentorName: session.mentorName,
+          mentorTitle: session.mentorTitle,
+          mentorImage: session.mentorImage,
+          sessionType: session.sessionType,
+          date: session.date,
+          duration: session.duration,
+          price: session.price,
+          status: (session.status as Session["status"]) || "completed",
+          hasReview: session.hasReview,
+          rating: session.rating,
+          reviewText: session.reviewText,
+          canReview: session.canReview,
+          daysLeft: session.daysLeft,
+        }))
+
+        setSessions(transformedSessions)
+      } catch (err) {
+        console.error("Error fetching session history:", err)
+        setError("Failed to load session history")
+        setSessions([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchSessionHistory()
+  }, [makeAuthenticatedRequest])
 
   const handleReviewSubmit = async (sessionId: string, reviewData: any) => {
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === sessionId
-          ? {
-            ...session,
-            hasReview: true,
+    try {
+      const response = await makeAuthenticatedRequest(
+        `/mentee-dashboard/submit-review`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sessionId: sessionId,
             rating: reviewData.rating,
-            reviewText: reviewData.review,
-            canReview: false,
-          }
-          : session,
-      ),
-    )
-    setShowReviewForm(null)
+            review: reviewData.review,
+            tags: reviewData.tags || [],
+            sessionSpecific: reviewData.sessionSpecific || {
+              punctuality: 0,
+              communication: 0,
+              expertise: 0,
+              helpfulness: 0,
+            },
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || "Failed to submit review")
+      }
+
+      // Update the session in the list to reflect the new review
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === sessionId
+            ? {
+                ...session,
+                hasReview: true,
+                rating: reviewData.rating,
+                reviewText: reviewData.review,
+                canReview: false,
+              }
+            : session,
+        ),
+      )
+      
+      setShowReviewForm(null)
+    } catch (err) {
+      console.error("Error submitting review:", err)
+      alert(err instanceof Error ? err.message : "Failed to submit review. Please try again.")
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -203,8 +297,29 @@ export function SessionHistory() {
         </p>
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <span className="ml-3 text-gray-600">Loading session history...</span>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && !isLoading && (
+        <div className="text-center py-8">
+          <p className="text-red-600 mb-2">{error}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            Retry
+          </Button>
+        </div>
+      )}
+
       {/* Sessions */}
-      {sessions.length === 0 ? (
+      {!isLoading && !error && sessions.length === 0 ? (
         <div className="text-center py-8">
           <Image
             src="/calendar.png"
@@ -219,7 +334,7 @@ export function SessionHistory() {
           <p className="text-gray-600 mb-4">
             Your completed sessions will appear here
           </p>
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2">
+          <Button className="bg-[#0073CF] hover:bg-blue-700 text-white rounded-full px-6 py-2">
             Book Your First Session
           </Button>
         </div>
@@ -326,13 +441,38 @@ export function SessionHistory() {
 
                   <div className="flex space-x-2">
                     {/* Book Again pill */}
-                    <Button className="bg-green-700 hover:bg-green-800 text-white rounded-full px-4 py-1 flex items-center">
+                    <Button 
+                      className="bg-green-700 hover:bg-green-800 text-white rounded-full px-4 py-1 flex items-center"
+                      onClick={() => {
+                        if (session.mentorId) {
+                          // Transform session data to mentor format for QuickBook
+                          const mentor: Mentor = {
+                            id: session.mentorId,
+                            name: session.mentorName,
+                            role: session.mentorTitle,
+                            location: "Remote", // Default, can be enhanced later
+                            company: session.mentorTitle.split(" at ")[1] || session.mentorTitle.split(" at ")[0] || "",
+                            rating: 0, // Will be fetched by QuickBook if needed
+                            reviews: 0,
+                            price: 0, // Will be fetched from session types
+                            tags: [],
+                            image: session.mentorImage || "/default_pfp.png",
+                            expertise: session.mentorTitle,
+                          }
+                          setSelectedMentor(mentor)
+                        }
+                      }}
+                    >
                       <RotateCcw className="h-3 w-3 mr-1" />
                       Book Again
                     </Button>
 
                     {/* Message pill */}
-                    <Button className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center" variant={"outline"}>
+                    <Button 
+                      className="border-black text-black hover:bg-gray-400 bg-white rounded-full px-4 py-1 flex items-center" 
+                      variant={"outline"}
+                      onClick={() => router.push("/quickactions/messages")}
+                    >
                       <MessageCircle className="h-3 w-3 mr-1" />
                       Message
                     </Button>
@@ -343,6 +483,23 @@ export function SessionHistory() {
           ))}
         </div>
       )}
+
+      {/* Quick Book Modal */}
+      <Dialog open={!!selectedMentor} onOpenChange={() => setSelectedMentor(null)}>
+        <DialogContent className="max-w-3xl w-full rounded-2xl overflow-hidden p-0">
+          <VisuallyHidden>
+            <DialogTitle>Book {selectedMentor?.name}</DialogTitle>
+          </VisuallyHidden>
+          {selectedMentor && (
+            <QuickBook
+              mentor={selectedMentor}
+              sessions={[]} // Empty, QuickBook will fetch from backend
+              timezones={["IST"]}
+              onClose={() => setSelectedMentor(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
