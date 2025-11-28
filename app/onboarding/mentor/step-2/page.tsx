@@ -27,21 +27,53 @@ export default function MentorStep2Page() {
     const token = localStorage.getItem("auth_token") || localStorage.getItem("access_token")
     console.log("Loading data with token:", token ? token.substring(0, 20) + "..." : "null")
     
+    if (!token) {
+      console.warn("No token found, cannot load existing data")
+      setIsLoading(false)
+      return
+    }
+    
     try {
-      const response = await fetch(`${API_BASE_URL}/mentors/onboarding/data`, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      })
+      // Fetch both onboarding data and user info
+      const [onboardingResponse, userResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/mentors/onboarding/data`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        }),
+        fetch(`${API_BASE_URL}/auth/me`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+      ])
 
-      if (response.ok) {
-        const data = await response.json()
-        setOnboardingData(data)
+      const data: any = {}
+      
+      if (onboardingResponse.ok) {
+        const onboardingData = await onboardingResponse.json()
+        data.step2_data = onboardingData.step2_data || {}
       } else {
-        console.error("Failed to load data:", response.status, response.statusText)
+        console.error("Failed to load onboarding data:", onboardingResponse.status, onboardingResponse.statusText)
+        data.step2_data = {}
       }
+
+      // If we have user data but no full_name in step2_data, use user's name
+      if (userResponse.ok) {
+        const userData = await userResponse.json()
+        if (userData.first_name || userData.last_name) {
+          const fullName = `${userData.first_name || ""} ${userData.last_name || ""}`.trim()
+          if (fullName && !data.step2_data.full_name) {
+            data.step2_data.full_name = fullName
+          }
+        }
+      }
+
+      setOnboardingData(data)
     } catch (error) {
       console.error("Error loading existing data:", error)
+      // Set empty data so form can still be used
+      setOnboardingData({ step2_data: {} })
     } finally {
       setIsLoading(false)
     }
