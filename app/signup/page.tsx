@@ -41,7 +41,7 @@ export default function SignupPage() {
   handleSignup(userType);
 };
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24 pt-24 ">
+    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24">
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
