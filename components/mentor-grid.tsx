@@ -1,5 +1,6 @@
-"use client";
-
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { API_BASE_URL } from "@/lib/api";
 import "@fontsource/mulish";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,84 +13,151 @@ import {
   Heart,
   Star,
   Zap,
-  Verified,
   Globe,
-  Award,
 } from "lucide-react";
 import Link from "next/link";
 
-const mentors = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    title: "Senior Product Manager",
-    company: "Google",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    reviews: 127,
-    location: "San Francisco, CA",
-    expertise: ["Product Management", "Strategy", "Leadership"],
-    price: 150,
-    mentees: 45,
-    available: true,
-    responseTime: "<4 hrs",
-    successRate: 95,
-    description: "Experienced product manager with a passion for building user-centric products.",
-    languages: ["English", "Spanish"],
-    yearsExperience: 10,
-    badge: "Top Mentor",
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    title: "Senior Software Engineer",
-    company: "Meta",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.8,
-    reviews: 89,
-    location: "Seattle, WA",
-    expertise: ["React", "Node.js", "System Design"],
-    price: 120,
-    mentees: 32,
-    available: false,
-    responseTime: "<6 hrs",
-    successRate: 90,
-    description: "Full-stack engineer specializing in scalable applications.",
-    languages: ["English", "Mandarin"],
-    yearsExperience: 8,
-    badge: "Expert",
-  },
-  {
-    id: 3,
-    name: "Emily Rodriguez",
-    title: "UX Design Lead",
-    company: "Apple",
-    image: "/placeholder.svg?height=80&width=80",
-    rating: 4.9,
-    reviews: 156,
-    location: "Cupertino, CA",
-    expertise: ["UX Design", "Design Systems", "Research"],
-    price: 180,
-    mentees: 67,
-    available: true,
-    responseTime: "<3 hrs",
-    successRate: 97,
-    description: "UX leader guiding product teams to create intuitive and engaging experiences.",
-    languages: ["English", "French"],
-    yearsExperience: 12,
-    badge: "Top Rated",
-  },
-];
+interface Mentor {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  location: string;
+  expertise: string[];
+  price: number;
+  mentees: number;
+  available: boolean;
+  responseTime: string;
+  successRate: number;
+  description: string;
+  languages: string[];
+  yearsExperience: number;
+  badge?: string;
+}
 
-export default function MentorCards({ showFilters }: { showFilters: boolean }) {
+export default function MentorCards({ showFilters, filters }: { showFilters: boolean; filters?: any }) {
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search");
+
+  useEffect(() => {
+    const fetchMentors = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        params.append("page", "1");
+        params.append("per_page", "50");
+        
+        if (searchQuery) {
+          params.append("search_query", searchQuery);
+        }
+
+        // Add price filters
+        if (filters?.minPrice !== undefined && filters?.minPrice > 0) {
+          params.append("min_rating", "0"); // API doesn't have min_price, using for reference
+        }
+        if (filters?.maxPrice !== undefined && filters?.maxPrice < 2000) {
+          params.append("max_price", String(filters.maxPrice * 100)); // Convert to paise
+        }
+
+        // Add skills filters
+        if (filters?.selectedIndustries && filters.selectedIndustries.length > 0) {
+          params.append("skills", filters.selectedIndustries.join(","));
+        }
+
+        // Add rating filters
+        if (filters?.mentorRatings && filters.mentorRatings.length > 0) {
+          const minRating = filters.mentorRatings[0] === "4★ & Above" ? 4
+            : filters.mentorRatings[0] === "3★ & Above" ? 3
+            : filters.mentorRatings[0] === "2★ & Above" ? 2
+            : 1;
+          params.append("min_rating", String(minRating));
+        }
+
+        const response = await fetch(`${API_BASE_URL}/mentors/profiles?${params.toString()}`);
+        if (response.ok) {
+          const data = await response.json();
+          let mappedMentors = data.mentors.map((m: any) => ({
+            id: m.id,
+            name: m.full_name,
+            title: m.headline || "Mentor",
+            company: m.company || "",
+            image: m.profile_picture_url || "/placeholder.svg?height=80&width=80",
+            rating: m.rating || 0,
+            reviews: m.total_sessions || 0,
+            location: m.location || "Remote",
+            expertise: m.skills || [],
+            price: m.hourly_rate || 0,
+            mentees: m.total_sessions || 0,
+            available: true,
+            responseTime: "24 hrs",
+            successRate: 100,
+            description: m.headline || "",
+            languages: [],
+            yearsExperience: 0,
+          }));
+
+          // Client-side filtering for fields not available in API
+          if (filters?.responseTime && filters.responseTime.length > 0) {
+            mappedMentors = mappedMentors.filter((m: Mentor) =>
+              filters.responseTime.some((rt: string) => m.responseTime.includes(rt) || rt === "< 24 Hours")
+            );
+          }
+
+          // Sort mentors
+          if (filters?.sortBy === "price-low") {
+            mappedMentors.sort((a: Mentor, b: Mentor) => a.price - b.price);
+          } else if (filters?.sortBy === "price-high") {
+            mappedMentors.sort((a: Mentor, b: Mentor) => b.price - a.price);
+          } else if (filters?.sortBy === "rating") {
+            mappedMentors.sort((a: Mentor, b: Mentor) => b.rating - a.rating);
+          }
+
+          setMentors(mappedMentors);
+        } else {
+          console.error("Failed to fetch mentors");
+        }
+      } catch (error) {
+        console.error("Error fetching mentors:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMentors();
+  }, [searchQuery, filters]);
+
+  if (loading) {
+    return (
+      <section className="py-12 font-[Mulish] bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <p>Loading mentors...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (mentors.length === 0) {
+    return (
+      <section className="py-12 font-[Mulish] bg-gray-50">
+        <div className="container mx-auto px-4 text-center">
+          <p>No mentors found matching your criteria.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-12 font-[Mulish] bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Grid: Use auto-rows-fr so all cards in a row have equal height */}
         <div
-          className={`grid grid-cols-1 gap-12 transition-all duration-300 ${
-            showFilters ? "md:grid-cols-2" : "md:grid-cols-3"
-          } auto-rows-fr`}
+          className={`grid grid-cols-1 gap-12 transition-all duration-300 ${showFilters ? "md:grid-cols-2" : "md:grid-cols-3"
+            } auto-rows-fr`}
         >
           {mentors.map((mentor) => (
             <Card
@@ -144,7 +212,7 @@ export default function MentorCards({ showFilters }: { showFilters: boolean }) {
                   </button>
                 </div>
 
-                <p className="mt-4 text-sm text-black font-[500] flex-1">{mentor.description}</p>
+                <p className="mt-4 text-sm text-black font-[500] flex-1 line-clamp-3">{mentor.description}</p>
 
                 {/* Stats */}
                 <div className="mt-6 flex justify-center gap-4 text-gray-700 w-full font-[Mulish]">
@@ -173,13 +241,18 @@ export default function MentorCards({ showFilters }: { showFilters: boolean }) {
 
                 {/* Expertise / Languages */}
                 <div className="mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
-                  {mentor.expertise.map((skill) => (
+                  {mentor.expertise.slice(0, 3).map((skill) => (
                     <span key={skill} className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
                       {skill}
                     </span>
                   ))}
+                  {mentor.expertise.length > 3 && (
+                    <span className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
+                      +{mentor.expertise.length - 3}
+                    </span>
+                  )}
                 </div>
-                {mentor.languages && (
+                {mentor.languages && mentor.languages.length > 0 && (
                   <div className="mt-3 group cursor-pointer inline-block font-[500]">
                     <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
                       <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
