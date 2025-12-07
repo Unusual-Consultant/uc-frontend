@@ -24,13 +24,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={mulish.variable}>
+    <html lang="en" className={`${mulish.variable} overflow-x-hidden`}>
       <body
-        className={`${mulish.className} min-h-screen bg-gradient-to-t from-[#B7DFFF] to-white`}
+        className={`${mulish.className} min-h-screen bg-gradient-to-t from-[#B7DFFF] to-white overflow-x-hidden`}
         suppressHydrationWarning
       >
         <Suspense fallback={null}>
-          <AuthenticatedUserProvider>``
+          <AuthenticatedUserProvider>
             <Header />
 
             <MainWrapper>
