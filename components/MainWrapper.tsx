@@ -9,7 +9,8 @@ export function MainWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const noPadding =
     pathname.startsWith("/login") ||
-    pathname.startsWith("/signup");
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/mentee/dashboard");
 
   return (
     <main className={noPadding ? "min-h-screen" : "min-h-screen pt-20"}>
