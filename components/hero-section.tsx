@@ -282,7 +282,7 @@ export function HeroSection() {
       <div className="relative container mx-auto max-w-[90rem] px-[1rem] sm:px-[2rem] lg:px-[4rem] pt-[6rem] pb-[3rem]">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-[3rem] items-start min-h-[80vh]">
           {/* Left Column */}
-          <div className="space-y-[2rem]">
+          <div className="flex flex-col gap-[2rem]">
             {/* Animated Heading */}
             <div
               className="space-y-[1.2rem] relative"
@@ -292,7 +292,7 @@ export function HeroSection() {
                 transform: "rotate(0deg)",
               }}
             >
-              <h1 className="text-[50px] md:text-[55px] font-[800] text-gray-900 leading-tight mb-4">
+              <h1 className="text-[50px] md:text-[55px] font-[800] text-gray-900 leading-tight mb-6">
                 Find Unusual Growth
                 <br />
                 <span className="text-black">through </span>
@@ -303,7 +303,7 @@ export function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -40 }}
                     transition={{ duration: 0.5 }}
-                    className="inline-block bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-bold"
+                    className="inline-block bg-gradient-to-r from-[#0073CF] to-[#003C6C] bg-clip-text text-transparent font-black"
                   >
                     {words[currentWordIndex]}
                   </motion.span>
@@ -318,7 +318,7 @@ export function HeroSection() {
 
             {/* Search Bar */}
             <div className="space-y-[1rem] mt-[1rem]">
-              <div className="flex items-center bg-white rounded-full shadow-lg p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840]">
+              <div className="flex items-center bg-white rounded-full shadow-lg p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840] mb-10">
                 <div className="relative flex-1">
                   <Search className="absolute left-[1rem] top-1/2 -translate-y-1/2 text-black h-[1.25rem] w-[1.25rem]" />
                   <Input
@@ -333,35 +333,53 @@ export function HeroSection() {
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="px-[2rem] py-[1rem] text-[1.125rem] font-medium bg-[#0073CF] text-white hover:bg-[#005fa3] rounded-full transition-all"
+                  className="px-[2rem] py-[1rem] text-[1.125rem] font-medium bg-[#0073CF] text-white hover:bg-[#003C6C] rounded-full transition-all"
                 >
                   Search
                 </Button>
               </div>
 
-              <div className="flex flex-wrap gap-2 items-center">
-                <span className="font-bold text-[15px] text-black">Popular:</span>
+              <div className="flex flex-wrap gap-2 items-center ">
+                <span className="font-bold text-[18px] text-black">Popular:</span>
+
                 {popularSkills.map((skill) => (
                   <span
                     key={skill}
-                    className="cursor-pointer text-[15px] bg-white text-black px-3 py-1 rounded-full shadow-sm hover:bg-gray-100 transition"
                     onClick={() => {
                       setSearchQuery(skill);
                       handleSearch();
                     }}
+                    className="
+    flex items-center justify-center
+    min-w-[208px] h-[35.47px]
+    px-[30px] py-[7.24px]
+    gap-[5.57px]
+    bg-white
+    rounded-[22.26px]
+    text-[15px] font-semibold
+    leading-[1.4]
+    tracking-[0px]
+    text-black
+    cursor-pointer
+    shadow-[0px_1px_2px_rgba(0,0,0,0.05)]
+    hover:bg-gray-100
+    transition
+  "
                   >
                     {skill}
                   </span>
                 ))}
               </div>
+
+
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mt-[1rem]">
+            <div className="flex flex-col sm:flex-row gap-4 mt-4">
               <div className="relative inline-block group">
                 <Button
                   asChild
-                  className="w-[241px] h-[54px] rounded-[36.08px] bg-[#0073CF] text-white text-[20px] font-semibold opacity-100 hover:bg-[#005fa3] transition-all duration-300"
+                  className="w-[258px] h-[54px] rounded-[36.08px] bg-[#0073CF] text-white text-[20px] font-semibold opacity-100 hover:bg-[#003C6C] transition-all duration-300"
                 >
                   <Link href="/mentors">Find a mentor</Link>
                 </Button>
@@ -384,7 +402,7 @@ export function HeroSection() {
                   asChild
                   variant="outline"
                   size="lg"
-                  className="w-[241px] h-[54px] rounded-[36.08px] text-[20px] bg-transparent border-black hover:bg-white hover:border-white transition-all duration-300"
+                  className="w-[258px] h-[54px] rounded-[36.08px] text-[20px] bg-transparent border-black hover:bg-white hover:border-white transition-all duration-300"
                 >
                   <Link href="/signup">Become a Mentor</Link>
                 </Button>
@@ -412,7 +430,7 @@ export function HeroSection() {
               </h3>
               <div
                 ref={mentorsRef}
-                className="relative overflow-x-auto no-scrollbar whitespace-nowrap"
+                className="relative overflow-x-auto no-scrollbar whitespace-nowrap mr-[-50vw]"
                 role="region"
               >
                 <div className="inline-flex gap-6 animate-scroll-left hover:[animation-play-state:paused]">
@@ -477,7 +495,7 @@ export function HeroSection() {
 
                             {/* Footer */}
                             <div className="flex items-center justify-between mt-2">
-                              <span className="font-[800] text-[20px] ">${mentor.price}/hr</span>
+                              <span className="font-[800] text-[20px] ">₹{mentor.price}/hr</span>
                               <div className="flex gap-2">
                                 <Button
                                   variant="outline"
@@ -503,10 +521,10 @@ export function HeroSection() {
                 </div>
               </div>
               {/* Mentor arrows positioned just below the mentors row */}
-              <div className="absolute -bottom-8 right-0 flex gap-2 z-10">
+              <div className="absolute -bottom-10 right-0 flex gap-2 z-10 ">
                 <button
                   onClick={() => scroll(mentorsRef, "left")}
-                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
+                  className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all "
                   aria-label="Scroll mentors left"
                 >
                   <ChevronLeft size={12} />
@@ -527,7 +545,7 @@ export function HeroSection() {
                 Success Stories
               </h3>
 
-              <div ref={testimonialsRef} className="relative overflow-x-auto no-scrollbar whitespace-nowrap w-full">
+              <div ref={testimonialsRef} className="relative overflow-x-auto no-scrollbar whitespace-nowrap mr-[-50vw]">
                 <div className="inline-flex gap-6 animate-scroll-right hover:[animation-play-state:paused]">
                   {[...testimonials, ...testimonials].map((t, i) => (
                     <Card
@@ -576,7 +594,7 @@ export function HeroSection() {
                   ))}
                 </div>
               </div>
-              <div className="absolute -bottom-6 right-0 flex gap-2 z-10">
+              <div className="absolute -bottom-10 right-0 flex gap-2 z-10">
                 <button
                   onClick={() => scroll(testimonialsRef, "left")}
                   className="w-6 h-6 flex items-center justify-center bg-white/90 border border-gray-300 rounded-full hover:bg-gray-100 shadow-sm transition-all"
@@ -599,3 +617,7 @@ export function HeroSection() {
     </section>
   );
 }
+
+
+
+
