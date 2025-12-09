@@ -89,24 +89,38 @@ export default function SignupPage() {
         <h1 className="font-mulish font-extrabold text-[22px] mb-2">
           {activeTab === "mentee" ? "Mentee Onboarding" : "Mentor Onboarding"}
         </h1>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col items-center">
+          <TabsList className="relative grid grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4 overflow-hidden" style={{ width: "289px", height: "48px", minWidth: "84px", maxWidth: "480px" }}>
+            {/* Sliding Blue Background */}
+            <div
+              className="absolute top-1 bottom-1 left-1 right-1 w-1/2 bg-[#0073CF] rounded-2xl transition-transform duration-300 ease-out pointer-events-none"
+              style={{
+                transform: activeTab === "mentor" ? "translateX(calc(100% + 4px))" : "translateX(0)",
+              }}
+            />
+            
             <TabsTrigger
               value="mentee"
-              className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+              className="relative z-10 flex items-center gap-2 rounded-3xl
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
             >
               <User className="h-4 w-4" />
               <span>Mentee</span>
             </TabsTrigger>
             <TabsTrigger
               value="mentor"
-              className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+              className="relative z-10 flex items-center gap-2 rounded-3xl
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
             >
               <GraduationCap className="h-4 w-4" />
               <span>Mentor</span>
