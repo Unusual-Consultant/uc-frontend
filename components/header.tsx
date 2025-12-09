@@ -70,22 +70,28 @@ export function Header() {
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenuTrigger>
-
-                  <DropdownMenuContent
-                    className="w-[--radix-dropdown-menu-trigger-width] mt-2 rounded-lg shadow-lg backdrop-blur-xl bg-white/80 border border-white/30"
-                  >
+                  <DropdownMenuContent className="w-auto p-2 mt-2 rounded-lg shadow-lg backdrop-blur-xl bg-white/80 border border-white/30 flex flex-col gap-1">
                     <DropdownMenuItem asChild>
-                      <Link href="/templates" className="text-sm hover:text-[#0073CF] transition-colors">
+                      <Link 
+                        href="/templates" 
+                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                      >
                         Templates
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/resume-tools" className="text-sm hover:text-[#0073CF] transition-colors">
+                      <Link 
+                        href="/resume-tools" 
+                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                      >
                         Resume Tools
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href="/resume-analyzer" className="text-sm hover:text-[#0073CF] transition-colors">
+                      <Link 
+                        href="/resume-analyzer" 
+                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                      >
                         Analyzer
                       </Link>
                     </DropdownMenuItem>
@@ -121,7 +127,6 @@ export function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-60 mt-2 rounded-xl shadow-2xl backdrop-blur-xl bg-white/95 border border-white/40 p-2">
-                {/* Header with user info */}
                 <div className="px-3 py-3 mb-2 rounded-lg bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100">
                   <p className="text-xs text-gray-500 uppercase tracking-wider font-semibold">Account</p>
                   <p className="text-sm font-bold text-gray-900 truncate">{displayName}</p>
@@ -185,15 +190,25 @@ export function Header() {
                     <div key="resume-builder" className="flex flex-col space-y-2">
                       <span className="font-medium text-gray-900">Resume Builder</span>
 
-                      <Link href="/templates" className="pl-4 text-sm text-gray-700 hover:text-blue-600">
+                      {/* ✅ Updated mobile hover style */}
+                      <Link 
+                        href="/templates"
+                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
+                      >
                         Templates
                       </Link>
 
-                      <Link href="/resume-tools" className="pl-4 text-sm text-gray-700 hover:text-blue-600">
+                      <Link 
+                        href="/resume-tools"
+                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
+                      >
                         Resume Tools
                       </Link>
 
-                      <Link href="/resume-analyzer" className="pl-4 text-sm text-gray-700 hover:text-blue-600">
+                      <Link 
+                        href="/resume-analyzer"
+                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
+                      >
                         Analyzer
                       </Link>
                     </div>
@@ -211,7 +226,6 @@ export function Header() {
                 )
               })}
 
-              {/* Mobile User Section */}
               {isAuthenticated && user ? (
                 <div className="pt-4 border-t">
                   <p className="font-semibold mb-2">Hi, {displayName}</p>
@@ -250,7 +264,3 @@ export function Header() {
     </header>
   )
 }
-
-
-
-
