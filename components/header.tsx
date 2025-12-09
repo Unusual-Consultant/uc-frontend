@@ -70,7 +70,10 @@ export function Header() {
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-48 mt-2 rounded-lg shadow-lg backdrop-blur-xl bg-white/80 border border-white/30">
+
+                  <DropdownMenuContent
+                    className="w-[--radix-dropdown-menu-trigger-width] mt-2 rounded-lg shadow-lg backdrop-blur-xl bg-white/80 border border-white/30"
+                  >
                     <DropdownMenuItem asChild>
                       <Link href="/templates" className="text-sm hover:text-[#0073CF] transition-colors">
                         Templates
