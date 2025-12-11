@@ -161,16 +161,38 @@ export function HeroSection() {
           fetch(`${API_BASE_URL}/statistics/trending-skills?limit=4`)
         ]);
 
+        let fetchedMentors: any[] = [];
+        let fetchedTestimonials: any[] = [];
+
         if (mentorsRes.ok) {
           const mentorsData = await mentorsRes.json();
           const transformedMentors = (mentorsData.featured_mentors || []).map(transformMentor);
-          setMentors(transformedMentors);
+          fetchedMentors = transformedMentors;
         }
 
         if (testimonialsRes.ok) {
           const testimonialsData = await testimonialsRes.json();
           const transformedTestimonials = (testimonialsData.featured_testimonials || []).map(transformTestimonial);
-          setTestimonials(transformedTestimonials);
+          fetchedTestimonials = transformedTestimonials;
+        }
+
+        // If backend returns empty data, use mock data as fallback
+        if (fetchedMentors.length === 0 || fetchedTestimonials.length === 0) {
+          console.log("Backend returned empty data, using mock data as fallback");
+          const { featuredMentors, testimonials } = await import("@/lib/data");
+          if (fetchedMentors.length === 0) {
+            setMentors(featuredMentors);
+          } else {
+            setMentors(fetchedMentors);
+          }
+          if (fetchedTestimonials.length === 0) {
+            setTestimonials(testimonials);
+          } else {
+            setTestimonials(fetchedTestimonials);
+          }
+        } else {
+          setMentors(fetchedMentors);
+          setTestimonials(fetchedTestimonials);
         }
 
         if (skillsRes.ok) {
@@ -185,33 +207,6 @@ export function HeroSection() {
         const { featuredMentors, testimonials } = await import("@/lib/data");
         setMentors(featuredMentors);
         setTestimonials(testimonials);
-      }
-    };
-    fetchData();
-  }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [mentorsRes, testimonialsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/featured-mentors/`),
-          fetch(`${API_BASE_URL}/featured-testimonials/`),
-        ]);
-
-        if (mentorsRes.ok) {
-          const mentorsData = await mentorsRes.json();
-          setMentors((mentorsData.featured_mentors || []).map(transformMentor));
-        }
-
-        if (testimonialsRes.ok) {
-          const testimonialsData = await testimonialsRes.json();
-          setTestimonials(
-            (testimonialsData.featured_testimonials || []).map(
-              transformTestimonial
-            )
-          );
-        }
-      } catch (e) {
-        console.error("API error:", e);
       }
     };
     fetchData();
@@ -437,7 +432,10 @@ export function HeroSection() {
                   {[...mentors, ...mentors].map((mentor, i) => (
                     <Card
                       key={`${mentor.id}-${i}`}
-                      className="bg-white/90 w-[522px] h-[246px] shadow-md hover:shadow-2xl rounded-2xl transition-all transform hover:-translate-y-1 border-0"
+                      className="bg-white/90 w-[522px] h-[246px] rounded-2xl transition-all transform hover:-translate-y-1 border-0"
+                      style={{
+                        boxShadow: '4px 8px 20px rgba(159,157,157,0.25), inset 0 0 2px rgba(159,157,157,0.25)'
+                      }}
                     >
                       <CardContent className="p-4 pt-7"> {/* Slightly increased top padding for better vertical balance */}
                         <div className="flex items-start gap-3">
@@ -550,7 +548,11 @@ export function HeroSection() {
                   {[...testimonials, ...testimonials].map((t, i) => (
                     <Card
                       key={`${t.name}-${i}`}
-                      className="inline-block w-[522px] h-[213px] flex-shrink-0 bg-white/90 border-0 shadow-md hover:shadow-2xl rounded-2xl transition-all transform hover:-translate-y-1"
+                      className="inline-block w-[522px] h-[213px] flex-shrink-0 bg-white/90 border-0 rounded-2xl transition-all transform hover:-translate-y-1"
+                      style={{
+                        filter: 'drop-shadow(4px 8px 20px rgba(159,157,157,0.25))',
+                        boxShadow: 'inset 0 0 2px rgba(159,157,157,0.25)'
+                      }}
                     >
                       <CardContent className="p-5 flex flex-col justify-between h-full">
                         {/* Top Section — Avatar + Text */}
