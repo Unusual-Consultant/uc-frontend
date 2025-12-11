@@ -62,7 +62,7 @@ export default function LoginPage() {
 
       {/* 🔹 Mirror Glaze Rectangle with Login Card Inside */}
       <div
-        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex items-center justify-center px-6 py-8 z-10"
+        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-6 py-8 z-10"
       >
         {/* Login Card */}
         <div className="w-full max-w-md">
