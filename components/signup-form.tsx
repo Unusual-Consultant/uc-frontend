@@ -218,14 +218,25 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
       {errors.general && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{errors.general}</div>}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "OTP" | "PW")}>
-        <TabsList className="grid w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4">
-          <TabsTrigger value="OTP" className="flex items-center gap-2 rounded-[30px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm">
+        <TabsList
+          className="mx-auto grid max-w-[371px] w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-[48px]"
+        >
+
+          <TabsTrigger
+            value="OTP"
+            className="flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm"
+          >
             <User className="h-4 w-4" /> <span>Sign up with OTP</span>
           </TabsTrigger>
-          <TabsTrigger value="PW" className="flex items-center gap-1 rounded-[30px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm">
+
+          <TabsTrigger
+            value="PW"
+            className="flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm"
+          >
             <GraduationCap className="h-4 w-4" /> <span>Create Password</span>
           </TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="OTP" className="space-y-4">
           <div className="space-y-4">

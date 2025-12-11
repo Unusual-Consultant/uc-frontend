@@ -24,7 +24,8 @@ export default function AnimatedSmartBuddy() {
   }, []);
 
   return (
-    <div className="absolute -top-8 -right-0 w-[120px] h-[120px] z-20">
+    // Change -top-8 to -bottom-8 to match the right-0 positioning (assuming the right-0 means 0 padding from the right)
+    <div className="absolute -bottom-8 -right-0 w-[120px] h-[108px] z-20">
       <Image
         src={images[index]}
         alt={`SmartBuddy Animation ${index + 1}`}
