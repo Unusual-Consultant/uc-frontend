@@ -219,19 +219,26 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "OTP" | "PW")}>
         <TabsList
-          className="mx-auto grid max-w-[371px] w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-[48px]"
+          className="relative mx-auto grid max-w-[371px] w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-[48px] overflow-hidden"
         >
+          {/* Sliding Blue Background */}
+          <div
+            className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
+            style={{
+              transform: activeTab === "PW" ? "translateX(100%)" : "translateX(0)",
+            }}
+          />
 
           <TabsTrigger
             value="OTP"
-            className="flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
           >
             <User className="h-4 w-4" /> <span>Sign up with OTP</span>
           </TabsTrigger>
 
           <TabsTrigger
             value="PW"
-            className="flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
           >
             <GraduationCap className="h-4 w-4" /> <span>Create Password</span>
           </TabsTrigger>
