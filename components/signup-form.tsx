@@ -214,7 +214,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
   };
 
   return (
-    <div className="w-full max-w-[425px] space-y-4">
+    <div className="w-full max-w-[450px] space-y-4">
       {errors.general && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{errors.general}</div>}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "OTP" | "PW")}>
@@ -260,27 +260,66 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[12px] text-black-500">Send OTP to:</p>
+          <div className="space-y-3">
+            <p className="text-[14px] text-black-700 font-medium">Send OTP to:</p>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-[13px]">
-                <input type="radio" name="otp" checked={formData.otpMethod === "email"} onChange={() => handleInputChange("otpMethod", "email")} /> Email
+              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+                <input
+                  type="radio"
+                  name="otp"
+                  checked={formData.otpMethod === "phone"}
+                  onChange={() => handleInputChange("otpMethod", "phone")}
+                  className="w-4 h-4"
+                />
+                Phone number
               </label>
-              <label className="flex items-center gap-2 text-[13px]">
-                <input type="radio" name="otp" checked={formData.otpMethod === "phone"} onChange={() => handleInputChange("otpMethod", "phone")} /> Phone number
+              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+                <input
+                  type="radio"
+                  name="otp"
+                  checked={formData.otpMethod === "email"}
+                  onChange={() => handleInputChange("otpMethod", "email")}
+                  className="w-4 h-4"
+                />
+                Email
               </label>
             </div>
 
-            {otpSent && (
-              <div className="flex gap-2">
-                <Input placeholder="Enter OTP" value={formData.otp} onChange={(e) => handleInputChange("otp", e.target.value)} className="flex-1 rounded-[30px] border px-4 py-3 border-black bg-transparent h-[50px]" />
-                {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
-              </div>
-            )}
+            {/* OTP Input and Get OTP Button side by side */}
+            <div className="flex gap-2 w-[93%] mx-auto">
+              <Input
+                placeholder="Enter OTP"
+                value={formData.otp}
+                onChange={(e) => handleInputChange("otp", e.target.value)}
+                className="flex-1 rounded-[30px] border px-4 py-3 border-black bg-transparent h-[50px]"
+                disabled={!otpSent}
+              />
+              <Button
+                className="px-6 h-[50px] rounded-[30px] bg-white border border-black text-black hover:bg-gray-50"
+                onClick={handleSendOTP}
+                disabled={isLoading || otpSent}
+              >
+                {isLoading ? "Sending..." : "Get OTP"}
+              </Button>
+            </div>
+            {errors.otp && <p className="text-red-500 text-sm text-center">{errors.otp}</p>}
 
-            <Button className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-gray border border-black block" onClick={otpSent ? handleVerifyOTP : handleSendOTP} disabled={isLoading}>
-              {isLoading ? "Processing..." : otpSent ? "Verify OTP" : "Get OTP"}
+            {/* Verify OTP Button */}
+            <Button
+              className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-gray-400 hover:bg-gray-500 text-white block disabled:opacity-50"
+              onClick={handleVerifyOTP}
+              disabled={isLoading || !otpSent}
+            >
+              {isLoading ? "Verifying..." : "Verify OTP"}
             </Button>
+
+            {/* Sign in link */}
+            <p className="text-[14px] text-black-700 text-center">
+              Already have an account?{" "}
+              <a href="/login" className="text-[#0073CF] font-semibold hover:underline">
+                Sign in
+              </a>
+            </p>
           </div>
         </TabsContent>
 
