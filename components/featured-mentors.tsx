@@ -205,13 +205,14 @@ export function FeaturedMentors() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-[1050px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-[50px] w-full md:w-[720px] lg:w-[1240px] mx-auto">
 
           {visibleMentors.map((mentor) => (
             <Card
               key={mentor.id}
-              className="relative w-[340px] h-[662px] transition-shadow duration-300 
-                    border rounded-xl overflow-hidden p-4 flex flex-col justify-between"
+              className={`relative w-[340px] lg:w-[380px] h-[662px] transition-shadow duration-300 
+                    rounded-xl overflow-hidden p-4 flex flex-col justify-between ${mentor.available ? 'border-[3px] border-[#28A745]' : 'border'
+                }`}
               style={{ boxShadow: "0px 4px 20px #9F9D9D40" }}
             >
 
