@@ -30,3 +30,6 @@ node_modules
 .env
 
 .env*.local
+
+.test
+2.txt
