@@ -199,6 +199,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
           ...userInfo,
           firstName: userInfo.first_name || userInfo.firstName,
           lastName: userInfo.last_name || userInfo.lastName,
+          profile_picture_url: userInfo.profile_image_url || userInfo.profile_picture_url,
           name: userInfo.first_name && userInfo.last_name 
             ? `${userInfo.first_name} ${userInfo.last_name}`.trim()
             : userInfo.first_name || userInfo.firstName || userInfo.name || userInfo.email?.split("@")[0],

@@ -28,6 +28,7 @@ export function ChatBot() {
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
+  const [bottomOffset, setBottomOffset] = useState(56) // Initial offset accounting for image overhang
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when new messages arrive
@@ -44,6 +45,32 @@ export function ChatBot() {
     window.addEventListener("openChatbot", handleOpenChatbot)
     return () => {
       window.removeEventListener("openChatbot", handleOpenChatbot)
+    }
+  }, [])
+
+  // Adjust bottom position to avoid footer overlap
+  useEffect(() => {
+    const handleScroll = () => {
+      const footer = document.querySelector("footer")
+      if (!footer) return
+
+      const rect = footer.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      const visibleFooterHeight = Math.max(0, windowHeight - rect.top)
+
+      // Maintain 24px (1.5rem) gap from viewport bottom or footer top
+      // The animated buddy image has -bottom-8 (32px) positioning, so we need to account for that
+      // Base offset = 24px (margin) + 32px (image overhang) = 56px
+      setBottomOffset(56 + visibleFooterHeight)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("resize", handleScroll)
+    handleScroll() // Initial check
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleScroll)
     }
   }, [])
 
@@ -97,24 +124,13 @@ export function ChatBot() {
   }
 
   return (
-    <>
-      {/* Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-  onClick={() => setIsOpen(!isOpen)}
-  size="sm"
-  variant="ghost"
-  className="w-14 h-14  transition-all duration-300 bg-transparent hover:bg-transparent"
-  title="Smart Buddy"
->
-  {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
-</Button>
-
-      </div>
-
+    <div
+      className="fixed right-6 z-50 flex flex-col items-end gap-4 transition-all duration-100 ease-out"
+      style={{ bottom: `${bottomOffset}px` }}
+    >
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)]">
+        <div className="w-96 max-w-[calc(100vw-2rem)]">
           <Card className="shadow-2xl border-0">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
@@ -131,9 +147,8 @@ export function ChatBot() {
                     className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
-                      }`}
+                      className={`max-w-[80%] p-3 rounded-lg ${message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
+                        }`}
                     >
                       <div className="flex items-start gap-2">
                         {message.sender === "bot" && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
@@ -181,6 +196,17 @@ export function ChatBot() {
           </Card>
         </div>
       )}
-    </>
+
+      {/* Chat Button */}
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        size="sm"
+        variant="ghost"
+        className="w-14 h-14 transition-all duration-300 bg-transparent hover:bg-transparent"
+        title="Smart Buddy"
+      >
+        {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
+      </Button>
+    </div>
   )
 }

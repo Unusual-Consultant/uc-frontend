@@ -40,14 +40,14 @@ interface FormErrors {
 export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
   const router = useRouter();
   const { setUser, setIsAuthenticated } = useAuthenticatedUser();
-  
+
   const [activeTab, setActiveTab] = useState<"OTP" | "PW">("OTP");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  
+
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
     lastName: "",
@@ -91,7 +91,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
 
   const handleSendOTP = async () => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       const response = await fetch(api.auth.signup.otp(), {
@@ -214,82 +214,139 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
   };
 
   return (
-    <div className="w-full max-w-[425px] space-y-4">
+    <div className="w-full max-w-[450px] space-y-4">
       {errors.general && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{errors.general}</div>}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "OTP" | "PW")}>
-        <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
-          <TabsTrigger value="OTP" className="flex items-center gap-2 rounded-2xl data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm">
+        <TabsList
+          className="relative mx-auto grid max-w-[371px] w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-[48px] overflow-hidden"
+        >
+          {/* Sliding Blue Background */}
+          <div
+            className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
+            style={{
+              transform: activeTab === "PW" ? "translateX(100%)" : "translateX(0)",
+            }}
+          />
+
+          <TabsTrigger
+            value="OTP"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
+          >
             <User className="h-4 w-4" /> <span>Sign up with OTP</span>
           </TabsTrigger>
-          <TabsTrigger value="PW" className="flex items-center gap-1 rounded-2xl data-[state=active]:bg-[#0073CF] data-[state=active]:text-white data-[state=active]:shadow-sm">
+
+          <TabsTrigger
+            value="PW"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
+          >
             <GraduationCap className="h-4 w-4" /> <span>Create Password</span>
           </TabsTrigger>
         </TabsList>
 
+
         <TabsContent value="OTP" className="space-y-4">
           <div className="space-y-4">
-            <Input placeholder="First Name" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="First Name" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
 
-            <Input placeholder="Last Name" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Last Name" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
 
-            <Input placeholder="Email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
-            <Input placeholder="Phone number (optional)" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Phone number (optional)" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[12px] text-black-500">Send OTP to:</p>
+          <div className="space-y-3">
+            <p className="text-[14px] text-black-700 font-medium">Send OTP to:</p>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-[13px]">
-                <input type="radio" name="otp" checked={formData.otpMethod === "email"} onChange={() => handleInputChange("otpMethod", "email")} /> Email
+              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+                <input
+                  type="radio"
+                  name="otp"
+                  checked={formData.otpMethod === "phone"}
+                  onChange={() => handleInputChange("otpMethod", "phone")}
+                  className="w-4 h-4"
+                />
+                Phone number
               </label>
-              <label className="flex items-center gap-2 text-[13px]">
-                <input type="radio" name="otp" checked={formData.otpMethod === "phone"} onChange={() => handleInputChange("otpMethod", "phone")} /> Phone number
+              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+                <input
+                  type="radio"
+                  name="otp"
+                  checked={formData.otpMethod === "email"}
+                  onChange={() => handleInputChange("otpMethod", "email")}
+                  className="w-4 h-4"
+                />
+                Email
               </label>
             </div>
 
-            {otpSent && (
-              <div className="flex gap-2">
-                <Input placeholder="Enter OTP" value={formData.otp} onChange={(e) => handleInputChange("otp", e.target.value)} className="flex-1 rounded-3xl border px-4 py-3 border-black" />
-                {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
-              </div>
-            )}
+            {/* OTP Input and Get OTP Button side by side */}
+            <div className="flex gap-2 w-[93%] mx-auto">
+              <Input
+                placeholder="Enter OTP"
+                value={formData.otp}
+                onChange={(e) => handleInputChange("otp", e.target.value)}
+                className="flex-1 rounded-[30px] border px-4 py-3 border-black bg-transparent h-[50px]"
+                disabled={!otpSent}
+              />
+              <Button
+                className="px-6 h-[50px] rounded-[30px] bg-white border border-black text-black hover:bg-gray-50"
+                onClick={handleSendOTP}
+                disabled={isLoading || otpSent}
+              >
+                {isLoading ? "Sending..." : "Get OTP"}
+              </Button>
+            </div>
+            {errors.otp && <p className="text-red-500 text-sm text-center">{errors.otp}</p>}
 
-            <Button className="rounded-3xl bg-gray border border-black" onClick={otpSent ? handleVerifyOTP : handleSendOTP} disabled={isLoading}>
-              {isLoading ? "Processing..." : otpSent ? "Verify OTP" : "Get OTP"}
+            {/* Verify OTP Button */}
+            <Button
+              className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-gray-400 hover:bg-gray-500 text-white block disabled:opacity-50"
+              onClick={handleVerifyOTP}
+              disabled={isLoading || !otpSent}
+            >
+              {isLoading ? "Verifying..." : "Verify OTP"}
             </Button>
+
+            {/* Sign in link */}
+            <p className="text-[14px] text-black-700 text-center">
+              Already have an account?{" "}
+              <a href="/login" className="text-[#0073CF] font-semibold hover:underline">
+                Sign in
+              </a>
+            </p>
           </div>
         </TabsContent>
 
         <TabsContent value="PW" className="space-y-4">
           <div className="space-y-4">
-            <Input placeholder="First Name" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="First Name" value={formData.firstName} onChange={(e) => handleInputChange("firstName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName}</p>}
 
-            <Input placeholder="Last Name" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Last Name" value={formData.lastName} onChange={(e) => handleInputChange("lastName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName}</p>}
 
-            <Input placeholder="Email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Email" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
-            <Input placeholder="Phone number (optional)" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="rounded-3xl border px-4 py-3 border-black" />
+            <Input placeholder="Phone number (optional)" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-4 py-3 border-black bg-transparent" />
             {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
 
-            <div className="relative">
-              <Input type={showPassword ? "text" : "password"} placeholder="Create Password" value={formData.password} onChange={(e) => handleInputChange("password", e.target.value)} className="rounded-3xl border px-4 py-3 pr-10 border-black" />
+            <div className="relative w-[93%] mx-auto">
+              <Input type={showPassword ? "text" : "password"} placeholder="Create Password" value={formData.password} onChange={(e) => handleInputChange("password", e.target.value)} className="w-full h-[50px] rounded-[30px] border px-4 py-3 pr-10 border-black bg-transparent" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
 
-            <div className="relative">
-              <Input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" value={formData.confirmPassword} onChange={(e) => handleInputChange("confirmPassword", e.target.value)} className="rounded-3xl border px-4 py-3 pr-10 border-black" />
+            <div className="relative w-[93%] mx-auto">
+              <Input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" value={formData.confirmPassword} onChange={(e) => handleInputChange("confirmPassword", e.target.value)} className="w-full h-[50px] rounded-[30px] border px-4 py-3 pr-10 border-black bg-transparent" />
               <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2">
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -297,7 +354,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
           </div>
 
-          <Button className="w-full rounded-3xl bg-[#0073CF] text-white" onClick={handlePasswordSignup} disabled={isLoading}>
+          <Button className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-[#0073CF] text-white block" onClick={handlePasswordSignup} disabled={isLoading}>
             {isLoading ? "Creating Account..." : "Continue"}
           </Button>
 

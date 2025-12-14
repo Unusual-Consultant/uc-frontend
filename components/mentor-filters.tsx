@@ -48,6 +48,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
   const [experienceLevel, setExperienceLevel] = useState<string[]>([]);
   const [availability, setAvailability] = useState<string[]>([]);
 
+  // Trigger callback whenever filters change
+  const notifyFilterChange = () => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        minPrice,
+        maxPrice,
+        isVerified,
+        sortBy,
+        sessionType,
+        packages,
+        mentorRatings,
+        responseTime,
+        selectedIndustries,
+        experienceLevel,
+        availability,
+      });
+    }
+  };
+
   const industries = [
     "Technology",
     "Finance",
@@ -117,6 +136,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     setPackages([]);
     setMentorRatings([]);
     setResponseTime([]);
+    setSelectedIndustries([]);
+    setExperienceLevel([]);
+    setAvailability([]);
+    // Notify with cleared filters
+    if (onFiltersChange) {
+      onFiltersChange({
+        minPrice: 0,
+        maxPrice: 2000,
+        isVerified: false,
+        sortBy: "relevance",
+        sessionType: [],
+        packages: [],
+        mentorRatings: [],
+        responseTime: [],
+        selectedIndustries: [],
+        experienceLevel: [],
+        availability: [],
+      });
+    }
   };
 
   const getActiveFiltersCount = () => {
@@ -130,7 +168,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
   };
 
   const toggleVerified = () => {
-    setIsVerified((prev) => !prev);
+    setIsVerified((prev) => {
+      const newVerified = !prev;
+      if (onFiltersChange) {
+        onFiltersChange({
+          minPrice,
+          maxPrice,
+          isVerified: newVerified,
+          sortBy,
+          sessionType,
+          packages,
+          mentorRatings,
+          responseTime,
+          selectedIndustries,
+          experienceLevel,
+          availability,
+        });
+      }
+      return newVerified;
+    });
   };
 
   return (
@@ -194,7 +250,24 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={sortBy} onValueChange={(value) => {
+            setSortBy(value);
+            if (onFiltersChange) {
+              onFiltersChange({
+                minPrice,
+                maxPrice,
+                isVerified,
+                sortBy: value,
+                sessionType,
+                packages,
+                mentorRatings,
+                responseTime,
+                selectedIndustries,
+                experienceLevel,
+                availability,
+              });
+            }
+          }}>
             <SelectTrigger className="border border-[#C7C7C7] rounded-md bg-white focus:ring-2 focus:ring-[#87CEEB]/40 transition-all">
               <SelectValue placeholder="Select sort option" />
             </SelectTrigger>
@@ -233,6 +306,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     setPriceRange(val);
     setMinPrice(val[0]);
     setMaxPrice(val[1]);
+    notifyFilterChange();
   }}
   min={0}
   max={2000}
@@ -258,6 +332,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 const value = Number(e.target.value);
                 setMinPrice(value);
                 setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
+                notifyFilterChange();
               }}
               className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
             />
@@ -269,6 +344,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 const value = Number(e.target.value);
                 setMaxPrice(value);
                 setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
+                notifyFilterChange();
               }}
               className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
             />
@@ -307,12 +383,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={industry}
                 checked={selectedIndustries.includes(industry)}
                 onCheckedChange={(checked) => {
-                  if (checked)
-                    setSelectedIndustries([...selectedIndustries, industry]);
-                  else
-                    setSelectedIndustries(
-                      selectedIndustries.filter((i) => i !== industry)
-                    );
+                  const newIndustries = checked
+                    ? [...selectedIndustries, industry]
+                    : selectedIndustries.filter((i) => i !== industry);
+                  setSelectedIndustries(newIndustries);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages,
+                      mentorRatings,
+                      responseTime,
+                      selectedIndustries: newIndustries,
+                      experienceLevel,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={industry} className="text-sm cursor-pointer">
@@ -338,10 +427,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={type}
                 checked={sessionType.includes(type)}
                 onCheckedChange={(checked) => {
-                  if (checked)
-                    setSessionType([...sessionType, type]);
-                  else
-                    setSessionType(sessionType.filter((t) => t !== type));
+                  const newSessionTypes = checked
+                    ? [...sessionType, type]
+                    : sessionType.filter((t) => t !== type);
+                  setSessionType(newSessionTypes);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType: newSessionTypes,
+                      packages,
+                      mentorRatings,
+                      responseTime,
+                      selectedIndustries,
+                      experienceLevel,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={type} className="text-sm cursor-pointer">
@@ -383,12 +487,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={level}
                 checked={experienceLevel.includes(level)}
                 onCheckedChange={(checked) => {
-                  if (checked)
-                    setExperienceLevel([...experienceLevel, level]);
-                  else
-                    setExperienceLevel(
-                      experienceLevel.filter((l) => l !== level)
-                    );
+                  const newLevels = checked
+                    ? [...experienceLevel, level]
+                    : experienceLevel.filter((l) => l !== level);
+                  setExperienceLevel(newLevels);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages,
+                      mentorRatings,
+                      responseTime,
+                      selectedIndustries,
+                      experienceLevel: newLevels,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={level} className="text-sm cursor-pointer">
@@ -414,8 +531,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={pkg}
                 checked={packages.includes(pkg)}
                 onCheckedChange={(checked) => {
-                  if (checked) setPackages([...packages, pkg]);
-                  else setPackages(packages.filter((p) => p !== pkg));
+                  const newPackages = checked
+                    ? [...packages, pkg]
+                    : packages.filter((p) => p !== pkg);
+                  setPackages(newPackages);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages: newPackages,
+                      mentorRatings,
+                      responseTime,
+                      selectedIndustries,
+                      experienceLevel,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={pkg} className="text-sm cursor-pointer">
@@ -441,8 +575,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={rating}
                 checked={mentorRatings.includes(rating)}
                 onCheckedChange={(checked) => {
-                  if (checked) setMentorRatings([...mentorRatings, rating]);
-                  else setMentorRatings(mentorRatings.filter((r) => r !== rating));
+                  const newRatings = checked
+                    ? [...mentorRatings, rating]
+                    : mentorRatings.filter((r) => r !== rating);
+                  setMentorRatings(newRatings);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages,
+                      mentorRatings: newRatings,
+                      responseTime,
+                      selectedIndustries,
+                      experienceLevel,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={rating} className="text-sm cursor-pointer">
@@ -470,8 +621,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={slot}
                 checked={availability.includes(slot)}
                 onCheckedChange={(checked) => {
-                  if (checked) setAvailability([...availability, slot]);
-                  else setAvailability(availability.filter((s) => s !== slot));
+                  const newAvailability = checked
+                    ? [...availability, slot]
+                    : availability.filter((s) => s !== slot);
+                  setAvailability(newAvailability);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages,
+                      mentorRatings,
+                      responseTime,
+                      selectedIndustries,
+                      experienceLevel,
+                      availability: newAvailability,
+                    });
+                  }
                 }}
 
               />
@@ -499,10 +667,25 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 id={option}
                 checked={responseTime.includes(option)}
                 onCheckedChange={(checked) => {
-                  if (checked)
-                    setResponseTime([...responseTime, option]);
-                  else
-                    setResponseTime(responseTime.filter((r) => r !== option));
+                  const newResponseTime = checked
+                    ? [...responseTime, option]
+                    : responseTime.filter((r) => r !== option);
+                  setResponseTime(newResponseTime);
+                  if (onFiltersChange) {
+                    onFiltersChange({
+                      minPrice,
+                      maxPrice,
+                      isVerified,
+                      sortBy,
+                      sessionType,
+                      packages,
+                      mentorRatings,
+                      responseTime: newResponseTime,
+                      selectedIndustries,
+                      experienceLevel,
+                      availability,
+                    });
+                  }
                 }}
               />
               <label htmlFor={option} className="text-sm cursor-pointer">
