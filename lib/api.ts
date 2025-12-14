@@ -1,5 +1,5 @@
 // API Configuration and Types
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://example.com/api/v1";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://uc-backend-210202864965.europe-west1.run.app/api/v1";
 
 // Reschedule Booking
 export interface RescheduleBookingRequest {
