@@ -45,6 +45,21 @@ export function MentorStep2Enhanced({ onNext, onBack, initialData }: MentorStep2
 
   const [isLoading, setIsLoading] = useState(false)
 
+  // Update form data when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        fullName: initialData.full_name || "",
+        roleOrTitle: initialData.role_or_title || "",
+        company: initialData.company || "",
+        yearsExperience: initialData.years_experience ? String(initialData.years_experience) : "",
+        topSkills: initialData.top_skills || [],
+        linkedinUrl: initialData.linkedin_url || "",
+        portfolioUrl: initialData.portfolio_url || "",
+      })
+    }
+  }, [initialData])
+
   const toggleSkill = (skill: string) => {
     if (formData.topSkills.includes(skill)) {
       setFormData({
@@ -93,10 +108,20 @@ export function MentorStep2Enhanced({ onNext, onBack, initialData }: MentorStep2
       })
 
       if (response.ok) {
+        const result = await response.json()
+        console.log("Step 2 saved successfully:", result)
         onNext(formData)
       } else {
-        const error = await response.json()
-        alert(`Error: ${error.detail}`)
+        const errorText = await response.text()
+        let errorMessage = "Failed to save data"
+        try {
+          const error = JSON.parse(errorText)
+          errorMessage = error.detail || error.message || errorMessage
+        } catch {
+          errorMessage = errorText || errorMessage
+        }
+        console.error("Error saving step 2:", response.status, errorMessage)
+        alert(`Error: ${errorMessage}`)
       }
     } catch (error) {
       console.error("Error saving step 2 data:", error)

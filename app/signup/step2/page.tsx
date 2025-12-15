@@ -28,6 +28,7 @@ export default function SignupStep2() {
   const [selectedCareerStage, setSelectedCareerStage] = useState<number | null>(null)
   const [customGoal, setCustomGoal] = useState("")
   const [customInterest, setCustomInterest] = useState("")
+  const [targetRole, setTargetRole] = useState("")
   
   const [email, setEmail] = useState("")
   const [userType, setUserType] = useState("mentee")
@@ -242,6 +243,7 @@ export default function SignupStep2() {
     languages: selectedLanguages.map((id) => id.toString()),
     career_stage: selectedCareerStage?.toString() || null,
     custom_interest: customInterest.trim(),
+    target_role: targetRole.trim() || null,
   }
 
   try {
@@ -418,6 +420,24 @@ export default function SignupStep2() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Target Role Section */}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <img src="/book.png" alt="target role" className="w-6 h-6" />
+                <h3 className="text-lg font-semibold text-gray-900">Target Role</h3>
+              </div>
+              <input
+                type="text"
+                placeholder="e.g., Product Manager, Software Engineer, Data Scientist"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] text-sm"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Enter the job title or role you want to achieve
+              </p>
             </div>
 
             {/* Languages Section */}
