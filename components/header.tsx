@@ -46,7 +46,7 @@ export function Header() {
   return (
     <header
       className="fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-white/30 
-                 shadow-[0_2px_20px_rgba(0,0,0,0.1)] border-b border-white/20"
+                 shadow-[0px_8px_8px_rgba(0,0,0,0.1)] border-b border-white/20"
     >
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-10">
 
@@ -54,7 +54,7 @@ export function Header() {
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2">
             <img src="/unusual-consultant-logo.jpg" alt="Logo" className="h-10 w-10" />
-            <span className="font-semibold text-lg text-black">Unusual Consultant</span>
+            <span className="font-bold text-xl text-black">Unusual Consultant</span>
           </Link>
         </div>
 
@@ -65,16 +65,16 @@ export function Header() {
               return (
                 <DropdownMenu key={link.name}>
                   <DropdownMenuTrigger asChild>
-                    <button className="text-sm font-medium text-gray-800 hover:text-[#0073CF] flex items-center gap-1 transition-colors">
+                    <button className="text-md font-semibold text-black hover:text-[#0073CF] flex items-center gap-1 transition-colors">
                       Resume Builder
                       <ChevronDown className="h-4 w-4" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-auto p-2 mt-2 rounded-lg shadow-lg backdrop-blur-xl bg-white/80 border border-white/30 flex flex-col gap-1">
+                  <DropdownMenuContent className="w-auto p-2 mt-2 rounded-xl shadow-[4px_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-xl bg-white/30 border border-white/30 flex flex-col gap-1">
                     <DropdownMenuItem asChild>
                       <Link 
                         href="/templates" 
-                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
                       >
                         Templates
                       </Link>
@@ -82,7 +82,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link 
                         href="/resume-tools" 
-                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
                       >
                         Resume Tools
                       </Link>
@@ -90,7 +90,7 @@ export function Header() {
                     <DropdownMenuItem asChild>
                       <Link 
                         href="/resume-analyzer" 
-                        className="w-[150px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
+                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
                       >
                         Analyzer
                       </Link>
@@ -103,7 +103,7 @@ export function Header() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-gray-800 hover:text-[#0073CF] transition-colors"
+                className="text-md font-semibold text-black hover:text-[#0073CF] transition-colors"
               >
                 {link.name}
               </Link>
@@ -166,9 +166,9 @@ export function Header() {
           ) : (
             <Button
               asChild
-              className="bg-[#0073CF] text-white px-6 py-2 rounded-full hover:bg-blue-700"
+              className="bg-[#0073CF] text-white px-10 py-4 rounded-full hover:bg-[#003c6c]"
             >
-              <Link href="/login">Login</Link>
+              <Link href="/login">Log in</Link>
             </Button>
           )}
         </div>
