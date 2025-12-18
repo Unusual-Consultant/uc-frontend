@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { API_BASE_URL } from "@/lib/api"
 
 interface SignupOption {
-  id: number
+  id: string | number
   name: string
 }
 
@@ -22,42 +22,42 @@ export default function SignupStep2() {
   const [isLoading, setIsLoading] = useState(true)
   const [options, setOptions] = useState<SignupOptions | null>(null)
   const [apiError, setApiError] = useState<string | null>(null)
-  const [selectedCareerGoal, setSelectedCareerGoal] = useState<number | null>(null)
-  const [selectedInterests, setSelectedInterests] = useState<number[]>([])
-  const [selectedLanguages, setSelectedLanguages] = useState<number[]>([])
-  const [selectedCareerStage, setSelectedCareerStage] = useState<number | null>(null)
+  const [selectedCareerGoal, setSelectedCareerGoal] = useState<string | number | null>(null)
+  const [selectedInterests, setSelectedInterests] = useState<(string | number)[]>([])
+  const [selectedLanguages, setSelectedLanguages] = useState<(string | number)[]>([])
+  const [selectedCareerStage, setSelectedCareerStage] = useState<string | number | null>(null)
   const [customGoal, setCustomGoal] = useState("")
   const [customInterest, setCustomInterest] = useState("")
   const [targetRole, setTargetRole] = useState("")
-  
+
   const [email, setEmail] = useState("")
   const [userType, setUserType] = useState("mentee")
-  
+
   useEffect(() => {
     // Safely get values from searchParams and localStorage
     const emailParam = searchParams.get("email")
     const userTypeParam = searchParams.get("userType")
     const tokenParam = searchParams.get("token")
-    
+
     if (emailParam) {
       setEmail(emailParam)
     } else if (typeof window !== "undefined") {
       setEmail(localStorage.getItem("google_email") || "")
     }
-    
+
     if (userTypeParam) {
       setUserType(userTypeParam)
     } else if (typeof window !== "undefined") {
       setUserType(localStorage.getItem("userType") || "mentee")
     }
-    
+
     // Store token if provided (from Google OAuth)
     if (tokenParam && typeof window !== "undefined") {
       localStorage.setItem("access_token", tokenParam)
       localStorage.setItem("auth_token", tokenParam)
       console.log("Token stored from URL:", tokenParam)
     }
-    
+
     fetchSignupOptions()
   }, [searchParams])
 
@@ -66,22 +66,22 @@ export default function SignupStep2() {
       setIsLoading(true)
       setApiError(null)
       console.log("🔍 Fetching signup options from API...")
-  
+
       // Use mentee signup options for both mentee and mentor (they share the same data)
       const response = await fetch(`${API_BASE_URL}/mentees/signup/options`, {
         headers: { "Content-Type": "application/json" }
       })
       console.log("📡 API Response status:", response.status)
-  
+
       if (!response.ok) {
         const errorText = await response.text()
         console.error("❌ API Error:", response.status, errorText)
         throw new Error(`API Error: ${response.status} - ${errorText}`)
       }
-  
+
       const data = await response.json()
       console.log("✅ API Data received:", data)
-  
+
       // ✅ Instead of throwing, just fall back per section if empty
       setOptions({
         career_goals: data.career_goals?.length ? data.career_goals : [
@@ -133,7 +133,7 @@ export default function SignupStep2() {
       console.error("❌ Error fetching signup options:", error)
       setApiError(error instanceof Error ? error.message : "Unknown error")
       console.log("🔄 Falling back to hardcoded data...")
-  
+
       // 👇 fallback if API totally fails
       setOptions({
         career_goals: [
@@ -185,14 +185,14 @@ export default function SignupStep2() {
       setIsLoading(false)
     }
   }
-  
 
-  const handleCareerGoalSelect = (goalId: number) => {
+
+  const handleCareerGoalSelect = (goalId: string | number) => {
     setSelectedCareerGoal(goalId)
     setCustomGoal("")
   }
 
-  const handleInterestToggle = (interestId: number) => {
+  const handleInterestToggle = (interestId: string | number) => {
     setSelectedInterests(prev =>
       prev.includes(interestId)
         ? prev.filter(id => id !== interestId)
@@ -200,7 +200,7 @@ export default function SignupStep2() {
     )
   }
 
-  const handleLanguageToggle = (languageId: number) => {
+  const handleLanguageToggle = (languageId: string | number) => {
     setSelectedLanguages(prev =>
       prev.includes(languageId)
         ? prev.filter(id => id !== languageId)
@@ -209,94 +209,94 @@ export default function SignupStep2() {
   }
 
   const handleContinue = async () => {
-  // --- Validation ---
-  if (!selectedCareerGoal && !customGoal.trim()) {
-    alert("Please select a career goal or enter a custom one")
-    return
-  }
-  if (selectedInterests.length === 0 && !customInterest.trim()) {
-    alert("Please select at least one interest")
-    return
-  }
-  if (selectedLanguages.length === 0) {
-    alert("Please select at least one language")
-    return
-  }
-  if (!selectedCareerStage) {
-    alert("Please select your current career stage")
-    return
-  }
-
-  // --- Prepare payload ---
-  const payload = {
-    email,
-    user_type: userType, // "mentee"
-    career_goal:
-      selectedCareerGoal != null
-        ? options?.career_goals.find((g) => g.id === selectedCareerGoal)?.name ||
-          customGoal.trim()
-        : customGoal.trim(),
-    interests: [
-      ...selectedInterests.map((id) => id.toString()), // UUID strings expected
-      ...(customInterest.trim() ? [customInterest.trim()] : []),
-    ],
-    languages: selectedLanguages.map((id) => id.toString()),
-    career_stage: selectedCareerStage?.toString() || null,
-    custom_interest: customInterest.trim(),
-    target_role: targetRole.trim() || null,
-  }
-
-  try {
-    setIsLoading(true)
-
-    // --- Correct endpoint for mentee onboarding ---
-    const endpoint = `${API_BASE_URL}/mentees/signup/step2`
-
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        ...(localStorage.getItem("auth_token") && {
-          "Authorization": `Bearer ${localStorage.getItem("auth_token")}`
-        })
-      },
-      body: JSON.stringify(payload),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("❌ Failed to save step 2:", {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText,
-        payload: payload
-      })
-      alert(`Failed to save data: ${response.status} - ${errorText}. Please try again.`)
+    // --- Validation ---
+    if (!selectedCareerGoal && !customGoal.trim()) {
+      alert("Please select a career goal or enter a custom one")
+      return
+    }
+    if (selectedInterests.length === 0 && !customInterest.trim()) {
+      alert("Please select at least one interest")
+      return
+    }
+    if (selectedLanguages.length === 0) {
+      alert("Please select at least one language")
+      return
+    }
+    if (!selectedCareerStage) {
+      alert("Please select your current career stage")
       return
     }
 
-    const result = await response.json()
-    console.log("Step 2 saved:", result)
-
-    // --- Save localStorage for next step ---
-    if (typeof window !== "undefined") {
-      localStorage.setItem(`${userType}_onboarding_data`, JSON.stringify(payload))
-      localStorage.setItem("user_id", result.user_id)
+    // --- Prepare payload ---
+    const payload = {
+      email,
+      user_type: userType, // "mentee"
+      career_goal:
+        selectedCareerGoal != null
+          ? options?.career_goals.find((g) => g.id === selectedCareerGoal)?.name ||
+          customGoal.trim()
+          : customGoal.trim(),
+      interests: [
+        ...selectedInterests.map((id) => id.toString()), // UUID strings expected
+        ...(customInterest.trim() ? [customInterest.trim()] : []),
+      ],
+      languages: selectedLanguages.map((id) => id.toString()),
+      career_stage: selectedCareerStage?.toString() || null,
+      custom_interest: customInterest.trim(),
+      target_role: targetRole.trim() || null,
     }
 
-    // --- Redirect to step 3 ---
-    router.push(`/signup/step3?email=${encodeURIComponent(email)}&userType=${userType}`)
-  } catch (err) {
-    console.error("❌ Error saving step 2 data:", {
-      error: err,
-      payload: payload,
-      endpoint: endpoint
-    })
-    alert(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`)
-  } finally {
-    setIsLoading(false)
+    try {
+      setIsLoading(true)
+
+      // --- Correct endpoint for mentee onboarding ---
+      const endpoint = `${API_BASE_URL}/mentees/signup/step2`
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(localStorage.getItem("auth_token") && {
+            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`
+          })
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("❌ Failed to save step 2:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          payload: payload
+        })
+        alert(`Failed to save data: ${response.status} - ${errorText}. Please try again.`)
+        return
+      }
+
+      const result = await response.json()
+      console.log("Step 2 saved:", result)
+
+      // --- Save localStorage for next step ---
+      if (typeof window !== "undefined") {
+        localStorage.setItem(`${userType}_onboarding_data`, JSON.stringify(payload))
+        localStorage.setItem("user_id", result.user_id)
+      }
+
+      // --- Redirect to step 3 ---
+      router.push(`/signup/step3?email=${encodeURIComponent(email)}&userType=${userType}`)
+    } catch (err) {
+      console.error("❌ Error saving step 2 data:", {
+        error: err,
+        payload: payload,
+        endpoint: endpoint
+      })
+      alert(`Network error: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`)
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
 
 
   if (isLoading) {
@@ -336,7 +336,7 @@ export default function SignupStep2() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-10">
       <div className="max-w-2xl mx-auto px-6">
         {/* Header */}
-       
+
 
         <div className="bg-white rounded-2xl shadow-md p-8">
           {/* Title and Progress */}
@@ -353,10 +353,10 @@ export default function SignupStep2() {
 
           <div className="space-y-8">
             {/* Career Goal Section */}
-            <div  className="mb-8">
+            <div className="mb-8">
               <div className="flex items-center gap-2 mb-1">
                 <img src="/primary.png" alt="career goal" className="w-6 h-6" />
-              <h3 className="text-lg font-semibold text-gray-900">Select primary career goal</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Select primary career goal</h3>
               </div>
               <input
                 type="text"
@@ -373,18 +373,17 @@ export default function SignupStep2() {
                   <button
                     key={goal.id}
                     onClick={() => handleCareerGoalSelect(goal.id)}
-                    className={`px-4 py-2 rounded-full border text-sm transition ${
-                      selectedCareerGoal === goal.id
+                    className={`px-4 py-2 rounded-full border text-sm transition ${selectedCareerGoal === goal.id
                         ? "border-[#0073CF] bg-[#E6F3FC] text-[#0073CF]"
                         : "border-gray-200 hover:border-gray-300 text-gray-700"
-                    }`}
+                      }`}
                   >
                     {goal.name}
                   </button>
                 ))}
               </div>
             </div>
-            
+
 
             {/* Interests Section */}
             <div className="mb-8">
@@ -408,13 +407,12 @@ export default function SignupStep2() {
                     key={interest.id}
                     onClick={() => handleInterestToggle(interest.id)}
                     disabled={selectedInterests.length >= 3 && !selectedInterests.includes(interest.id)}
-                    className={`px-4 py-2 rounded-full border text-sm transition ${
-                      selectedInterests.includes(interest.id)
+                    className={`px-4 py-2 rounded-full border text-sm transition ${selectedInterests.includes(interest.id)
                         ? "border-[#0073CF] bg-[#E6F3FC] text-[#0073CF]"
                         : selectedInterests.length >= 3
-                        ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                        : "border-gray-200 hover:border-gray-300 text-gray-700"
-                    }`}
+                          ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                          : "border-gray-200 hover:border-gray-300 text-gray-700"
+                      }`}
                   >
                     {interest.name}
                   </button>
@@ -441,57 +439,57 @@ export default function SignupStep2() {
             </div>
 
             {/* Languages Section */}
-<div className="mb-8">
-  <div className="flex items-center gap-2 mb-3">
-    <img src="/human.png" alt="languages" className="w-6 h-6" />
-    <h3 className="text-lg font-semibold text-gray-900">Languages you speak</h3>
-  </div>
-  <select
-    value=""
-    onChange={(e) => {
-      const langId = parseInt(e.target.value)
-      if (langId && selectedLanguages.length < 3) handleLanguageToggle(langId)
-    }}
-    disabled={selectedLanguages.length >= 3}
-    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] text-sm"
-  >
-    <option value="">Languages you speak (max 3)</option>
-    {options.languages
-      .filter((lang) => !selectedLanguages.includes(lang.id))
-      .map((lang) => (
-        <option key={lang.id} value={lang.id}>
-          {lang.name}
-        </option>
-      ))}
-  </select>
-  {selectedLanguages.length > 0 && (
-    <div className="mt-3 flex flex-wrap gap-2">
-      {selectedLanguages.slice(0, 3).map((langId, index) => {
-        const lang = options.languages.find((l) => l.id === langId)
-        return lang ? (
-          <span
-            key={langId}
-            onClick={() => handleLanguageToggle(langId)}
-            className="inline-flex items-center px-3 py-1 bg-[#0073CF] text-white rounded-full text-xs cursor-pointer hover:bg-[#005fa3]"
-          >
-            {index + 1}. {lang.name} ×
-          </span>
-        ) : null
-      })}
-    </div>
-  )}
+            <div className="mb-8">
+              <div className="flex items-center gap-2 mb-3">
+                <img src="/human.png" alt="languages" className="w-6 h-6" />
+                <h3 className="text-lg font-semibold text-gray-900">Languages you speak</h3>
+              </div>
+              <select
+                value=""
+                onChange={(e) => {
+                  const langId = e.target.value
+                  if (langId && selectedLanguages.length < 3) handleLanguageToggle(langId)
+                }}
+                disabled={selectedLanguages.length >= 3}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] text-sm"
+              >
+                <option value="">Languages you speak (max 3)</option>
+                {options.languages
+                  .filter((lang) => !selectedLanguages.includes(lang.id))
+                  .map((lang) => (
+                    <option key={lang.id} value={lang.id}>
+                      {lang.name}
+                    </option>
+                  ))}
+              </select>
+              {selectedLanguages.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {selectedLanguages.slice(0, 3).map((langId, index) => {
+                    const lang = options.languages.find((l) => l.id === langId)
+                    return lang ? (
+                      <span
+                        key={langId}
+                        onClick={() => handleLanguageToggle(langId)}
+                        className="inline-flex items-center px-3 py-1 bg-[#0073CF] text-white rounded-full text-xs cursor-pointer hover:bg-[#005fa3]"
+                      >
+                        {index + 1}. {lang.name} ×
+                      </span>
+                    ) : null
+                  })}
+                </div>
+              )}
 
 
-              
+
 
               <div className="mb-8">
-              <div className="flex items-center gap-2 mb-4">
-                <img src="/earth.png" alt="career stage" className="w-5 h-5" />
-                <h3 className="text-lg font-semibold text-gray-900">Current Career Stage</h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <img src="/earth.png" alt="career stage" className="w-5 h-5" />
+                  <h3 className="text-lg font-semibold text-gray-900">Current Career Stage</h3>
                 </div>
                 <select
                   value={selectedCareerStage || ""}
-                  onChange={(e) => setSelectedCareerStage(parseInt(e.target.value) || null)}
+                  onChange={(e) => setSelectedCareerStage(e.target.value || null)}
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] text-sm"
                 >
                   <option value="">Select Career Strategy</option>

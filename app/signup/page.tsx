@@ -29,23 +29,23 @@ export default function SignupPage() {
   };
 
   const handleSocialSignup = (
-    provider: string,
-    userType: "mentee" | "mentor"
-  ) => {
-    // Save who is signing up before redirect
-    localStorage.setItem("userType", userType);
+  provider: string,
+  userType: "mentee" | "mentor"
+) => {
+  // Save who is signing up before redirect
+  localStorage.setItem("userType", userType);
 
-    if (provider === "google") {
-      // Use the API object for consistency
-      window.location.href = api.auth.google.login(userType);
-      return;
-    }
-    handleSignup(userType);
-  };
+  if (provider === "google") {
+    // Use the API object for consistency
+    window.location.href = api.auth.google.login(userType);
+    return;
+  }
+  handleSignup(userType);
+};
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24">
       {/* 🔹 Background Infinite Scroll Rows */}
-      <div className="absolute top-[150px] left-0 w-full overflow-hidden">
+      <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
           <img
             src="/image.png"
@@ -65,7 +65,7 @@ export default function SignupPage() {
         </div>
       </div>
 
-      <div className="absolute top-[425px] left-0 w-full overflow-hidden">
+      <div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-right w-full">
           <img
             src="/image.png"
@@ -97,10 +97,10 @@ export default function SignupPage() {
             <div
               className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
               style={{
-                transform: activeTab === "mentor" ? "translateX(100%)" : "translateX(0)",
+                transform: activeTab === "mentor" ? "translateX(calc(100% + 4px))" : "translateX(0)",
               }}
             />
-
+            
             <TabsTrigger
               value="mentee"
               className="relative z-10 flex items-center gap-2 rounded-[30px]
@@ -145,10 +145,11 @@ export default function SignupPage() {
                 <div
                   key={step}
                   className={`w-3 h-3 rounded-full transition-all duration-300
-            ${currentStep === step
-                      ? "bg-[#0073CF] scale-110"
-                      : "border border-[#0073CF] bg-transparent"
-                    }`}
+            ${
+              currentStep === step
+                ? "bg-[#0073CF] scale-110"
+                : "border border-[#0073CF] bg-transparent"
+            }`}
                 />
               ))}
             </div>
@@ -206,10 +207,11 @@ export default function SignupPage() {
                 <div
                   key={step}
                   className={`w-3 h-3 rounded-full transition-all duration-300
-            ${currentStep === step
-                      ? "bg-[#0073CF] scale-110"
-                      : "border border-[#0073CF] bg-transparent"
-                    }`}
+            ${
+              currentStep === step
+                ? "bg-[#0073CF] scale-110"
+                : "border border-[#0073CF] bg-transparent"
+            }`}
                 />
               ))}
             </div>

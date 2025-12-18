@@ -73,7 +73,7 @@ export function Header() {
                   <DropdownMenuContent className="w-auto p-2 mt-2 rounded-xl shadow-[4px_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-xl bg-white/30 border border-white/30 flex flex-col gap-1">
                     <DropdownMenuItem asChild>
                       <Link 
-                        href="/templates" 
+                        href="/career-toolkit/resume-builder" 
                         className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
                       >
                         Templates
@@ -89,7 +89,7 @@ export function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link 
-                        href="/resume-analyzer" 
+                        href="/career-toolkit/ai-resume-analyzer" 
                         className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
                       >
                         Analyzer
