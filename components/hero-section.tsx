@@ -288,7 +288,7 @@ export function HeroSection() {
               }}
             >
               <h1 className="text-[50px] md:text-[55px] font-[800] text-gray-900 leading-tight mb-6">
-                Find Unusual Growth
+                Find Unusual growth
                 <br />
                 <span className="text-black">through </span>
                 <AnimatePresence mode="wait">
@@ -313,7 +313,7 @@ export function HeroSection() {
 
             {/* Search Bar */}
             <div className="space-y-[1rem] mt-[1rem]">
-              <div className="flex items-center bg-white rounded-full shadow-lg p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840] mb-10">
+              <div className="flex items-center bg-white rounded-full shadow-[0px_4px_12px_rgba(0,0,0,0.15)] p-[0.25rem] gap-[0.5rem] overflow-hidden shadow-[#58585840] mb-10">
                 <div className="relative flex-1">
                   <Search className="absolute left-[1rem] top-1/2 -translate-y-1/2 text-black h-[1.25rem] w-[1.25rem]" />
                   <Input
@@ -346,7 +346,7 @@ export function HeroSection() {
                     }}
                     className="
     flex items-center justify-center
-    min-w-[208px] h-[35.47px]
+    min-w-[20px] h-[35.47px]
     px-[30px] py-[7.24px]
     gap-[5.57px]
     bg-white
@@ -380,7 +380,7 @@ export function HeroSection() {
                 </Button>
 
                 {/* Tooltip bubble */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10">
+                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10 pointer-events-none">
                   <div className="relative bg-white text-[#003C6C] text-[14px] font-medium px-5 py-3 rounded-xl shadow-[0_4px_8px_#9F9D9D40] w-[221px] text-center">
                     Looking for guidance?
                     {/* Small arrow */}
@@ -403,7 +403,7 @@ export function HeroSection() {
                 </Button>
 
                 {/* Tooltip bubble */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10">
+                <div className="absolute left-1/2 -translate-x-1/2 top-[65px] opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300 z-10 pointer-events-none">
                   <div className="relative bg-white text-[#003C6C] text-[14px] font-medium px-5 py-3 rounded-xl shadow-[0_4px_8px_#9F9D9D40] w-[293px] text-center">
                     Want to be mentor as an expert?
                     {/* Small arrow */}

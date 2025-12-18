@@ -178,12 +178,12 @@
 }
 
 .animate-scroll-right {
-  animation: scrollRight 15s linear infinite;
+  animation: scrollRight 30s linear infinite;
 }
 
 
 .animate-scroll-left {
-  animation: scrollLeft 15s linear infinite;
+  animation: scrollLeft 30s linear infinite;
 }
 
 
