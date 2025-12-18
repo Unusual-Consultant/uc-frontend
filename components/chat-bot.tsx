@@ -28,7 +28,6 @@ export function ChatBot() {
   const [inputMessage, setInputMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
-  const [bottomOffset, setBottomOffset] = useState(56) // Initial offset accounting for image overhang
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom when new messages arrive
@@ -45,32 +44,6 @@ export function ChatBot() {
     window.addEventListener("openChatbot", handleOpenChatbot)
     return () => {
       window.removeEventListener("openChatbot", handleOpenChatbot)
-    }
-  }, [])
-
-  // Adjust bottom position to avoid footer overlap
-  useEffect(() => {
-    const handleScroll = () => {
-      const footer = document.querySelector("footer")
-      if (!footer) return
-
-      const rect = footer.getBoundingClientRect()
-      const windowHeight = window.innerHeight
-      const visibleFooterHeight = Math.max(0, windowHeight - rect.top)
-
-      // Maintain 24px (1.5rem) gap from viewport bottom or footer top
-      // The animated buddy image has -bottom-8 (32px) positioning, so we need to account for that
-      // Base offset = 24px (margin) + 32px (image overhang) = 56px
-      setBottomOffset(56 + visibleFooterHeight)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    window.addEventListener("resize", handleScroll)
-    handleScroll() // Initial check
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("resize", handleScroll)
     }
   }, [])
 
@@ -125,8 +98,7 @@ export function ChatBot() {
 
   return (
     <div
-      className="fixed right-6 z-50 flex flex-col items-end gap-4 transition-all duration-100 ease-out"
-      style={{ bottom: `${bottomOffset}px` }}
+      className="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-4"
     >
       {/* Chat Window */}
       {isOpen && (

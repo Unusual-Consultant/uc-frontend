@@ -163,8 +163,8 @@ export default function LoginForm({ userType }: LoginFormProps) {
       data-[state=inactive]:text-black
       transition-colors duration-300"
           >
-            <KeyRound className="h-4 w-4" />
-            <span>Password</span>
+            {/* <KeyRound className="h-4 w-4" /> */}
+            <span className="font-semibold">Sign in with Password</span>
           </TabsTrigger>
 
           <TabsTrigger
@@ -176,8 +176,8 @@ export default function LoginForm({ userType }: LoginFormProps) {
       data-[state=inactive]:text-black
       transition-colors duration-300"
           >
-            <Smartphone className="h-4 w-4" />
-            <span>OTP</span>
+            {/* <Smartphone className="h-4 w-4" /> */}
+            <span className="font-semibold">Sign in with OTP</span>
           </TabsTrigger>
         </TabsList>
 
@@ -195,15 +195,15 @@ export default function LoginForm({ userType }: LoginFormProps) {
               htmlFor={`${userType}-email`}
               className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
             >
-              Email
+              Email or Phone Number
             </Label>
             <Input
               id={`${userType}-email`}
               type="email"
-              placeholder="john@example.com"
+              placeholder="Enter your email or phone number"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
-              className="w-[93%] mx-auto h-[50px] px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium bg-transparent"
+              className="w-[93%] mx-auto h-[50px] px-8 py-3 rounded-[30px] border border-black text-black font-medium bg-transparent placeholder:text-black"
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
@@ -221,7 +221,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               placeholder="Enter your password"
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
-              className="w-[93%] mx-auto h-[50px] px-4 py-3 rounded-[30px] border border-black text-gray-800 bg-transparent"
+              className="w-[93%] mx-auto h-[50px] px-8 py-3 rounded-[30px] border border-black text-gray-800 bg-transparent placeholder:text-black"
             />
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
@@ -248,13 +248,13 @@ export default function LoginForm({ userType }: LoginFormProps) {
                 <Input
                   id={`${userType}-otp-contact`}
                   type="text"
-                  placeholder="john@example.com or +1234567890"
+                  placeholder="Enter your email or phone number"
                   value={otpContact}
                   onChange={(e) => {
                     setOtpContact(e.target.value);
                     if (errors.otpContact) setErrors({ ...errors, otpContact: undefined });
                   }}
-                  className="w-[93%] mx-auto h-[50px] px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium bg-transparent"
+                  className="w-[97%] mx-auto h-[50px] px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium bg-transparent placeholder:text-black"
                 />
                 {errors.otpContact && <p className="text-red-500 text-sm">{errors.otpContact}</p>}
               </div>
@@ -297,7 +297,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
                     setOtpCode(e.target.value);
                     if (errors.otpCode) setErrors({ ...errors, otpCode: undefined });
                   }}
-                  className="w-full px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium text-center tracking-widest text-lg bg-transparent"
+                  className="w-full px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium text-center tracking-widest text-lg bg-transparent placeholder:text-black"
                   maxLength={6}
                 />
                 {errors.otpCode && <p className="text-red-500 text-sm">{errors.otpCode}</p>}

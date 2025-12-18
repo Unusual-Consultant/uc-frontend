@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +11,9 @@ import { api } from "@/lib/api";
 import LoginForm from "@/components/login-form";
 
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState("mentee");
+  const searchParams = useSearchParams();
+  const userType = searchParams.get('type');
+  const [activeTab, setActiveTab] = useState(userType === 'mentor' ? 'mentor' : 'mentee');
   const router = useRouter();
 
   const handleLogin = (userType: "mentee" | "mentor") => {
@@ -62,7 +64,7 @@ export default function LoginPage() {
 
       {/* 🔹 Mirror Glaze Rectangle with Login Card Inside */}
       <div
-        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-6 py-8 z-10"
+        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-16 py-8 z-10"
       >
         {/* Login Card */}
         <div className="w-full max-w-md">
@@ -99,8 +101,8 @@ export default function LoginPage() {
                   data-[state=active]:shadow-none
                   transition-colors duration-300"
               >
-                <User className="h-4 w-4" />
-                <span>Mentee</span>
+                <User className="h-4 w-4 font-bold" />
+                <span className="font-bold">Mentee</span>
               </TabsTrigger>
               <TabsTrigger
                 value="mentor"
@@ -112,15 +114,15 @@ export default function LoginPage() {
                   data-[state=active]:shadow-none
                   transition-colors duration-300"
               >
-                <GraduationCap className="h-4 w-4" />
-                <span>Mentor</span>
+                <GraduationCap className="h-4 w-4 font-bold" />
+                <span className="font-bold">Mentor</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Mentee Tab */}
             <TabsContent value="mentee" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-semibold">Sign in as Mentee</h3>
+                <h3 className="font-bold text-[20px] py-2">Sign in as Mentee</h3>
                 <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
                   Access your learning dashboard and connect with mentors
                 </p>
@@ -163,7 +165,7 @@ export default function LoginPage() {
             {/* Mentor Tab */}
             <TabsContent value="mentor" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-semibold">Sign in as Mentor</h3>
+                <h3 className="font-bold text-[20px] py-2">Sign in as Mentor</h3>
                 <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
                   Access your mentor dashboard and manage your sessions
                 </p>
@@ -208,7 +210,7 @@ export default function LoginPage() {
             <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-700">
               Don’t have an account?{" "}
               <Link
-                href="/signup"
+                href={`/signup?type=${activeTab}`}
                 className="text-[#0073CF] hover:underline font-semibold"
               >
                 Sign up
