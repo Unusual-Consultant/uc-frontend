@@ -36,7 +36,7 @@ export function Header() {
     return (
       <header className="flex justify-start py-2 px-6">
         <Link href="/" className="flex items-center space-x-2">
-          <img src="/unusual-consultant-logo.jpg" alt="Logo" className="h-10 w-10" />
+          <img src="/UCLogo-main.png" alt="Logo" className="w-10" />
           <span className="font-semibold text-lg text-black">Unusual Consultant</span>
         </Link>
       </header>
@@ -53,7 +53,7 @@ export function Header() {
         {/* Logo */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2">
-            <img src="/unusual-consultant-logo.jpg" alt="Logo" className="h-10 w-10" />
+            <img src="/UCLogo-main.png" alt="Logo" className="w-10" />
             <span className="font-bold text-xl text-black">Unusual Consultant</span>
           </Link>
         </div>

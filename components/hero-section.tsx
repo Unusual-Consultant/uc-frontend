@@ -322,7 +322,7 @@ export function HeroSection() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    className="pl-[3rem] pr-[1.25rem] py-[1rem] text-[1.125rem] border-none bg-transparent text-black placeholder-black focus:ring-0 focus:outline-none rounded-full"
+                    className="pl-[3rem] pr-[1.25rem] py-[1rem] text-[1.25rem] border-none bg-transparent text-black placeholder:text-black placeholder:font-semibold placeholder:text-[1rem] focus:ring-0 focus:outline-none rounded-full"
                   />
                 </div>
                 <Button
