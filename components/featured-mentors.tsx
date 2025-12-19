@@ -18,6 +18,7 @@ import {
   Globe
 } from "lucide-react"
 import Link from "next/link"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Mentor {
   id: number
@@ -116,7 +117,7 @@ export function FeaturedMentors() {
   const fetchMentors = async () => {
     try {
       console.log("Fetching mentors from API...")
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-mentors/all/mentors?per_page=9`)
+      const response = await fetch(`${API_BASE_URL}/featured-mentors/all/mentors?per_page=9`)
       console.log("Response status:", response.status)
       if (response.ok) {
         const data = await response.json()
