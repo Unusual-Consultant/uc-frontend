@@ -44,7 +44,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
         return
       }
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/v1/mentors/ai-recommended", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/mentors/ai-recommended`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ skills: skills || [], desired_role: role || null, limit: 4 }),
