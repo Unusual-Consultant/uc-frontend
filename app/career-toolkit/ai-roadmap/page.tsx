@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { SuggestedMentorsPage } from "../components/suggested_mentors";
 import { CompanyAlignedMentors } from "../components/company-mentors";
+import { API_BASE_URL } from "@/lib/api";
 
 interface RoadmapStep {
   duration: string;
@@ -129,7 +130,7 @@ export default function AIRoadmap() {
     setShowRoadmap(false)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/career-roadmap/generate`, {
+      const response = await fetch(`${API_BASE_URL}/career-roadmap/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -294,8 +295,8 @@ export default function AIRoadmap() {
                       key={tag}
                       onClick={() => toggleTag(tag, "skill")}
                       className={`px-3 py-1 border rounded-full text-sm cursor-pointer transition ${isSelected
-                          ? "bg-[#0073CF] text-white border-[#0073CF]"
-                          : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
+                        ? "bg-[#0073CF] text-white border-[#0073CF]"
+                        : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
                         }`}
                     >
                       {tag}
@@ -368,8 +369,8 @@ export default function AIRoadmap() {
                       key={tag}
                       onClick={() => toggleTag(tag, "tool")}
                       className={`px-3 py-1 border rounded-full text-sm cursor-pointer transition ${isSelected
-                          ? "bg-[#0073CF] text-white border-[#0073CF]"
-                          : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
+                        ? "bg-[#0073CF] text-white border-[#0073CF]"
+                        : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
                         }`}
                     >
                       {tag}

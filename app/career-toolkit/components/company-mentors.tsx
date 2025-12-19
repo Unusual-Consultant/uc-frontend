@@ -8,6 +8,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { QuickBook } from "@/components/dashboard/quickbook"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Mentor {
   id: string;
@@ -47,7 +48,7 @@ export function CompanyAlignedMentors({ company, role }: CompanyAlignedMentorsPr
 
       setIsLoading(true);
       try {
-        let url = `${process.env.NEXT_PUBLIC_API_URL}/mentors/company-aligned?company=${encodeURIComponent(company)}&limit=4`;
+        let url = `${API_BASE_URL}/mentors/company-aligned?company=${encodeURIComponent(company)}&limit=4`;
         if (role) {
           url += `&role=${encodeURIComponent(role)}`;
         }

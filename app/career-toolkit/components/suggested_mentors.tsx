@@ -8,6 +8,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { QuickBook } from "@/components/dashboard/quickbook"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Mentor {
   id: string
@@ -44,7 +45,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
         return
       }
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/mentors/ai-recommended`, {
+        const response = await fetch(`${API_BASE_URL}/mentors/ai-recommended`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ skills: skills || [], desired_role: role || null, limit: 4 }),
