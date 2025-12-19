@@ -24,7 +24,7 @@ export default function AnimatedSmartBuddy() {
   }, []);
 
   return (
-    <div className="absolute -top-8 -right-0 w-[120px] h-[120px] z-20">
+    <div className="absolute bottom-0 right-0 w-[120px] h-[108px] z-20">
       <Image
         src={images[index]}
         alt={`SmartBuddy Animation ${index + 1}`}

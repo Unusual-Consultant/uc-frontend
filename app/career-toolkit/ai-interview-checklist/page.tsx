@@ -23,10 +23,10 @@ import { API_BASE_URL } from "@/lib/api"
 interface InterviewChecklistResponse {
   role_overview: string
   background_input: string
-  practice_questions: string
-  puzzles_estimations: string
-  study_links: string
-  dos_donts: string
+  practice_questions: any
+  puzzles_estimations: any
+  study_links: any
+  dos_donts: any
   analysis_timestamp: string
   industry: string
   role: string
@@ -128,7 +128,7 @@ export default function AIInterviewChecklist() {
       const data: InterviewChecklistResponse = await response.json()
       setChecklistData(data)
       setGenerated(true)
-      
+
       // Decrement usage
       if (usesRemaining > 0) {
         setUsesRemaining((prev) => prev - 1)
@@ -195,7 +195,72 @@ export default function AIInterviewChecklist() {
     </div>
   )
 
-  const CardDropdown = ({ title, content }: { title: string; content: string }) => (
+  const renderContent = (content: any) => {
+    if (typeof content === 'string') {
+      return <div className="whitespace-pre-line">{content}</div>
+    }
+
+    if (Array.isArray(content)) {
+      return (
+        <ul className="list-disc pl-5 space-y-2">
+          {content.map((item, idx) => {
+            if (typeof item === 'string') return <li key={idx}>{item}</li>
+            // Handle objects
+            if (item.question) return <li key={idx}>{item.question}</li>
+            if (item.puzzle) return <li key={idx}>{item.puzzle}</li>
+            if (item.title) {
+              // Check if there's a url
+              if (item.url) return <li key={idx}><a href={item.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{item.title}</a></li>
+              return <li key={idx}>{item.title}</li>
+            }
+            // Fallback for unknown objects
+            return <li key={idx}>{JSON.stringify(item)}</li>
+          })}
+        </ul>
+      )
+    }
+
+    if (typeof content === 'object' && content !== null) {
+      // Handle Dos and Donts
+      if (content.dos || content.donts) {
+        return (
+          <div className="space-y-4">
+            {content.dos && (
+              <div>
+                <h4 className="font-semibold text-green-700 mb-2">Do&apos;s</h4>
+                <ul className="list-none space-y-1">
+                  {content.dos.map((item: string, idx: number) => (
+                    <li key={idx} className="flex gap-2">
+                      <span className="text-green-600">✅</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {content.donts && (
+              <div>
+                <h4 className="font-semibold text-red-700 mb-2">Don&apos;ts</h4>
+                <ul className="list-none space-y-1">
+                  {content.donts.map((item: string, idx: number) => (
+                    <li key={idx} className="flex gap-2">
+                      <span className="text-red-600">❌</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )
+      }
+      return <pre className="whitespace-pre-wrap font-sans">{JSON.stringify(content, null, 2)}</pre>
+    }
+
+    return null
+  }
+
+  const CardDropdown = ({ title, content }: { title: string; content: any }) => (
     <div
       onClick={() => toggleExpand(title)}
       className="rounded-xl shadow-[0_4px_12px_#9F9D9D40,0_2px_8px_#DADADA40] bg-white px-5 py-4 cursor-pointer hover:bg-gray-50 transition"
@@ -209,8 +274,8 @@ export default function AIInterviewChecklist() {
         </div>
       </div>
       {expanded === title && generated && (
-        <div className="mt-3 text-sm text-gray-700 whitespace-pre-line">
-          {content}
+        <div className="mt-3 text-sm text-gray-700">
+          {renderContent(content)}
         </div>
       )}
     </div>
@@ -220,31 +285,31 @@ export default function AIInterviewChecklist() {
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== Header Box ===== */}
       <div className="w-full max-w-5xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
-  <div className="flex flex-col space-y-2">
-    <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
-      <span className="text-[#0073CF]">AI Interview</span> Checklist
-    </h1>
-    <p className="text-black text-[20px] md:text-[22px] whitespace-nowrap">
-      Prepare for your next interview with Smart Buddy&apos;s personalized guide.
-    </p>
-  </div>
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
+            <span className="text-[#0073CF]">AI Interview</span> Checklist
+          </h1>
+          <p className="text-black text-[20px] md:text-[22px] whitespace-nowrap">
+            Prepare for your next interview with Smart Buddy&apos;s personalized guide.
+          </p>
+        </div>
 
-  <Button
-    onClick={handleStart}
-    className={cn(
-      "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8 md:top-auto md:right-auto"
-    )}
-  >
-    <Image
-      src="/sparkle-filled.png"
-      alt="sparkle"
-      width={20}
-      height={20}
-      className="object-contain"
-    />
-    {usesRemaining} of {totalUses} free uses remaining
-  </Button>
-</div>
+        <Button
+          onClick={handleStart}
+          className={cn(
+            "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8 md:top-auto md:right-auto"
+          )}
+        >
+          <Image
+            src="/sparkle-filled.png"
+            alt="sparkle"
+            width={20}
+            height={20}
+            className="object-contain"
+          />
+          {usesRemaining} of {totalUses} free uses remaining
+        </Button>
+      </div>
 
 
       {/* ===== Form Box ===== */}
@@ -268,8 +333,8 @@ export default function AIInterviewChecklist() {
               <Label className="text-black font-medium">
                 Target Company <span className="text-black">(optional)</span>
               </Label>
-              <Input 
-                placeholder="e.g. Google, Amazon..." 
+              <Input
+                placeholder="e.g. Google, Amazon..."
                 className="rounded-xl border border-gray-300"
                 value={targetCompany}
                 onChange={(e) => setTargetCompany(e.target.value)}
@@ -312,7 +377,7 @@ export default function AIInterviewChecklist() {
         </Card>
       )}
 
-  <SuggestedMentorsPage />
+      <SuggestedMentorsPage role={selectedRole} skills={[]} />
     </div>
   )
 }

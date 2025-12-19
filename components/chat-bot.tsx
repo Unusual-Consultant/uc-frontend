@@ -97,24 +97,12 @@ export function ChatBot() {
   }
 
   return (
-    <>
-      {/* Chat Button */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-  onClick={() => setIsOpen(!isOpen)}
-  size="sm"
-  variant="ghost"
-  className="w-14 h-14  transition-all duration-300 bg-transparent hover:bg-transparent"
-  title="Smart Buddy"
->
-  {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
-</Button>
-
-      </div>
-
+    <div
+      className="fixed right-6 bottom-6 z-50 flex flex-col items-end gap-4"
+    >
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)]">
+        <div className="w-96 max-w-[calc(100vw-2rem)]">
           <Card className="shadow-2xl border-0">
             <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
@@ -131,9 +119,8 @@ export function ChatBot() {
                     className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
-                      }`}
+                      className={`max-w-[80%] p-3 rounded-lg ${message.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-900"
+                        }`}
                     >
                       <div className="flex items-start gap-2">
                         {message.sender === "bot" && <Bot className="h-4 w-4 mt-0.5 flex-shrink-0" />}
@@ -181,6 +168,17 @@ export function ChatBot() {
           </Card>
         </div>
       )}
-    </>
+
+      {/* Chat Button */}
+      <Button
+        onClick={() => setIsOpen(!isOpen)}
+        size="sm"
+        variant="ghost"
+        className="w-14 h-14 transition-all duration-300 bg-transparent hover:bg-transparent"
+        title="Smart Buddy"
+      >
+        {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
+      </Button>
+    </div>
   )
 }

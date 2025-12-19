@@ -6,6 +6,8 @@ import { Footer } from "@/components/footer"
 import { AuthenticatedUserProvider } from "@/context/AuthenticatedUserProvider"
 import { ChatBot } from "@/components/chat-bot"
 import { Mulish } from "next/font/google";
+import { Suspense } from "react";
+import { MainWrapper } from "@/components/MainWrapper";
 
 const mulish = Mulish({
   subsets: ["latin"],
@@ -13,8 +15,6 @@ const mulish = Mulish({
   variable: "--font-mulish",
   display: "swap",
 });
-
-
 
 export const metadata: Metadata = {
   title: "Unusual Consultant - Find Your Perfect Mentor",
@@ -24,17 +24,23 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={mulish.variable}>
+    <html lang="en" className={`${mulish.variable} overflow-x-hidden`}>
       <body
-       className={`${mulish.className} min-h-screen bg-gradient-to-t from-[#B7DFFF] to-white`}
-       suppressHydrationWarning
-         >
-        <AuthenticatedUserProvider>
-          <Header />
-          <main className="min-h-screen pt-20">{children}</main>
-          <Footer />
-          <ChatBot />
-        </AuthenticatedUserProvider>
+        className={`${mulish.className} min-h-screen bg-gradient-to-t from-[#B7DFFF] to-white overflow-x-hidden`}
+        suppressHydrationWarning
+      >
+        <Suspense fallback={null}>
+          <AuthenticatedUserProvider>
+            <Header />
+
+            <MainWrapper>
+              {children}
+            </MainWrapper>
+
+            <Footer />
+            <ChatBot />
+          </AuthenticatedUserProvider>
+        </Suspense>
       </body>
     </html>
   )

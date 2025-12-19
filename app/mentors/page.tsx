@@ -10,22 +10,115 @@ import { Search, Filter, Wand2 } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Image from "next/image";
 
+import { useRouter } from "next/navigation";
+
 export default function MentorsPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [filters, setFilters] = useState<any>({
+    minPrice: 0,
+    maxPrice: 2000,
+    isVerified: false,
+    sortBy: "relevance",
+    sessionType: [],
+    packages: [],
+    mentorRatings: [],
+    responseTime: [],
+    selectedIndustries: [],
+    experienceLevel: [],
+    availability: [],
+  });
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const search = urlParams.get("search");
     if (search) setSearchQuery(search);
+
+    // Load filters from URL
+    const minPrice = urlParams.get("minPrice") ? Number(urlParams.get("minPrice")) : 0;
+    const maxPrice = urlParams.get("maxPrice") ? Number(urlParams.get("maxPrice")) : 2000;
+    const skills = urlParams.get("skills") ? urlParams.get("skills")!.split(",") : [];
+    const rating = urlParams.get("rating") ? urlParams.get("rating")!.split(",") : [];
+    const sortBy = urlParams.get("sortBy") || "relevance";
+    const verified = urlParams.get("verified") === "true";
+    const responseTime = urlParams.get("responseTime") ? urlParams.get("responseTime")!.split(",") : [];
+    const sessionType = urlParams.get("sessionType") ? urlParams.get("sessionType")!.split(",") : [];
+
+    setFilters({
+      minPrice,
+      maxPrice,
+      isVerified: verified,
+      sortBy,
+      sessionType,
+      packages: [],
+      mentorRatings: rating,
+      responseTime,
+      selectedIndustries: skills,
+      experienceLevel: [],
+      availability: [],
+    });
   }, []);
 
   const handleSearch = () => {
     const url = new URL(window.location.href);
     if (searchQuery) url.searchParams.set("search", searchQuery);
     else url.searchParams.delete("search");
-    window.history.pushState({}, "", url.toString());
+    router.push(url.toString());
+  };
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+    // Update URL with filter parameters
+    const url = new URL(window.location.href);
+    
+    // Add/update filter params
+    if (newFilters.minPrice > 0 || newFilters.maxPrice < 2000) {
+      url.searchParams.set("minPrice", newFilters.minPrice);
+      url.searchParams.set("maxPrice", newFilters.maxPrice);
+    } else {
+      url.searchParams.delete("minPrice");
+      url.searchParams.delete("maxPrice");
+    }
+
+    if (newFilters.selectedIndustries?.length > 0) {
+      url.searchParams.set("skills", newFilters.selectedIndustries.join(","));
+    } else {
+      url.searchParams.delete("skills");
+    }
+
+    if (newFilters.mentorRatings?.length > 0) {
+      url.searchParams.set("rating", newFilters.mentorRatings.join(","));
+    } else {
+      url.searchParams.delete("rating");
+    }
+
+    if (newFilters.sortBy !== "relevance") {
+      url.searchParams.set("sortBy", newFilters.sortBy);
+    } else {
+      url.searchParams.delete("sortBy");
+    }
+
+    if (newFilters.isVerified) {
+      url.searchParams.set("verified", "true");
+    } else {
+      url.searchParams.delete("verified");
+    }
+
+    if (newFilters.responseTime?.length > 0) {
+      url.searchParams.set("responseTime", newFilters.responseTime.join(","));
+    } else {
+      url.searchParams.delete("responseTime");
+    }
+
+    if (newFilters.sessionType?.length > 0) {
+      url.searchParams.set("sessionType", newFilters.sessionType.join(","));
+    } else {
+      url.searchParams.delete("sessionType");
+    }
+
+    router.push(url.toString());
   };
 
   return (
@@ -96,23 +189,23 @@ export default function MentorsPage() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-80 overflow-y-auto">
-                <MentorFilters />
+                <MentorFilters onFiltersChange={handleFiltersChange} />
               </SheetContent>
             </Sheet>
           </div>
 
-          {/* ✅ Main Content */}
+          {/* Main Content */}
           <div className={`transition-all duration-300 flex gap-8 ${showFilters ? "flex-row" : "flex-col"}`}>
             {/* Filters Sidebar */}
             {showFilters && (
               <div className="hidden lg:block w-[320px] shrink-0">
-                <MentorFilters />
+                <MentorFilters onFiltersChange={handleFiltersChange} />
               </div>
             )}
 
             {/* Mentor Cards Section */}
             <div className="flex-1 min-w-0">
-              <MentorGrid showFilters={showFilters} />
+              <MentorGrid showFilters={showFilters} filters={filters} />
             </div>
           </div>
         </div>

@@ -116,7 +116,7 @@ export function FeaturedMentors() {
   const fetchMentors = async () => {
     try {
       console.log("Fetching mentors from API...")
-      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-mentors/all/mentors?per_page=9")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-mentors/all/mentors?per_page=9`)
       console.log("Response status:", response.status)
       if (response.ok) {
         const data = await response.json()
@@ -180,7 +180,7 @@ export function FeaturedMentors() {
   }
 
   return (
-    <section className="py-16 bg-gray-50 w-[1255px]">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -205,80 +205,81 @@ export function FeaturedMentors() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-[1050px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 lg:gap-[50px] w-full md:w-[720px] lg:w-[1240px] mx-auto">
 
           {visibleMentors.map((mentor) => (
-           <Card
-           key={mentor.id}
-           className="relative w-[340px] h-[662px] transition-shadow duration-300 
-                    border rounded-xl overflow-hidden p-4 flex flex-col justify-between"
-           style={{ boxShadow: "0px 4px 20px #9F9D9D40" }}
-         >
-         
-           {/* Top blue banner */}
-           <div className="bg-[#C4E1FF] h-[80px] w-full absolute top-0 left-0 z-0 rounded-t-xl" />
-         
-           {/* Online badge */}
-           {mentor.available && (
-  <div className="absolute top-2 left-2 bg-[#28A745] text-white text-xs px-3 py-1 rounded-full flex items-center gap-2 z-10 h-[25px]">
-    
-    {/* White Circle */}
-    <div className="w-[17px] h-[17px] rounded-full bg-white flex items-center justify-center">
-      {/* Zap Icon SVG in #28A745 */}
-      <svg
-        width="12"
-        height="12"
-        viewBox="0 0 24 24"
-        fill="#28A745"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
-      </svg>
-    </div>
-<span className="text-[14px] font-[700]"></span>
-    Online
-  </div>
-)}
+            <Card
+              key={mentor.id}
+              className={`relative w-[340px] lg:w-[380px] h-[662px] transition-shadow duration-300 
+                    rounded-xl overflow-hidden p-4 flex flex-col justify-between ${mentor.available ? 'border-[3px] border-[#28A745]' : 'border'
+                }`}
+              style={{ boxShadow: "0px 4px 20px #9F9D9D40" }}
+            >
 
-         
-           {/* Top section: Avatar + rating */}
-           <div className="flex gap-4 items-start relative z-11 mt-16">
-             {/* Avatar + rating */}
-             <div className="relative -mt-6"> 
-               <Avatar className="w-20 h-20 border-4 border-white shadow-md">
-                 <AvatarImage src={mentor.image} alt={mentor.name} />
-               </Avatar>
-               <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
-                 <Star className="w-3 h-3 text-yellow-400" /> {mentor.rating.toFixed(1)}
-               </div>
-             </div>
-         
-             {/* Name/Title/Company */}
-             <div className="flex-1 flex flex-col justify-start text-black mt-1"> 
-               <div className="flex items-center gap-1">
-                 <h3 className=" font-[700] text-[20px]">{mentor.name}</h3>
-                 <Verified className="w-4 h-4 text-blue-500" />
-               </div>
-               <p className="font-[500] text-[14px] text-black">{mentor.title}</p>
-               <p className="font-[500] text-[14px] text-blue-600">{mentor.company}</p>
-             </div>
-           </div>
-   
-           <button className="ml-auto text-black hover:text-red-500 transition-colors">
-    <Heart className="w-4 h-4" />
-  </button>
+              {/* Top blue banner */}
+              <div className="bg-[#C4E1FF] h-[80px] w-full absolute top-0 left-0 z-0 rounded-t-xl" />
+
+              {/* Online badge */}
+              {mentor.available && (
+                <div className="absolute top-2 left-2 bg-[#28A745] text-white text-xs px-3 py-1 rounded-full flex items-center gap-2 z-10 h-[25px]">
+
+                  {/* White Circle */}
+                  <div className="w-[17px] h-[17px] rounded-full bg-white flex items-center justify-center">
+                    {/* Zap Icon SVG in #28A745 */}
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="#28A745"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" />
+                    </svg>
+                  </div>
+                  <span className="text-[14px] font-[700]"></span>
+                  Online
+                </div>
+              )}
+
+
+              {/* Top section: Avatar + rating */}
+              <div className="flex gap-4 items-start relative z-11 mt-16">
+                {/* Avatar + rating */}
+                <div className="relative -mt-6">
+                  <Avatar className="w-20 h-20 border-4 border-white shadow-md">
+                    <AvatarImage src={mentor.image} alt={mentor.name} />
+                  </Avatar>
+                  <div className="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
+                    <Star className="w-3 h-3 text-yellow-400" /> {mentor.rating.toFixed(1)}
+                  </div>
+                </div>
+
+                {/* Name/Title/Company */}
+                <div className="flex-1 flex flex-col justify-start text-black mt-1">
+                  <div className="flex items-center gap-1">
+                    <h3 className=" font-[700] text-[20px]">{mentor.name}</h3>
+                    <Verified className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <p className="font-[500] text-[14px] text-black">{mentor.title}</p>
+                  <p className="font-[500] text-[14px] text-blue-600">{mentor.company}</p>
+                </div>
+              </div>
+
+              <button className="ml-auto text-black hover:text-red-500 transition-colors">
+                <Heart className="w-4 h-4" />
+              </button>
               {/* Location + Experience + Like */}
-<div className="mt-1 flex items-center font-semibold text-sm text-black text-[14px]">
-  <div className="flex items-center gap-1">
-    <MapPin className="w-4 h-4" /> {mentor.location}
-  </div>
+              <div className="mt-1 flex items-center font-semibold text-sm text-black text-[14px]">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" /> {mentor.location}
+                </div>
 
-  {mentor.yearsExperience && (
-    <div className="flex items-center gap-1 ml-3">
-      <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
-    </div>
-  )}
-</div>
+                {mentor.yearsExperience && (
+                  <div className="flex items-center gap-1 ml-3">
+                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
+                  </div>
+                )}
+              </div>
 
 
               {/* Description */}
@@ -286,95 +287,95 @@ export function FeaturedMentors() {
 
               {/* Stats in vertical columns */}
               {/* Stats Section */}
-<div className="mt-6 flex justify-between px-2 text-black">
-  <div className="flex flex-col items-center text-[12px]">
-    <span className="font-[600] whitespace-nowrap">Response Time</span>
-    <div className="flex items-center gap-1 mt-1">
-      <Clock className="w-4 h-4 text-red-500" />
-      <span className="font-[700]">{mentor.responseTime}</span>
-    </div>
-  </div>
+              <div className="mt-6 flex justify-between px-2 text-black">
+                <div className="flex flex-col items-center text-[12px]">
+                  <span className="font-[600] whitespace-nowrap">Response Time</span>
+                  <div className="flex items-center gap-1 mt-1">
+                    <Clock className="w-4 h-4 text-red-500" />
+                    <span className="font-[700]">{mentor.responseTime}</span>
+                  </div>
+                </div>
 
-  <div className="flex flex-col items-center text-[12px]">
-    <span className="font-[600] whitespace-nowrap">Total Mentees</span>
-    <div className="flex items-center gap-1 mt-1">
-      <Users className="w-4 h-4 text-blue-500" />
-      <span className="font-[700]">{mentor.mentees}</span>
-    </div>
-  </div>
+                <div className="flex flex-col items-center text-[12px]">
+                  <span className="font-[600] whitespace-nowrap">Total Mentees</span>
+                  <div className="flex items-center gap-1 mt-1">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    <span className="font-[700]">{mentor.mentees}</span>
+                  </div>
+                </div>
 
-  <div className="flex flex-col items-center text-[12px]">
-    <span className="font-[600] whitespace-nowrap">Success Rate</span>
-    <div className="flex items-center gap-1 mt-1">
-      <CheckCircle className="w-4 h-4 text-green-500" />
-      <span className="font-[700]">{mentor.successRate}%</span>
-    </div>
-  </div>
-</div>
+                <div className="flex flex-col items-center text-[12px]">
+                  <span className="font-[600] whitespace-nowrap">Success Rate</span>
+                  <div className="flex items-center gap-1 mt-1">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="font-[700]">{mentor.successRate}%</span>
+                  </div>
+                </div>
+              </div>
 
 
               {/* Tags */}
               <div className="mt-6 flex flex-wrap gap-2 text-black py-2">
-  {mentor.expertise.map((skill) => (
-    <span
-      key={skill}
-      className="inline-flex items-center justify-center px-3 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-medium"
-    >
-      <span className="px-2">{skill}</span>
-    </span>
-  ))}
-</div>
+                {mentor.expertise.map((skill) => (
+                  <span
+                    key={skill}
+                    className="inline-flex items-center justify-center px-3 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-medium"
+                  >
+                    <span className="px-2">{skill}</span>
+                  </span>
+                ))}
+              </div>
 
 
               {/* Languages pill */}
               {mentor.languages && mentor.languages.length > 0 && (
-  <div className="mt-4 group cursor-pointer inline-block ">
-    <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-[13px] font-[600] rounded-full transition-all duration-300 ease-in-out w-[154px] h-[30px]">
-      
-      {/* Default (before hover) */}
-      <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
-        <Globe className="w-4 h-4 text-blue-400" />
-       <span>{mentor.languages.length} Languages</span> 
-      </span>
+                <div className="mt-4 group cursor-pointer inline-block ">
+                  <div className="relative inline-flex items-center justify-center gap-1 px-2 py-1 bg-gray-300 text-[13px] font-[600] rounded-full transition-all duration-300 ease-in-out w-[154px] h-[30px]">
 
-      {/* Hover (show languages, let pill expand naturally) */}
-      <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-        {mentor.languages.join(", ")}
-      </span>
-    </div>
-  </div>
-)}
+                    {/* Default (before hover) */}
+                    <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
+                      <Globe className="w-4 h-4 text-blue-400" />
+                      <span>{mentor.languages.length} Languages</span>
+                    </span>
+
+                    {/* Hover (show languages, let pill expand naturally) */}
+                    <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                      {mentor.languages.join(", ")}
+                    </span>
+                  </div>
+                </div>
+              )}
 
 
 
               {/* Rate + Buttons */}
               <div className="mt-8 flex items-end gap-4 w-full">
-  {/* Price Section */}
-  <div className="flex flex-col">
-    <span className="text-[14px] font-[600] leading-none">Starting from</span>
-    <span className="text-[20px] font-[700] text-[#0073CF] leading-none mt-1">
-      ₹{mentor.price}/hr
-    </span>
-  </div>
+                {/* Price Section */}
+                <div className="flex flex-col">
+                  <span className="text-[14px] font-[600] leading-none">Starting from</span>
+                  <span className="text-[20px] font-[700] text-[#0073CF] leading-none mt-1">
+                    ₹{mentor.price}/hr
+                  </span>
+                </div>
 
-  {/* Buttons */}
-  <div className="flex flex-col gap-2 flex-1">
-    <Button
-      variant="outline"
-      size="sm"
-      className="w-full border-black rounded-full"
-    >
-      <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
-    </Button>
+                {/* Buttons */}
+                <div className="flex flex-col gap-2 flex-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-black rounded-full"
+                  >
+                    <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
+                  </Button>
 
-    <Button
-      size="sm"
-      className="w-full bg-[#0073CF] text-white hover:bg-blue-700 rounded-full"
-    >
-      Quick Book
-    </Button>
-  </div>
-</div>
+                  <Button
+                    size="sm"
+                    className="w-full bg-[#0073CF] text-white hover:bg-blue-700 rounded-full"
+                  >
+                    Quick Book
+                  </Button>
+                </div>
+              </div>
 
 
             </Card>
@@ -393,7 +394,7 @@ export function FeaturedMentors() {
 
           {/* Arrow in circle */}
           <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex items-center gap-2 group cursor-pointer">
-          <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
+            <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
           </span>
         </div>
       </div>

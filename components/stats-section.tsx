@@ -186,7 +186,7 @@ export function StatsSection() {
   if (loading) {
     return (
       <section className="relative -mt-32 pb-20">
-        <div className="max-w-[1159px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+        <div className="w-[80%] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
           <p className="text-center text-gray-600">Loading statistics...</p>
         </div>
       </section>
@@ -196,7 +196,7 @@ export function StatsSection() {
   return (
     <section className="relative -mt-32 pb-20">
       
-      <div className="max-w-[1000px] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
+      <div className="w-[80%] mx-auto bg-white rounded-[40px] shadow-[0_20px_40px_#9F9D9D40] p-10">
      
         {/* Header */}
         <div className="text-left mb-16">
@@ -211,7 +211,7 @@ export function StatsSection() {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Monthly Growth Chart */}
-          <Card>
+          <Card className="border-0 shadow-none">
   <CardContent className="p-4 sm:p-6">
     <h3 className="text-xl font-semibold mb-4">Monthly Growth Metrics</h3>
     <ResponsiveContainer width="100%" height={300}>
@@ -233,7 +233,7 @@ export function StatsSection() {
 
 
           {/* Performance KPIs */}
-          <Card>
+          <Card className="border-0 shadow-none">
             <CardContent className="p-4 sm:p-6">
               <h3 className="text-xl font-semibold mb-4">Key Performance Indicators</h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -257,21 +257,20 @@ export function StatsSection() {
         </div>
 
         {/* Success Metrics */}
-        <Card>
+        <Card className="border-0 shadow-none">
           <CardContent className="p-4 sm:p-6">
-            <h3 className="text-xl font-semibold mb-6 text-center">Success Metrics</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {successMetrics.map((item) => (
                <div key={item.metric} className="text-center">
-               <div className="relative w-28 h-28 mx-auto mb-4">
-                 <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+               <div className="relative w-40 h-40 mx-auto mb-4 shadow-[-8px_-8px_16px_rgba(0,0,0,0.1)] rounded-full">
+                 <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 100 100">
                    <defs>
                      <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                        <stop offset="0%" stopColor="#003C6C" />
                        <stop offset="100%" stopColor="#06B6D4" />
                      </linearGradient>
                    </defs>
-                   <circle cx="50" cy="50" r="40" stroke="#E5E7EB" strokeWidth="15" fill="none" />
+                   <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="15" fill="none" />
                    <circle
                      cx="50"
                      cy="50"
@@ -285,7 +284,7 @@ export function StatsSection() {
                    />
                  </svg>
                  <div className="absolute inset-0 flex items-center justify-center">
-                   <span className="text-2xl font-bold text-[#003C6C]">{item.percentage}%</span>
+                   <span className="text-3xl font-bold text-[#003C6C]">{item.percentage}%</span>
                  </div>
                </div>
                <p className="font-medium text-blue-900 font-semibold text-lg">{item.metric}</p>

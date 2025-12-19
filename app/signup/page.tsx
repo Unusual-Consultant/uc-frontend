@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api, API_BASE_URL } from "@/lib/api";
@@ -10,8 +10,10 @@ import SignupForm from "@/components/signup-form";
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const userType = searchParams.get('type');
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("mentee");
+  const [activeTab, setActiveTab] = useState(userType === 'mentor' ? 'mentor' : 'mentee');
   const [currentStep, setCurrentStep] = useState(1);
   const [step, setStep] = useState(2);
 
@@ -41,7 +43,7 @@ export default function SignupPage() {
   handleSignup(userType);
 };
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24 pt-24 ">
+    <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24">
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
@@ -84,32 +86,46 @@ export default function SignupPage() {
       </div>
 
       {/* 🔹 Frosted Glass Signup Box */}
-      <div className=" bg-gradient-to-b from-[rgba(209,234,255,0.4)] to-[rgba(209,234,255,0.1)] backdrop-blur-[700px] rounded-[30px] shadow-[0px_4px_4px_rgba(0,0,0,0.25)] flex flex-col items-center px-6 py-8 z-10">
+      <div className="bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex flex-col items-center px-16 py-8 z-10">
         {/* Header + Tabs */}
         <h1 className="font-mulish font-extrabold text-[22px] mb-2">
           {activeTab === "mentee" ? "Mentee Onboarding" : "Mentor Onboarding"}
         </h1>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col items-center">
+          <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden" style={{ width: "289px", height: "48px", minWidth: "84px", maxWidth: "480px" }}>
+            {/* Sliding Blue Background */}
+            <div
+              className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
+              style={{
+                transform: activeTab === "mentor" ? "translateX(calc(100% + 4px))" : "translateX(0)",
+              }}
+            />
+            
             <TabsTrigger
               value="mentee"
-              className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+              className="relative z-10 flex items-center gap-2 rounded-[30px]
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
             >
-              <User className="h-4 w-4" />
-              <span>Mentee</span>
+              <User className="h-4 w-4 font-bold" />
+              <span className="font-bold">Mentee</span>
             </TabsTrigger>
             <TabsTrigger
               value="mentor"
-              className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+              className="relative z-10 flex items-center gap-2 rounded-[30px]
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
             >
-              <GraduationCap className="h-4 w-4" />
-              <span>Mentor</span>
+              <GraduationCap className="h-4 w-4 font-bold" />
+              <span className="font-bold">Mentor</span>
             </TabsTrigger>
           </TabsList>
 
@@ -126,9 +142,8 @@ export default function SignupPage() {
             </p>
             <div className="flex items-center justify-center gap-3 mt-6">
               {[1, 2, 3].map((step) => (
-                <button
+                <div
                   key={step}
-                  onClick={() => setCurrentStep(step)}
                   className={`w-3 h-3 rounded-full transition-all duration-300
             ${
               currentStep === step
@@ -141,35 +156,35 @@ export default function SignupPage() {
             <p className="text-[15px] text-black-500">Step 1 of 3</p>
 
             {/* Social Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-3 w-[418px]">
               <Button
                 variant="outline"
-                className="w-[400px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
                 onClick={() => handleSocialSignup("google", "mentee")}
                 aria-label="Continue with Google"
               >
-                <img src="/google.png" alt="Google" className="h-5 w-5" />
-                Continue with Google
+                <img src="/google.png" alt="Google" className="h-5" />
+                <span className="font-bold">Continue with Google</span>
               </Button>
               <Button
                 variant="outline"
-                className=" grid w-full flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
                 onClick={() => handleSocialSignup("linkedin", "mentee")}
               >
                 <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
-                Continue with LinkedIn
+                <span className="font-bold">Continue with LinkedIn</span>
               </Button>
             </div>
 
-            <p className="text-[15px] text-black-500">
+            <p className="text-[15px] py-2 text-black-500">
               Recommended for fast signup
             </p>
 
             {/* OR Divider */}
             <div className="flex items-center w-full max-w-[400px]">
-              <div className="flex-grow h-px bg-gray-300"></div>
-              <span className="px-2 text-black/50 text-[12px]">OR</span>
-              <div className="flex-grow h-px bg-gray-300"></div>
+              <div className="flex-grow h-px bg-gray-400"></div>
+              <span className="px-2 text-black text-[14px] font-semibold">OR</span>
+              <div className="flex-grow h-px bg-gray-400"></div>
             </div>
 
             {/* Signup Form */}
@@ -184,14 +199,13 @@ export default function SignupPage() {
             <p className="text-[23px] font-semibold">
               Join as a Freelance Mentor
             </p>
-            <p className="text-[13px] text-black-500 font-semibold">
+            <p className="text-[15px] text-black-500 font-medium">
               Share your expertise & earn money helping grow others
             </p>
             <div className="flex items-center justify-center gap-3 mt-6">
               {[1, 2, 3, 4, 5].map((step) => (
-                <button
+                <div
                   key={step}
-                  onClick={() => setCurrentStep(step)}
                   className={`w-3 h-3 rounded-full transition-all duration-300
             ${
               currentStep === step
@@ -204,35 +218,35 @@ export default function SignupPage() {
             <p className="text-[15px] text-black-500">Step 1 of 5</p>
 
             {/* Social Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-3 w-[418px]">
               <Button
                 variant="outline"
-                className="w-[400px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
                 onClick={() => handleSocialSignup("google", "mentor")}
                 aria-label="Continue with Google"
               >
                 <img src="/google.png" alt="Google" className="h-5 w-5" />
-                Continue with Google
+                <span className="font-bold">Continue with Google</span>
               </Button>
               <Button
                 variant="outline"
-                className=" grid w-full flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
                 onClick={() => handleSocialSignup("linkedin", "mentor")}
               >
                 <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
-                Continue with LinkedIn
+                <span className="font-bold">Continue with LinkedIn</span>
               </Button>
             </div>
 
-            <p className="text-[15px] text-black-500">
+            <p className="text-[15px] py-2 text-black-500">
               Recommended for fast signup
             </p>
 
             {/* OR Divider */}
             <div className="flex items-center w-full max-w-[400px]">
-              <div className="flex-grow h-px bg-gray-300"></div>
-              <span className="px-2 text-black/50 text-[12px]">OR</span>
-              <div className="flex-grow h-px bg-gray-300"></div>
+              <div className="flex-grow h-px bg-gray-400"></div>
+              <span className="px-2 text-black text-[14px] font-semibold">OR</span>
+              <div className="flex-grow h-px bg-gray-400"></div>
             </div>
 
             {/* Signup Form */}

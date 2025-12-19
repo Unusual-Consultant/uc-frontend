@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,7 +11,9 @@ import { api } from "@/lib/api";
 import LoginForm from "@/components/login-form";
 
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState("mentee");
+  const searchParams = useSearchParams();
+  const userType = searchParams.get('type');
+  const [activeTab, setActiveTab] = useState(userType === 'mentor' ? 'mentor' : 'mentee');
   const router = useRouter();
 
   const handleLogin = (userType: "mentee" | "mentor") => {
@@ -41,9 +43,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative flex min-h-screen  items-center justify-center bg-white px-4 overflow-hidden pb-32 pt-32 ">
+    <div className="relative flex min-h-screen  items-center justify-center bg-white px-4 overflow-hidden pb-32 pt-0">
       {/* 🔹 Background Infinite Scroll Rows */}
-      <div className="absolute top-[230px] left-0 w-full overflow-hidden">
+      <div className="absolute top-[150px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left">
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
@@ -51,8 +53,7 @@ export default function LoginPage() {
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
         </div>
       </div>
-
-      <div className="absolute bottom-[230px] left-0 w-full overflow-hidden ">
+      <div className="absolute top-[425px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-right">
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
           <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
@@ -63,7 +64,7 @@ export default function LoginPage() {
 
       {/* 🔹 Mirror Glaze Rectangle with Login Card Inside */}
       <div
-        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.4)] flex items-center justify-center px-6 py-8 z-10"
+        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-16 py-8 z-10"
       >
         {/* Login Card */}
         <div className="w-full max-w-md">
@@ -79,35 +80,49 @@ export default function LoginPage() {
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
-            className="w-full"
+            className="w-full flex flex-col items-center"
           >
-            <TabsList className="grid w-full grid-cols-2 rounded-3xl bg-gray-100 p-1 mb-4">
+            <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden" style={{ width: "289px", height: "48px", minWidth: "84px", maxWidth: "480px" }}>
+              {/* Sliding Blue Background */}
+              <div
+                className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
+                style={{
+                  transform: activeTab === "mentor" ? "translateX(100%)" : "translateX(0)",
+                }}
+              />
+
               <TabsTrigger
                 value="mentee"
-                className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+                className="relative z-10 flex items-center gap-2 rounded-[30px]
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
               >
-                <User className="h-4 w-4" />
-                <span>Mentee</span>
+                <User className="h-4 w-4 font-bold" />
+                <span className="font-bold">Mentee</span>
               </TabsTrigger>
               <TabsTrigger
                 value="mentor"
-                className="flex items-center gap-2 rounded-3xl
-                  data-[state=active]:bg-[#0073CF] 
+                className="relative z-10 flex items-center gap-2 rounded-[30px]
+                  data-[state=active]:bg-transparent 
                   data-[state=active]:text-white 
-                  data-[state=active]:shadow-sm"
+                  data-[state=inactive]:bg-transparent
+                  data-[state=inactive]:text-black
+                  data-[state=active]:shadow-none
+                  transition-colors duration-300"
               >
-                <GraduationCap className="h-4 w-4" />
-                <span>Mentor</span>
+                <GraduationCap className="h-4 w-4 font-bold" />
+                <span className="font-bold">Mentor</span>
               </TabsTrigger>
             </TabsList>
 
             {/* Mentee Tab */}
             <TabsContent value="mentee" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-semibold">Sign in as Mentee</h3>
+                <h3 className="font-bold text-[20px] py-2">Sign in as Mentee</h3>
                 <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
                   Access your learning dashboard and connect with mentors
                 </p>
@@ -129,7 +144,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 rounded-3xl border border-black"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
                   onClick={() => handleSocialLogin("google", "mentee")}
                   aria-label="Continue with Google"
                 >
@@ -138,7 +153,7 @@ export default function LoginPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 rounded-3xl border border-black"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
                   onClick={() => handleSocialLogin("linkedin", "mentee")}
                 >
                   <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -150,7 +165,7 @@ export default function LoginPage() {
             {/* Mentor Tab */}
             <TabsContent value="mentor" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-semibold">Sign in as Mentor</h3>
+                <h3 className="font-bold text-[20px] py-2">Sign in as Mentor</h3>
                 <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
                   Access your mentor dashboard and manage your sessions
                 </p>
@@ -172,7 +187,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 rounded-3xl border border-black"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
                   onClick={() => handleSocialLogin("google", "mentor")}
                   aria-label="Continue with Google"
                 >
@@ -181,7 +196,7 @@ export default function LoginPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full flex items-center justify-center gap-2 rounded-3xl border border-black"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
                   onClick={() => handleSocialLogin("linkedin", "mentor")}
                 >
                   <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -195,7 +210,7 @@ export default function LoginPage() {
             <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-700">
               Don’t have an account?{" "}
               <Link
-                href="/signup"
+                href={`/signup?type=${activeTab}`}
                 className="text-[#0073CF] hover:underline font-semibold"
               >
                 Sign up
