@@ -85,10 +85,10 @@ export function TestimonialsSection() {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-testimonials/all?per_page=9")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-testimonials/all?per_page=9`)
       if (!response.ok) throw new Error("Failed to fetch testimonials")
       const data = await response.json()
-      
+
       // Transform backend data to frontend format
       const transformedTestimonials = data.testimonials.map((testimonial: any, index: number) => ({
         id: testimonial.id || index + 1,
@@ -99,7 +99,7 @@ export function TestimonialsSection() {
         content: testimonial.content || "Great experience!",
         rating: testimonial.rating || 5,
       }))
-      
+
       setTestimonials(transformedTestimonials)
     } catch (error) {
       console.error("Error fetching testimonials:", error)
@@ -109,7 +109,7 @@ export function TestimonialsSection() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/statistics/platform")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/statistics/platform`)
       if (!response.ok) throw new Error("Failed to fetch statistics")
       const data = await response.json()
       setStatsData(data)
@@ -170,12 +170,12 @@ export function TestimonialsSection() {
               className="border-0 bg-white shadow-[0_8px_24px_#9F9D9D20] hover:shadow-[0_8px_32px_#9F9D9D30] transition-all duration-300 rounded-[32px]"
             >
               <CardContent className="p-8 flex flex-col justify-between h-full">
-               
+
 
                 {/* Quote */}
                 <Quote className="h-8 w-8 text-gray-400 rotate-180 mb-2" />
-                   {/* Stars above testimonial */}
-                   <div className="flex mb-4">
+                {/* Stars above testimonial */}
+                <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
                   ))}
@@ -206,8 +206,8 @@ export function TestimonialsSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
           <div className="bg-white shadow-[0_8px_24px_#9F9D9D20] p-6 text-center rounded-bl-[48px]">
             <div className="text-4xl font-bold text-blue-600 mb-2">
-              {statsData && statsData.average_rating > 0 
-                ? `${statsData.average_rating.toFixed(1)}/5` 
+              {statsData && statsData.average_rating > 0
+                ? `${statsData.average_rating.toFixed(1)}/5`
                 : "4.9/5"}
             </div>
             <div className="text-black">Average Rating</div>

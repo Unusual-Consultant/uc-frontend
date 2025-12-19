@@ -44,14 +44,14 @@ export function CompanyAlignedMentors({ company, role }: CompanyAlignedMentorsPr
   useEffect(() => {
     const fetchMentors = async () => {
       if (!company) return;
-      
+
       setIsLoading(true);
       try {
-        let url = `http://127.0.0.1:8000/api/v1/mentors/company-aligned?company=${encodeURIComponent(company)}&limit=4`;
+        let url = `${process.env.NEXT_PUBLIC_API_URL}/mentors/company-aligned?company=${encodeURIComponent(company)}&limit=4`;
         if (role) {
           url += `&role=${encodeURIComponent(role)}`;
         }
-        
+
         const response = await fetch(url);
         if (response.ok) {
           const data = await response.json();
@@ -101,8 +101,8 @@ export function CompanyAlignedMentors({ company, role }: CompanyAlignedMentorsPr
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex">
-            <Building2 width={32}
-          height={32}/>
+          <Building2 width={32}
+            height={32} />
           <h2 className="text-xl md:text-2xl font-bold mb-4 text-gray-900 px-2">
             Company Aligned Mentors
           </h2>

@@ -116,7 +116,7 @@ export function FeaturedMentors() {
   const fetchMentors = async () => {
     try {
       console.log("Fetching mentors from API...")
-      const response = await fetch("http://127.0.0.1:8000/api/v1/featured-mentors/all/mentors?per_page=9")
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-mentors/all/mentors?per_page=9`)
       console.log("Response status:", response.status)
       if (response.ok) {
         const data = await response.json()
