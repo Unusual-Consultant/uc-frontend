@@ -76,7 +76,7 @@ const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderProps> = ({ c
 
   const makeAuthenticatedRequest = useCallback(async (url: string, options: RequestInit = {}) => {
     const authToken = typeof window !== 'undefined' ? localStorage.getItem("auth_token") : null;
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://uc-backend-210202864965.europe-west1.run.app/api/v1';
     const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
 
     const headers = {
@@ -102,74 +102,74 @@ const AuthenticatedUserProvider: React.FC<AuthenticatedUserProviderProps> = ({ c
     return response;
   }, [router]);
 
-const processOAuthCallback = useCallback(async (code: string) => {
-  console.log("Processing OAuth callback with code:", code);
-  try {
-    if (!isAuthenticated) {
-      const callbackUrl = api.auth.google.callback(code);
-      console.log("Calling callback URL:", callbackUrl);
+  const processOAuthCallback = useCallback(async (code: string) => {
+    console.log("Processing OAuth callback with code:", code);
+    try {
+      if (!isAuthenticated) {
+        const callbackUrl = api.auth.google.callback(code);
+        console.log("Calling callback URL:", callbackUrl);
 
-      const response = await fetch(callbackUrl);
-      if (!response.ok) {
-        let errorMessage = `HTTP error! status: ${response.status}`;
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.detail || errorMessage;
-        } catch {
-          errorMessage = response.statusText || errorMessage;
+        const response = await fetch(callbackUrl);
+        if (!response.ok) {
+          let errorMessage = `HTTP error! status: ${response.status}`;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.detail || errorMessage;
+          } catch {
+            errorMessage = response.statusText || errorMessage;
+          }
+          throw new Error(errorMessage);
         }
-        throw new Error(errorMessage);
+
+        const data = await response.json();
+        console.log("Callback response data:", data);
+
+        if (data.token && data.user_info) {
+          // ✅ Transform backend response to include camelCase fields
+          const transformedUserInfo = {
+            ...data.user_info,
+            firstName: data.user_info.first_name || data.user_info.firstName,
+            lastName: data.user_info.last_name || data.user_info.lastName,
+            name: data.user_info.first_name && data.user_info.last_name
+              ? `${data.user_info.first_name} ${data.user_info.last_name}`.trim()
+              : data.user_info.first_name || data.user_info.firstName || data.user_info.name || data.user_info.email?.split("@")[0],
+          };
+
+          // ✅ merge token into user object
+          const userWithToken = { ...transformedUserInfo, token: data.token };
+
+          // ✅ save both in localStorage
+          localStorage.setItem("auth_token", data.token);
+          localStorage.setItem("user_info", JSON.stringify(userWithToken));
+
+          // ✅ update state
+          setToken(data.token);
+          setUser(userWithToken);
+          setIsAuthenticated(true);
+
+          console.log("Authentication successful, redirecting to dashboard...");
+          router.push("/dashboard");
+        } else {
+          throw new Error("No token received from server");
+        }
+      }
+    } catch (error) {
+      console.error("Error handling Google callback:", error);
+
+      lastProcessedCode.current = null;
+      globallyBlockOAuth.current = false;
+      if (typeof window !== "undefined" && window.__oauthProcessing) {
+        window.__oauthProcessing.blocked = false;
+        window.__oauthProcessing.lastCode = null;
       }
 
-      const data = await response.json();
-      console.log("Callback response data:", data);
-
-      if (data.token && data.user_info) {
-        // ✅ Transform backend response to include camelCase fields
-        const transformedUserInfo = {
-          ...data.user_info,
-          firstName: data.user_info.first_name || data.user_info.firstName,
-          lastName: data.user_info.last_name || data.user_info.lastName,
-          name: data.user_info.first_name && data.user_info.last_name 
-            ? `${data.user_info.first_name} ${data.user_info.last_name}`.trim()
-            : data.user_info.first_name || data.user_info.firstName || data.user_info.name || data.user_info.email?.split("@")[0],
-        };
-        
-        // ✅ merge token into user object
-        const userWithToken = { ...transformedUserInfo, token: data.token };
-
-        // ✅ save both in localStorage
-        localStorage.setItem("auth_token", data.token);
-        localStorage.setItem("user_info", JSON.stringify(userWithToken));
-
-        // ✅ update state
-        setToken(data.token);
-        setUser(userWithToken);
-        setIsAuthenticated(true);
-
-        console.log("Authentication successful, redirecting to dashboard...");
-        router.push("/dashboard");
-      } else {
-        throw new Error("No token received from server");
-      }
+      const errorMessage = error instanceof Error ? error.message : "Authentication failed";
+      alert(`Login failed: ${errorMessage}. Please try again.`);
+      router.push("/");
+    } finally {
+      isProcessing.current = false;
     }
-  } catch (error) {
-    console.error("Error handling Google callback:", error);
-
-    lastProcessedCode.current = null;
-    globallyBlockOAuth.current = false;
-    if (typeof window !== "undefined" && window.__oauthProcessing) {
-      window.__oauthProcessing.blocked = false;
-      window.__oauthProcessing.lastCode = null;
-    }
-
-    const errorMessage = error instanceof Error ? error.message : "Authentication failed";
-    alert(`Login failed: ${errorMessage}. Please try again.`);
-    router.push("/");
-  } finally {
-    isProcessing.current = false;
-  }
-}, [router, isAuthenticated]);
+  }, [router, isAuthenticated]);
 
 
   const logout = useCallback(() => {
@@ -185,7 +185,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
       window.__oauthProcessing.blocked = false;
       window.__oauthProcessing.lastCode = null;
     }
-    router.push("/"); 
+    router.push("/");
   }, [router]);
 
   const getCurrentUser = useCallback(async () => {
@@ -200,7 +200,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
           firstName: userInfo.first_name || userInfo.firstName,
           lastName: userInfo.last_name || userInfo.lastName,
           profile_picture_url: userInfo.profile_image_url || userInfo.profile_picture_url,
-          name: userInfo.first_name && userInfo.last_name 
+          name: userInfo.first_name && userInfo.last_name
             ? `${userInfo.first_name} ${userInfo.last_name}`.trim()
             : userInfo.first_name || userInfo.firstName || userInfo.name || userInfo.email?.split("@")[0],
         };
@@ -226,7 +226,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
               ...userData,
               firstName: userData.first_name || userData.firstName,
               lastName: userData.last_name || userData.lastName,
-              name: userData.first_name && userData.last_name 
+              name: userData.first_name && userData.last_name
                 ? `${userData.first_name} ${userData.last_name}`.trim()
                 : userData.first_name || userData.firstName || userData.name || userData.email?.split("@")[0],
             };
@@ -248,7 +248,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
       const tokenParam = urlParams.get("token");
-      
+
       if (tokenParam && !localStorage.getItem("auth_token")) {
         // Token from URL - store it and fetch user info
         localStorage.setItem("auth_token", tokenParam);
@@ -267,7 +267,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
           ...userData,
           firstName: userData.first_name || userData.firstName,
           lastName: userData.last_name || userData.lastName,
-          name: userData.first_name && userData.last_name 
+          name: userData.first_name && userData.last_name
             ? `${userData.first_name} ${userData.last_name}`.trim()
             : userData.first_name || userData.firstName || userData.name || userData.email?.split("@")[0],
         };
@@ -287,7 +287,7 @@ const processOAuthCallback = useCallback(async (code: string) => {
         setIsAuthenticated(false);
       }
     }
-  }, [getCurrentUser]); 
+  }, [getCurrentUser]);
 
   useEffect(() => {
     const code = searchParams.get("code");
