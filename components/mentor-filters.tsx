@@ -69,20 +69,15 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
   const industries = [
     "Technology",
+    "Product Management",
+    "Data Science",
     "Finance",
     "Marketing",
     "Design",
     "Healthcare",
+    "Sales",
     "Education",
     "Consulting",
-    "Sales",
-    "Operations",
-    "HR",
-    "Manufacturing",
-    "Retail",
-    "Media",
-    "Legal",
-    "Real Estate",
   ];
   const sessionTypes = ["1:1 Session", "Group Session"];
   const packageOptions = [
@@ -91,7 +86,11 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     "Mock Interview",
     "Career Guidance",
     "Portfolio Review",
+    "Technical Interview",
+    "System Design",
+    "Leadership Coaching",
   ];
+
   const experienceLevels = [
     "Entry Level (0-2 years)",
     "Mid Level (3-5 years)",
@@ -100,11 +99,13 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
   ];
 
   const ratingOptions = [
-    "4★ & Above",
-    "3★ & Above",
-    "2★ & Above",
-    "1★ & Above",
+    "4.5 Stars and above",
+    "4.0 Stars and above",
+    "3.5 Stars and above",
+    "Any Rating",
+
   ];
+
   const avalability = [
     "Available Today",
     "This week",
@@ -122,8 +123,10 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     { value: "relevance", label: "Relevance" },
     { value: "price-low", label: "Price: Low to High" },
     { value: "price-high", label: "Price: High to Low" },
-    { value: "rating", label: "Highest Rated" },
-    { value: "experience", label: "Most Experienced" },
+    { value: "experience", label: "High to Low" },
+    { value: "rating", label: "High to Low" },
+    { value: "response-time", label: "Fastest First" },
+    { value: "newest-mentors", label: "Newest Mentors First" },
   ];
 
   const clearAllFilters = () => {
@@ -195,7 +198,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       <div className="flex items-center justify-between">
         <h2 className="text-[24px] font-[700] flex items-center gap-2">
           <Filter className="h-6 w-6 text-black" />
-          Filters
+          Filters & Sort
         </h2>
         {getActiveFiltersCount() > 0 && (
           <Button variant="ghost" size="sm" onClick={clearAllFilters}>
@@ -206,7 +209,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </div>
 
       {/* Verified Mentors Row */}
-      <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-5 bg-white shadow-sm w-full max-w-[400px]">
+      <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-7 bg-white shadow-sm w-full max-w-[400px]">
         {/* Text */}
         <span className="text-[16px] font-[600] font-[Mulish] text-black">
           Verified Mentors only
@@ -326,10 +329,10 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
           <div className="flex items-center gap-3">
             <input
               type="number"
-              placeholder="Min ₹"
-              value={minPrice}
+              placeholder="Min Price"
+              value={minPrice === 0 ? '' : minPrice}
               onChange={(e) => {
-                const value = Number(e.target.value);
+                const value = e.target.value === '' ? 0 : Number(e.target.value);
                 setMinPrice(value);
                 setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
                 notifyFilterChange();
@@ -338,10 +341,10 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
             />
             <input
               type="number"
-              placeholder="Max ₹"
-              value={maxPrice}
+              placeholder="Max Price"
+              value={maxPrice === 2000 ? '' : maxPrice}
               onChange={(e) => {
-                const value = Number(e.target.value);
+                const value = e.target.value === '' ? 2000 : Number(e.target.value);
                 setMaxPrice(value);
                 setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
                 notifyFilterChange();
@@ -404,7 +407,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={industry} className="text-sm cursor-pointer">
+              <label htmlFor={industry} className="text-md font-semibold cursor-pointer">
                 {industry}
               </label>
             </div>
@@ -415,7 +418,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Session Type */}
       <Card className="border border-[#C7C7C7] rounded-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             <Clock className="h-5 w-5 text-black" />
             Session Type
           </CardTitle>
@@ -448,7 +451,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={type} className="text-sm cursor-pointer">
+              <label htmlFor={type} className="text-md font-semibold cursor-pointer">
                 {type}
               </label>
             </div>
@@ -458,7 +461,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
       <Card className="border border-[#C7C7C7]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2font-[700] text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -508,7 +511,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={level} className="text-sm cursor-pointer">
+              <label htmlFor={level} className="text-mb font-semibold cursor-pointer">
                 {level}
               </label>
             </div>
@@ -519,7 +522,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Packages */}
       <Card className="border border-[#C7C7C7] rounded-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             <Briefcase className="h-5 w-5 text-black" />
             Packages
           </CardTitle>
@@ -552,7 +555,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={pkg} className="text-sm cursor-pointer">
+              <label htmlFor={pkg} className="text-md font-semibold cursor-pointer">
                 {pkg}
               </label>
             </div>
@@ -563,7 +566,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Mentor Rating */}
       <Card className="border border-[#C7C7C7] rounded-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             <Star className="h-5 w-5 text-black" />
             Mentor Rating
           </CardTitle>
@@ -596,7 +599,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={rating} className="text-sm cursor-pointer">
+              <label htmlFor={rating} className="text-md font-semibold cursor-pointer">
                 {rating}
               </label>
             </div>
@@ -607,7 +610,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Availability */}
       <Card className="border border-[#C7C7C7] rounded-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             {/* Availability Icon */}
             <Clock className="h-5 w-5 text-black" />
             Availability
@@ -643,7 +646,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 }}
 
               />
-              <label htmlFor={slot} className="text-sm cursor-pointer">
+              <label htmlFor={slot} className="text-md font-semibold cursor-pointer">
                 {slot}
               </label>
             </div>
@@ -655,7 +658,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Response Time */}
       <Card className="border border-[#C7C7C7] rounded-lg">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             <Timer className="h-5 w-5 text-black" />
             Response Time
           </CardTitle>
@@ -688,7 +691,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={option} className="text-sm cursor-pointer">
+              <label htmlFor={option} className="text-md font-semibold cursor-pointer">
                 {option}
               </label>
             </div>

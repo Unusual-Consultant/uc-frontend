@@ -1,7 +1,7 @@
 "use client";
 
 import "@fontsource/mulish";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MentorFilters } from "@/components/mentor-filters";
 import MentorGrid from "@/components/mentor-grid";
 import { Input } from "@/components/ui/input";
@@ -68,7 +68,7 @@ export default function MentorsPage() {
     router.push(url.toString());
   };
 
-  const handleFiltersChange = (newFilters: any) => {
+  const handleFiltersChange = useCallback((newFilters: any) => {
     setFilters(newFilters);
     // Update URL with filter parameters
     const url = new URL(window.location.href);
@@ -119,7 +119,7 @@ export default function MentorsPage() {
     }
 
     router.push(url.toString());
-  };
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gray-50 font-[Mulish]">

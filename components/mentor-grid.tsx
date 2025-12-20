@@ -38,6 +38,161 @@ interface Mentor {
   badge?: string;
 }
 
+const DUMMY_MENTORS: Mentor[] = [
+  {
+    id: "1",
+    name: "Sarah Johnson",
+    title: "Senior Product Manager",
+    company: "Google",
+    image: "https://randomuser.me/api/portraits/women/44.jpg",
+    rating: 4.9,
+    reviews: 127,
+    location: "Delhi, India",
+    expertise: ["Product Strategy", "Agile", "User Research", "Growth"],
+    price: 1500,
+    mentees: 89,
+    available: true,
+    responseTime: "24",
+    successRate: 98,
+    description: "Experienced PM with 10+ years in tech. Helped launch products used by millions. Passionate about mentoring aspiring product managers.",
+    languages: ["English", "Spanish"],
+    yearsExperience: 10,
+  },
+  {
+    id: "2",
+    name: "Michael Chen",
+    title: "Tech Lead & Architect",
+    company: "Microsoft",
+    image: "https://randomuser.me/api/portraits/men/32.jpg",
+    rating: 4.8,
+    reviews: 203,
+    location: "Seattle, WA",
+    expertise: ["System Design", "Cloud Architecture", "Leadership", "React"],
+    price: 1200,
+    mentees: 156,
+    available: true,
+    responseTime: "12",
+    successRate: 96,
+    description: "Architect specializing in scalable systems. Love helping engineers grow into leadership roles and master system design.",
+    languages: ["English", "Mandarin"],
+    yearsExperience: 12,
+  },
+  {
+    id: "3",
+    name: "Priya Sharma",
+    title: "Data Science Manager",
+    company: "Amazon",
+    image: "https://randomuser.me/api/portraits/women/68.jpg",
+    rating: 4.7,
+    reviews: 94,
+    location: "Bangalore, India",
+    expertise: ["Machine Learning", "Python", "Data Analysis", "AI"],
+    price: 1000,
+    mentees: 67,
+    available: false,
+    responseTime: "24",
+    successRate: 95,
+    description: "ML expert with focus on practical applications. Mentoring data scientists and analysts to advance their careers.",
+    languages: ["English", "Hindi"],
+    yearsExperience: 8,
+  },
+  {
+    id: "4",
+    name: "James Rodriguez",
+    title: "Startup Founder & CEO",
+    company: "TechVentures",
+    image: "https://randomuser.me/api/portraits/men/67.jpg",
+    rating: 4.9,
+    reviews: 78,
+    location: "Austin, TX",
+    expertise: ["Entrepreneurship", "Fundraising", "Strategy", "Leadership"],
+    price: 1800,
+    mentees: 45,
+    available: true,
+    responseTime: "48",
+    successRate: 100,
+    description: "Serial entrepreneur. Successfully raised $50M+ across 3 startups. Here to help founders navigate their journey.",
+    languages: ["English"],
+    yearsExperience: 15,
+  },
+  {
+    id: "5",
+    name: "Emily Watson",
+    title: "UX Design Lead",
+    company: "Apple",
+    image: "https://randomuser.me/api/portraits/women/89.jpg",
+    rating: 4.8,
+    reviews: 112,
+    location: "Cupertino, CA",
+    expertise: ["UI/UX Design", "Figma", "Design Systems", "Research"],
+    price: 1100,
+    mentees: 92,
+    available: true,
+    responseTime: "24",
+    successRate: 97,
+    description: "Design leader passionate about creating intuitive experiences. Mentoring designers at all levels to elevate their craft.",
+    languages: ["English", "French"],
+    yearsExperience: 9,
+  },
+  {
+    id: "6",
+    name: "David Kim",
+    title: "DevOps Engineer",
+    company: "Netflix",
+    image: "https://randomuser.me/api/portraits/men/46.jpg",
+    rating: 4.6,
+    reviews: 65,
+    location: "Los Angeles, CA",
+    expertise: ["DevOps", "Kubernetes", "CI/CD", "AWS"],
+    price: 900,
+    mentees: 54,
+    available: true,
+    responseTime: "24",
+    successRate: 94,
+    description: "DevOps specialist helping teams build reliable infrastructure. Expert in cloud platforms and automation.",
+    languages: ["English", "Korean"],
+    yearsExperience: 7,
+  },
+  {
+    id: "7",
+    name: "Lisa Anderson",
+    title: "Marketing Director",
+    company: "Meta",
+    image: "https://randomuser.me/api/portraits/women/22.jpg",
+    rating: 4.9,
+    reviews: 143,
+    location: "New York, NY",
+    expertise: ["Digital Marketing", "Growth Hacking", "Brand Strategy", "SEO"],
+    price: 1300,
+    mentees: 108,
+    available: true,
+    responseTime: "12",
+    successRate: 99,
+    description: "Marketing leader with proven track record in scaling brands. Passionate about teaching data-driven marketing strategies.",
+    languages: ["English"],
+    yearsExperience: 11,
+  },
+  {
+    id: "8",
+    name: "Raj Patel",
+    title: "Blockchain Developer",
+    company: "Coinbase",
+    image: "https://randomuser.me/api/portraits/men/71.jpg",
+    rating: 4.7,
+    reviews: 56,
+    location: "Remote",
+    expertise: ["Blockchain", "Solidity", "Web3", "Smart Contracts"],
+    price: 1400,
+    mentees: 38,
+    available: true,
+    responseTime: "24",
+    successRate: 93,
+    description: "Web3 developer specializing in DeFi and NFTs. Helping developers transition into blockchain technology.",
+    languages: ["English", "Gujarati"],
+    yearsExperience: 5,
+  },
+];
+
 export default function MentorCards({ showFilters, filters }: { showFilters: boolean; filters?: any }) {
   const [mentors, setMentors] = useState<Mentor[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +206,7 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
         const params = new URLSearchParams();
         params.append("page", "1");
         params.append("per_page", "50");
-        
+
         if (searchQuery) {
           params.append("search_query", searchQuery);
         }
@@ -73,15 +228,15 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
         if (filters?.mentorRatings && filters.mentorRatings.length > 0) {
           const minRating = filters.mentorRatings[0] === "4★ & Above" ? 4
             : filters.mentorRatings[0] === "3★ & Above" ? 3
-            : filters.mentorRatings[0] === "2★ & Above" ? 2
-            : 1;
+              : filters.mentorRatings[0] === "2★ & Above" ? 2
+                : 1;
           params.append("min_rating", String(minRating));
         }
 
         const response = await fetch(`${API_BASE_URL}/mentors/profiles?${params.toString()}`);
         if (response.ok) {
           const data = await response.json();
-          let mappedMentors = data.mentors.map((m: any) => ({
+          let mappedMentors = data.mentors && data.mentors.length > 0 ? data.mentors.map((m: any) => ({
             id: m.id,
             name: m.full_name,
             title: m.headline || "Mentor",
@@ -93,13 +248,13 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
             expertise: m.skills || [],
             price: m.hourly_rate || 0,
             mentees: m.total_sessions || 0,
-            available: true,
+            available: m.is_online || m.available || false,
             responseTime: "24 hrs",
             successRate: 100,
             description: m.headline || "",
             languages: [],
             yearsExperience: 0,
-          }));
+          })) : DUMMY_MENTORS;
 
           // Client-side filtering for fields not available in API
           if (filters?.responseTime && filters.responseTime.length > 0) {
@@ -120,9 +275,13 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           setMentors(mappedMentors);
         } else {
           console.error("Failed to fetch mentors");
+          // Use dummy data if API fails
+          setMentors(DUMMY_MENTORS);
         }
       } catch (error) {
         console.error("Error fetching mentors:", error);
+        // Use dummy data if API request fails
+        setMentors(DUMMY_MENTORS);
       } finally {
         setLoading(false);
       }
@@ -162,30 +321,25 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           {mentors.map((mentor) => (
             <Card
               key={mentor.id}
-              className="relative border border-[#C7C7C7] rounded-xl p-4 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 overflow-hidden bg-white"
+              className={`relative rounded-xl p-6 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 overflow-hidden bg-white ${
+                mentor.available ? 'border-2 border-green-500' : 'border border-[#C7C7C7]'
+              }`}
             >
               {/* Card content wrapper: flex-col + flex-1 for inner content */}
               <div className="flex flex-col flex-1">
                 {/* Banner */}
                 <div className="absolute top-0 left-0 w-full h-20 bg-[#C4E1FF] rounded-t-xl z-0" />
 
-                {mentor.available && (
-                  <div className="absolute top-3 left-3 bg-green-500 text-white text-xs px-4 py-1 rounded-full flex items-center gap-1 z-20">
-                    <div className="w-4 h-4 bg-white rounded-full flex items-center justify-center">
-                      <Zap className="w-3 h-3 text-green-500 fill-green-500" />
-                    </div>
-                    Online
-                  </div>
-                )}
-
                 {/* Avatar + Info */}
                 <div className="flex gap-4 items-start relative z-10 mt-14 py-2">
                   <div className="relative -mt-6">
-                    <Avatar className="w-20 h-20 border-4 border-white shadow-md">
+                    <Avatar className={`w-20 h-20 border-2 shadow-md ${
+                      mentor.available ? 'border-green-500' : 'border-white'
+                    }`}>
                       <AvatarImage src={mentor.image} alt={mentor.name} />
                     </Avatar>
-                    <div className="absolute w-[58px] h-[23px] -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center gap-1 shadow">
-                      <Star className="w-3 h-3 text-yellow-400" />{" "}
+                    <div className="absolute w-[70px] h-[23px] -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center space-x-2 justify-center shadow">
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />{" "}
                       <span className="text-black">{mentor.rating.toFixed(1)}</span>
                     </div>
                   </div>
@@ -194,21 +348,21 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                     <div className="flex items-center gap-1">
                       <h3 className="text-lg font-bold">{mentor.name}</h3>
                     </div>
-                    <p className="text-sm">{mentor.title}</p>
-                    <p className="text-sm font-medium text-blue-600">{mentor.company}</p>
+                    <p className="text-sm font-semibold">{mentor.title}</p>
+                    <p className="text-sm font-bold text-blue-600">{mentor.company}</p>
                   </div>
                 </div>
 
                 {/* Location / Experience / Favorite */}
-                <div className="mt-4 flex gap-4 font-semibold text-sm text-black items-center">
-                  <div className="flex items-center gap-1 text-[14px]">
-                    <MapPin className="w-4 h-4" /> {mentor.location}
+                <div className="mt-4 flex gap-4 font-semibold text-[12px] text-black items-center">
+                  <div className="flex items-center">
+                    <MapPin className="text-sm h-4" /> {mentor.location}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4" /> {mentor.yearsExperience} yrs experience
+                  <div className="flex items-center">
+                    <Users className="text-sm h-4 w-4" /> {mentor.yearsExperience} yrs experience
                   </div>
                   <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-10">
-                    <Heart className="w-4 h-4 text-black " />
+                    <Heart className="text-sm h-4 text-black " />
                   </button>
                 </div>
 
@@ -217,24 +371,24 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 {/* Stats */}
                 <div className="mt-6 flex justify-center gap-4 text-gray-700 w-full font-[Mulish]">
                   <div className="flex flex-col items-center">
-                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Response Time</span>
+                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Response Time</span>
                     <div className="flex items-center gap-1 mt-1">
                       <Clock className="w-4 h-4 text-red-500" />
-                      <span className="text-[13px] font-[700]">{mentor.responseTime}</span>
+                      <span className="text-[13px] font-[800]">&lt; {mentor.responseTime} hrs</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Total Mentees</span>
+                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Total Mentees</span>
                     <div className="flex items-center gap-1 mt-1">
                       <Users className="w-4 h-4 text-blue-500" />
-                      <span className="text-[13px] font-[700]">{mentor.mentees}</span>
+                      <span className="text-[13px] font-[800]">{mentor.mentees}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-[600] text-[13px] text-center whitespace-nowrap">Success Rate</span>
+                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Success Rate</span>
                     <div className="flex items-center gap-1 mt-1">
                       <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-[13px] font-[700]">{mentor.successRate}%</span>
+                      <span className="text-[13px] font-[800]">{mentor.successRate}%</span>
                     </div>
                   </div>
                 </div>
@@ -242,19 +396,19 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 {/* Expertise / Languages */}
                 <div className="mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
                   {mentor.expertise.slice(0, 3).map((skill) => (
-                    <span key={skill} className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
+                    <span key={skill} className="px-4 py-1 bg-[#edf7ff] text-[12px] rounded-full font-semibold">
                       {skill}
                     </span>
                   ))}
                   {mentor.expertise.length > 3 && (
-                    <span className="px-4 py-1 bg-[#D1EAFF] text-[12px] rounded-full font-semibold">
+                    <span className="px-4 py-1 bg-[#edf7ff] text-[12px] rounded-full font-semibold">
                       +{mentor.expertise.length - 3}
                     </span>
                   )}
                 </div>
                 {mentor.languages && mentor.languages.length > 0 && (
                   <div className="mt-3 group cursor-pointer inline-block font-[500]">
-                    <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-gray-300 text-xs rounded-full transition-all duration-300 ease-in-out">
+                    <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-[#e9eef3] text-xs rounded-full transition-all duration-300 ease-in-out">
                       <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
                         <Globe className="w-3 h-3 text-blue-400" />
                         Languages
@@ -270,13 +424,16 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 <div className="mt-8 flex items-start gap-4">
                   <div className="flex flex-col pt-7">
                     <span className="text-sm font-semibold">Starting from</span>
-                    <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}/hr</span>
+                    <span className="py-2">
+                      <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}</span>
+                      <span className="text-lg font-bold text-black">/Session</span>
+                    </span>
                   </div>
                   <div className="flex flex-col gap-2 flex-1">
-                    <Button variant="outline" size="sm" className="w-full border-black rounded-full">
+                    <Button variant="outline" size="sm" className="w-full border-black hover:border-[#ffffff] rounded-full hover:bg-[#edf7ff]">
                       <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
                     </Button>
-                    <Button size="sm" className="w-full bg-blue-600 text-white hover:bg-blue-700 rounded-full">
+                    <Button size="sm" className="w-full bg-[#0073cf] text-white hover:bg-[#003c6c] rounded-full">
                       Quick Book
                     </Button>
                   </div>
