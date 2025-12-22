@@ -36,24 +36,20 @@ const resumeOfferings = [
 
 const faqs = [
   {
-    question: "What makes your resume templates ATS-friendly?",
-    answer: "Our templates are specifically designed to pass Applicant Tracking Systems. They use clean formatting, standard fonts, and proper structure that ATS software can easily parse and read."
+    question: "What makes a resume ATS-friendly?",
+    answer: "ATS-friendly resumes use standard formatting, clear section headings, and avoid complex graphics or tables that applicant tracking systems can't read. Our templates are designed to pass through ATS while still looking professional."
   },
   {
-    question: "How does the AI Resume Analyzer work?",
-    answer: "Our AI analyzes your resume for formatting issues, keyword optimization, content quality, and ATS compatibility. It provides actionable insights and suggestions to improve your resume's effectiveness."
+    question: "How does the AI Resume analyzer work?",
+    answer: "Our AI analyzes your resume for ATS compatibility, keyword optimization, formatting issues, and content quality. It provides a detailed score and actionable suggestions to improve your resume."
   },
   {
-    question: "Can I get expert feedback on my resume?",
-    answer: "Yes! You can book a session with industry experts who will provide personalized feedback and suggestions tailored to your career goals and target industry."
+    question: "Can I customize the templates?",
+    answer: "Yes! All templates are fully customizable. You can change colors, fonts, section order, and content to match your personal brand and the job you're applying for."
   },
   {
-    question: "Are the resume templates free to use?",
-    answer: "We offer 234 free resume templates that you can use immediately. Premium templates with advanced features are also available for purchase."
-  },
-  {
-    question: "How long does an expert review take?",
-    answer: "Expert reviews typically take 24-48 hours. You'll receive detailed feedback via email, and you can book a follow-up call if needed."
+    question: "What's the difference between AI review and expert review?",
+    answer: "AI review provides instant automated feedback on technical aspects like ATS compatibility & keyword optimization. Expert review offers personalized, human feedback from industry professionals who understand your career goals & industry."
   },
 ]
 
