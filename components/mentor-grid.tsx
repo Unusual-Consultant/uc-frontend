@@ -211,26 +211,34 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           params.append("search_query", searchQuery);
         }
 
-        // Add price filters
-        if (filters?.minPrice !== undefined && filters?.minPrice > 0) {
-          params.append("min_price", String(filters.minPrice * 100)); // Convert to paise
-        }
+        // Add price filters - backend only supports max_price, min_price is client-side filtered
         if (filters?.maxPrice !== undefined && filters?.maxPrice < 2000) {
-          params.append("max_price", String(filters.maxPrice * 100)); // Convert to paise
+          params.append("max_price", String(filters.maxPrice)); // Backend expects rupees
         }
 
-        // Add skills filters
+        // Add skills filters (domain/industry)
         if (filters?.selectedIndustries && filters.selectedIndustries.length > 0) {
           params.append("skills", filters.selectedIndustries.join(","));
         }
 
+        // Add location filter if backend supports it
+        if (filters?.location && filters.location.trim()) {
+          params.append("location", filters.location);
+        }
+
         // Add rating filters
         if (filters?.mentorRatings && filters.mentorRatings.length > 0) {
-          const minRating = filters.mentorRatings[0] === "4★ & Above" ? 4
-            : filters.mentorRatings[0] === "3★ & Above" ? 3
-              : filters.mentorRatings[0] === "2★ & Above" ? 2
-                : 1;
-          params.append("min_rating", String(minRating));
+          // Find the highest minimum rating from selected options
+          const ratings = filters.mentorRatings.map((rating: string) => {
+            if (rating.includes("4.5")) return 4.5;
+            if (rating.includes("4.0") || rating.includes("4★")) return 4.0;
+            if (rating.includes("3.5") || rating.includes("3★")) return 3.5;
+            return 0;
+          });
+          const minRating = Math.max(...ratings);
+          if (minRating > 0) {
+            params.append("min_rating", String(minRating));
+          }
         }
 
         const response = await fetch(`${API_BASE_URL}/mentors/profiles?${params.toString()}`);
@@ -239,25 +247,25 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           let mappedMentors = data.mentors && data.mentors.length > 0 ? data.mentors.map((m: any) => ({
             id: m.id,
             name: m.full_name,
-            title: m.headline || "Mentor",
+            title: m.role || m.headline || "Mentor",
             company: m.company || "",
             image: m.profile_picture_url || "/placeholder.svg?height=80&width=80",
             rating: m.rating || 0,
             reviews: m.total_sessions || 0,
             location: m.location || "Remote",
             expertise: m.skills || [],
-            price: m.hourly_rate || 0,
+            price: m.hourly_rate || 0, // Backend already returns in rupees (converted from paise)
             mentees: m.total_sessions || 0,
             available: m.is_online || m.available || false,
             responseTime: "24 hrs",
             successRate: 100,
             description: m.headline || "",
-            languages: [],
-            yearsExperience: m.years_of_experience || m.experience_years || m.years_experience || 0,
+            languages: m.languages || [],
+            yearsExperience: m.years_experience || 0,
           })) : DUMMY_MENTORS;
 
           // Client-side filtering for fields not available in API
-          
+
           // Filter by verified status
           if (filters?.isVerified) {
             // Assuming verified mentors have higher ratings or specific badge
@@ -281,8 +289,8 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           if (filters?.packages && filters.packages.length > 0) {
             // Filter mentors whose expertise matches selected packages
             mappedMentors = mappedMentors.filter((m: Mentor) =>
-              filters.packages.some((pkg: string) => 
-                m.expertise.some((exp: string) => 
+              filters.packages.some((pkg: string) =>
+                m.expertise.some((exp: string) =>
                   exp.toLowerCase().includes(pkg.toLowerCase()) ||
                   pkg.toLowerCase().includes(exp.toLowerCase())
                 )
@@ -405,9 +413,8 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           {mentors.map((mentor) => (
             <Card
               key={mentor.id}
-              className={`relative rounded-xl p-5 lg:p-6 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 bg-white ${
-                mentor.available ? 'border-[3px] border-[#28a745]' : 'border border-white'
-              }`}
+              className={`relative rounded-xl p-5 lg:p-6 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 bg-white ${mentor.available ? 'border-[3px] border-[#28a745]' : 'border border-white'
+                }`}
               style={{ overflow: 'visible' }}
             >
               {/* Card content wrapper: flex-col + flex-1 for inner content */}
@@ -418,9 +425,8 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 {/* Avatar + Info */}
                 <div className="flex gap-3 lg:gap-4 items-start relative z-10 mt-10 lg:mt-12 py-2">
                   <div className="relative -mt-4 lg:-mt-6">
-                    <Avatar className={`w-16 h-16 lg:w-20 lg:h-20 border-[3px] shadow-md ${
-                      mentor.available ? 'border-[#28a745]' : 'border-white'
-                    }`}>
+                    <Avatar className={`w-16 h-16 lg:w-20 lg:h-20 border-[3px] shadow-md ${mentor.available ? 'border-[#28a745]' : 'border-white'
+                      }`}>
                       <AvatarImage src={mentor.image} alt={mentor.name} />
                     </Avatar>
                     <div className="absolute w-[60px] lg:w-[70px] h-[20px] lg:h-[23px] -bottom-2 lg:-bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-xs lg:text-sm flex items-center space-x-1 lg:space-x-2 justify-center shadow">
@@ -439,14 +445,20 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 </div>
 
                 {/* Location / Experience / Favorite */}
-                <div className="mt-3 lg:mt-4 flex gap-2 lg:gap-3 font-semibold text-[11px] lg:text-xs text-black items-center">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 lg:h-4 w-3 lg:w-4" />
+                <div className="mt-3 lg:mt-4 flex gap-10 lg:gap-10 font-semibold text-[11px] lg:text-xs text-black items-center">
+                  <div className="flex items-center gap-2">
+                    <svg width="10" height="14" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M9.33333 4.66667C9.33333 4.05383 9.21263 3.447 8.97811 2.88081C8.74358 2.31462 8.39984 1.80017 7.9665 1.36683C7.53316 0.933495 7.01871 0.589751 6.45252 0.355229C5.88634 0.120707 5.2795 0 4.66667 0C4.05383 0 3.447 0.120707 2.88081 0.355229C2.31462 0.589751 1.80018 0.933495 1.36683 1.36683C0.933495 1.80017 0.589751 2.31462 0.355229 2.88081C0.120707 3.447 -9.13196e-09 4.05383 0 4.66667C0 5.59133 0.272667 6.45133 0.736667 7.17667H0.731333L4.66667 13.3333L8.602 7.17667H8.59733C9.07795 6.42774 9.33341 5.55655 9.33333 4.66667ZM4.66667 6.66667C4.13623 6.66667 3.62753 6.45595 3.25245 6.08088C2.87738 5.70581 2.66667 5.1971 2.66667 4.66667C2.66667 4.13623 2.87738 3.62753 3.25245 3.25245C3.62753 2.87738 4.13623 2.66667 4.66667 2.66667C5.1971 2.66667 5.70581 2.87738 6.08088 3.25245C6.45595 3.62753 6.66667 4.13623 6.66667 4.66667C6.66667 5.1971 6.45595 5.70581 6.08088 6.08088C5.70581 6.45595 5.1971 6.66667 4.66667 6.66667Z" fill="black" />
+                    </svg>
+
                     <span className="line-clamp-1">{mentor.location}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-3 lg:h-4 w-3 lg:w-4" />
-                    <span>{mentor.yearsExperience} yrs</span>
+                  <div className="flex items-center gap-2">
+                    <svg width="9" height="14" viewBox="0 0 9 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.2 8.4C3.08609 8.4 2.0178 7.9575 1.23015 7.16985C0.442499 6.3822 0 5.31391 0 4.2C0 3.08609 0.442499 2.0178 1.23015 1.23015C2.0178 0.442499 3.08609 0 4.2 0C5.31391 0 6.3822 0.442499 7.16985 1.23015C7.9575 2.0178 8.4 3.08609 8.4 4.2C8.4 5.31391 7.9575 6.3822 7.16985 7.16985C6.3822 7.9575 5.31391 8.4 4.2 8.4ZM4.2 6.3C4.75695 6.3 5.2911 6.07875 5.68492 5.68492C6.07875 5.2911 6.3 4.75695 6.3 4.2C6.3 3.64305 6.07875 3.1089 5.68492 2.71508C5.2911 2.32125 4.75695 2.1 4.2 2.1C3.64305 2.1 3.1089 2.32125 2.71508 2.71508C2.32125 3.1089 2.1 3.64305 2.1 4.2C2.1 4.75695 2.32125 5.2911 2.71508 5.68492C3.1089 6.07875 3.64305 6.3 4.2 6.3ZM7 8.225V14L4.2 11.2L1.4 14V8.225C2.22049 8.79998 3.1981 9.10842 4.2 9.10842C5.2019 9.10842 6.17951 8.79998 7 8.225Z" fill="black" />
+                    </svg>
+
+                    <span>{mentor.yearsExperience} yrs experience</span>
                   </div>
                   <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-8 lg:-top-10">
                     <Heart className="h-4 w-4 text-black" />
@@ -466,7 +478,7 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                   </div>
                   <div className="flex flex-col items-center">
                     <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Total Mentees</span>
-                    <div className="flex items-center gap-1 mt-1">
+                    <div className="flex font-bold items-center gap-1 mt-1">
                       <Users className="w-3 h-3 lg:w-4 lg:h-4 text-blue-500" />
                       <span className="text-xs lg:text-sm font-bold">{mentor.mentees}</span>
                     </div>
@@ -474,7 +486,10 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                   <div className="flex flex-col items-center">
                     <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Success Rate</span>
                     <div className="flex items-center gap-1 mt-1">
-                      <CheckCircle className="w-3 h-3 lg:w-4 lg:h-4 text-green-500" />
+                      <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M16.7106 0.519957C16.6255 0.315036 16.4626 0.152192 16.2577 0.0670911C16.1569 0.0241184 16.0486 0.00132504 15.939 0H11.7458C11.5234 0 11.3101 0.0883566 11.1528 0.245632C10.9955 0.402908 10.9072 0.616219 10.9072 0.83864C10.9072 1.06106 10.9955 1.27437 11.1528 1.43165C11.3101 1.58892 11.5234 1.67728 11.7458 1.67728H13.9179L9.2299 6.36528L6.47078 3.59777C6.39281 3.51916 6.30006 3.45677 6.19786 3.41419C6.09567 3.37162 5.98605 3.3497 5.87534 3.3497C5.76463 3.3497 5.65502 3.37162 5.55282 3.41419C5.45062 3.45677 5.35787 3.51916 5.27991 3.59777L0.248068 8.62961C0.169464 8.70757 0.107074 8.80032 0.0644972 8.90252C0.0219206 9.00471 0 9.11433 0 9.22504C0 9.33575 0.0219206 9.44536 0.0644972 9.54756C0.107074 9.64976 0.169464 9.74251 0.248068 9.82047C0.326031 9.89908 0.418785 9.96147 0.520981 10.004C0.623177 10.0466 0.732792 10.0685 0.843503 10.0685C0.954213 10.0685 1.06383 10.0466 1.16602 10.004C1.26822 9.96147 1.36097 9.89908 1.43894 9.82047L5.87534 5.37568L8.63447 8.14319C8.71243 8.2218 8.80518 8.28419 8.90738 8.32677C9.00958 8.36934 9.11919 8.39126 9.2299 8.39126C9.34061 8.39126 9.45023 8.36934 9.55242 8.32677C9.65462 8.28419 9.74737 8.2218 9.82534 8.14319L15.1004 2.85976V5.03184C15.1004 5.25426 15.1887 5.46757 15.346 5.62485C15.5033 5.78212 15.7166 5.87048 15.939 5.87048C16.1614 5.87048 16.3748 5.78212 16.532 5.62485C16.6893 5.46757 16.7777 5.25426 16.7777 5.03184V0.83864C16.7763 0.729049 16.7535 0.62078 16.7106 0.519957Z" fill="#16A34A"/>
+</svg>
+
                       <span className="text-xs lg:text-sm font-bold">{mentor.successRate}%</span>
                     </div>
                   </div>

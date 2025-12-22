@@ -1,151 +1,238 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+'use client'
+
+import { Card, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { FileText, Download, Eye, Wand2 } from "lucide-react"
+import { ArrowRight, ChevronDown } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useState } from "react"
+
+const resumeOfferings = [
+  {
+    title: "Resume Templates",
+    description: "Browse our collection of ATS-friendly resume templates tailored for different industries and experience levels.",
+    href: "/career-toolkit/resume-builder",
+    backgroundImage: "/resume-templates.png",
+    buttonText: "Browse Templates",
+    priceText: "234 free available",
+  },
+  {
+    title: "AI Resume Analyzer",
+    description: "Upload your resume and get AI-powered insights on formatting, content quality, and ATS compatibility.",
+    href: "/career-toolkit/ai-resume-analyzer",
+    backgroundImage: "/resume-analyser.png",
+    buttonText: "Analyse Resume",
+    priceText: "Free Forever",
+  },
+  {
+    title: "Expert Review",
+    description: "Connect with industry experts who can provide personalized feedback and suggestions for improvement.",
+    href: "/quickactions/resume-review",
+    backgroundImage: "/expert-review.png",
+    buttonText: "Book Expert Review",
+    priceText: "Starting from ₹89",
+  },
+]
+
+const faqs = [
+  {
+    question: "What makes your resume templates ATS-friendly?",
+    answer: "Our templates are specifically designed to pass Applicant Tracking Systems. They use clean formatting, standard fonts, and proper structure that ATS software can easily parse and read."
+  },
+  {
+    question: "How does the AI Resume Analyzer work?",
+    answer: "Our AI analyzes your resume for formatting issues, keyword optimization, content quality, and ATS compatibility. It provides actionable insights and suggestions to improve your resume's effectiveness."
+  },
+  {
+    question: "Can I get expert feedback on my resume?",
+    answer: "Yes! You can book a session with industry experts who will provide personalized feedback and suggestions tailored to your career goals and target industry."
+  },
+  {
+    question: "Are the resume templates free to use?",
+    answer: "We offer 234 free resume templates that you can use immediately. Premium templates with advanced features are also available for purchase."
+  },
+  {
+    question: "How long does an expert review take?",
+    answer: "Expert reviews typically take 24-48 hours. You'll receive detailed feedback via email, and you can book a follow-up call if needed."
+  },
+]
 
 export default function ResumeBuilderPage() {
+  const [openFAQs, setOpenFAQs] = useState<number[]>([])
+
+  const toggleFAQ = (index: number) => {
+    setOpenFAQs(prev => 
+      prev.includes(index) 
+        ? prev.filter(i => i !== index)
+        : [...prev, index]
+    )
+  }
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">AI-Powered Resume Builder</h1>
-        <p className="text-lg text-gray-600">Create a professional resume in minutes with our intelligent builder</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Form Section */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" placeholder="John" />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="john@example.com" />
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" placeholder="+1 (555) 123-4567" />
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input id="location" placeholder="San Francisco, CA" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Professional Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                placeholder="Write a brief summary of your professional background and key achievements..."
-                rows={4}
-              />
-              <Button className="mt-2 bg-transparent" variant="outline">
-                <Wand2 className="mr-2 h-4 w-4" />
-                AI Generate
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Work Experience</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="jobTitle">Job Title</Label>
-                <Input id="jobTitle" placeholder="Senior Product Manager" />
-              </div>
-              <div>
-                <Label htmlFor="company">Company</Label>
-                <Input id="company" placeholder="Google" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="startDate">Start Date</Label>
-                  <Input id="startDate" type="date" />
-                </div>
-                <div>
-                  <Label htmlFor="endDate">End Date</Label>
-                  <Input id="endDate" type="date" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Describe your responsibilities and achievements..." rows={3} />
-              </div>
-              <Button variant="outline">Add Another Position</Button>
-            </CardContent>
-          </Card>
-
-          <div className="flex space-x-4">
-            <Button className="flex-1">
-              <Eye className="mr-2 h-4 w-4" />
-              Preview Resume
-            </Button>
-            <Button variant="outline" className="flex-1 bg-transparent">
-              <Download className="mr-2 h-4 w-4" />
-              Download PDF
-            </Button>
-          </div>
+    <div className="min-h-screen bg-gray-50 font-[Mulish] pb-0">
+      {/* Constrained content wrapper */}
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1300px] pb-16">
+        {/* Banner */}
+        <div className="relative w-full flex justify-center mb-8 lg:mb-10">
+          <Image
+            src="/resume-banner.png"
+            alt="Resume Builder Banner"
+            width={1400}
+            height={150}
+            className="object-contain"
+            priority
+          />
         </div>
 
-        {/* Preview Section */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="mr-2 h-5 w-5" />
-                Resume Preview
-              </CardTitle>
-              <CardDescription>See how your resume will look</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-white border rounded-lg p-6 shadow-sm min-h-[600px]">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">John Doe</h2>
-                  <p className="text-gray-600">john@example.com | +1 (555) 123-4567</p>
-                  <p className="text-gray-600">San Francisco, CA</p>
+      
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
+          {resumeOfferings.map((offering) => (
+            <Card
+              key={offering.title}
+              className="border-0 shadow-[0_20px_40px_#9F9D9D40] overflow-hidden flex flex-col h-full rounded-2xl"
+            >
+              <div className="relative h-38 overflow-hidden">
+                <img
+                  src={offering.backgroundImage || "/placeholder.svg"}
+                  alt={offering.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              <CardContent className="p-6 flex flex-col flex-1">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-black mb-2">{offering.title}</h3>
+                  <CardDescription className="text-gray-800 text-base leading-relaxed">
+                    {offering.description}
+                  </CardDescription>
+                  
+                  {/* Pricing Info */}
+                  <div className="mt-4 text-left">
+                    <p className="text-[#0073CF] font-bold text-base">{offering.priceText}</p>
+                  </div>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Summary</h3>
-                  <p className="text-gray-700 text-sm">
-                    Experienced product manager with 5+ years of experience in building and scaling digital products...
-                  </p>
-                </div>
+                {/* Explore Button */}
+                <Link href={offering.href} className="mt-6">
+                  <Button
+                    className="relative w-full bg-[#0073CF] hover:bg-[#0073CF] text-white rounded-full overflow-hidden h-11 flex items-center justify-center group px-2"
+                  >
+                    {/* Button text */}
+                    <span className="z-10 relative text-center font-medium transition-all duration-300 group-hover:opacity-0">
+                      {offering.buttonText}
+                    </span>
 
-                <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Work Experience</h3>
-                  <div className="mb-4">
-                    <div className="flex justify-between items-start mb-1">
-                      <h4 className="font-medium text-gray-900">Senior Product Manager</h4>
-                      <span className="text-sm text-gray-600">2020 - Present</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">Google</p>
-                    <p className="text-sm text-gray-700">
-                      Led product strategy for search features, managing cross-functional teams...
+                    {/* Arrow circle */}
+                    <span className="absolute right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center transition-all duration-300 group-hover:w-[calc(100%-16px)] group-hover:right-2 group-hover:rounded-full">
+                      <ArrowRight className="text-[#0073CF] h-4 w-4" />
+                    </span>
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Why Choose Section */}
+        <div className="mt-16 mb-20">
+          <h2 className="text-3xl sm:text-4xl font-bold m-2">
+            <span className="text-black">Why choose our </span>
+            <span className="text-[#0073CF]">Resume Builder?</span>
+          </h2>
+        </div>
+
+        {/* Features Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-12">
+          {[
+            {
+              title: "ATS-Friendly",
+              description: "All templates pass Applicant Tracking System",
+              icon: "/icons/ats-friendly.png",
+            },
+            {
+              title: "AI-Powered",
+              description: "Smart suggestions and instant feedback",
+              icon: "/icons/ai-powered.png",
+            },
+            {
+              title: "Expert Reviewed",
+              description: "Designed by HR professionals",
+              icon: "/icons/expert-reviewed.png",
+            },
+            {
+              title: "Easy to use",
+              description: "Optimize your resume in minutes",
+              icon: "/icons/easy-to-use.png",
+            },
+          ].map((feature, index) => (
+            <Card
+              key={index}
+              className="relative border-0 shadow-[0_20px_40px_#9F9D9D40] rounded-2xl pt-8"
+            >
+              {/* Blue circle - half above card */}
+              <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 bg-[#0073CF] rounded-full flex items-center justify-center">
+                <Image
+                  src={feature.icon}
+                  alt={feature.title}
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                />
+              </div>
+
+              <CardContent className="pt-12 mb-6 pb-6 px-12 text-center">
+                <h3 className="text-xl font-bold text-black mb-3">{feature.title}</h3>
+                <p className=" text-base leading-relaxed">
+                  {feature.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* FAQ Section */}
+        <div className="mt-20 mb-12">
+          <h2 className="text-3xl sm:text-4xl font-bold m-2 mb-12">
+            <span className="text-black">Frequently Asked </span>
+            <span className="text-[#0073CF]">Questions?</span>
+          </h2>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="w-full bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 relative"
+              >
+                {/* Blue strip on left */}
+                <div className="absolute left-0 top-0 h-full w-2 bg-[#0073CF] rounded-l-2xl"></div>
+                
+                <button
+                  onClick={() => toggleFAQ(index)}
+                  className="w-full px-6 py-5 pl-8 flex items-center justify-between transition-colors"
+                >
+                  <span className="text-left font-bold text-lg text-black pr-4">
+                    {faq.question}
+                  </span>
+                  <div className={`flex-shrink-0 w-10 h-10 bg-[#f0f8ff] rounded-full flex items-center justify-center transition-transform duration-300 ${openFAQs.includes(index) ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-5 h-5 text-[#0073CF]" />
+                  </div>
+                </button>
+                
+                <div
+                  className={`transition-all duration-300 ease-in-out ${
+                    openFAQs.includes(index) ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  } overflow-hidden`}
+                >
+                  <div className="px-6 pb-5 pt-2 pl-8">
+                    <p className="text-gray-700 text-base leading-relaxed font-semibold">
+                      {faq.answer}
                     </p>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>

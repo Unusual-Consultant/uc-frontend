@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +17,7 @@ interface Message {
 }
 
 export function ChatBot() {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -29,6 +31,17 @@ export function ChatBot() {
   const [isLoading, setIsLoading] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // Hide chatbot on sign-in, sign-up, and onboarding pages
+  const shouldHideChatBot = pathname?.startsWith('/login') || 
+                             pathname?.startsWith('/signup') || 
+                             pathname?.startsWith('/onboarding')
+
+  if (shouldHideChatBot) {
+    return (
+      <></>
+    )
+  }
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
