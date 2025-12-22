@@ -183,7 +183,7 @@ export default function AIRoadmap() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-6xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
+      <div className="w-full max-w-[1240px] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
 
         {/* Title */}
         <h1 className="text-[40px] md:text-[52px] font-semibold text-gray-900 leading-tight">
@@ -217,7 +217,7 @@ export default function AIRoadmap() {
 
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-6xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
 
         <CardContent className="p-8 space-y-8">
           {/* ===== Dropdown Section ===== */}
@@ -436,7 +436,7 @@ export default function AIRoadmap() {
             <Button
               onClick={generateRoadmap}
               disabled={isLoading}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952] text-white rounded-full px-8 py-3 text-lg font-semibold transition w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Generating..." : (
                 <>
@@ -451,7 +451,7 @@ export default function AIRoadmap() {
 
       {/* ===== Roadmap Section ===== */}
       {showRoadmap && (
-        <Card className="w-full max-w-6xl rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
+        <Card className="w-full max-w-[1240px] rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
           <CardContent className="p-8 text-gray-500 text-lg ">
 
             {/* ===== Roadmap Summary Heading ===== */}

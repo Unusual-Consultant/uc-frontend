@@ -282,9 +282,9 @@ export default function AIInterviewChecklist() {
   )
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-[100px] py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-5xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
+      <div className="w-full max-w-[1240px] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
         <div className="flex flex-col space-y-2">
           <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
             <span className="text-[#0073CF]">AI Interview</span> Checklist
@@ -313,7 +313,7 @@ export default function AIInterviewChecklist() {
 
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
         <CardContent className="p-8 space-y-6">
           <div className="grid text-[20px] md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Dropdown
@@ -350,7 +350,7 @@ export default function AIInterviewChecklist() {
             <Button
               onClick={generateChecklist}
               disabled={isLoading}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -365,7 +365,7 @@ export default function AIInterviewChecklist() {
 
       {/* ===== Results / Sections Box ===== */}
       {generated && checklistData && (
-        <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
+        <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
           <CardContent className="p-8 space-y-5">
             <CardDropdown title="Role Overview" content={checklistData.role_overview} />
             <CardDropdown title="Background Input" content={checklistData.background_input} />
