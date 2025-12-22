@@ -104,15 +104,23 @@ export function ChatBot() {
       {isOpen && (
         <div className="w-96 max-w-[calc(100vw-2rem)]">
           <Card className="shadow-2xl border-0">
-            <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg relative">
               <CardTitle className="flex items-center gap-2">
                 <Bot className="h-5 w-5" />
                 Smart Buddy
               </CardTitle>
+              <Button
+                onClick={() => setIsOpen(false)}
+                size="icon"
+                variant="ghost"
+                className="absolute top-3 right-3 h-8 w-8 text-white hover:bg-white/20 rounded-full"
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </CardHeader>
             <CardContent className="p-0">
               {/* Messages */}
-              <div className="h-80 overflow-y-auto p-4 space-y-4">
+              <div className="max-h-80 overflow-y-auto p-4 space-y-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -170,15 +178,17 @@ export function ChatBot() {
       )}
 
       {/* Chat Button */}
-      <Button
-        onClick={() => setIsOpen(!isOpen)}
-        size="sm"
-        variant="ghost"
-        className="w-14 h-14 transition-all duration-300 bg-transparent hover:bg-transparent"
-        title="Smart Buddy"
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <AnimatedCornerIcons />}
-      </Button>
+      {!isOpen && (
+        <Button
+          onClick={() => setIsOpen(!isOpen)}
+          size="sm"
+          variant="ghost"
+          className="w-14 h-14 transition-all duration-300 bg-transparent hover:bg-transparent"
+          title="Smart Buddy"
+        >
+          <AnimatedCornerIcons />
+        </Button>
+      )}
     </div>
   )
 }

@@ -55,7 +55,7 @@ const DUMMY_MENTORS: Mentor[] = [
     responseTime: "24",
     successRate: 98,
     description: "Experienced PM with 10+ years in tech. Helped launch products used by millions. Passionate about mentoring aspiring product managers.",
-    languages: ["English", "Spanish"],
+    languages: ["English", "Spanish", "Hindi"],
     yearsExperience: 10,
   },
   {
@@ -213,7 +213,7 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
 
         // Add price filters
         if (filters?.minPrice !== undefined && filters?.minPrice > 0) {
-          params.append("min_rating", "0"); // API doesn't have min_price, using for reference
+          params.append("min_price", String(filters.minPrice * 100)); // Convert to paise
         }
         if (filters?.maxPrice !== undefined && filters?.maxPrice < 2000) {
           params.append("max_price", String(filters.maxPrice * 100)); // Convert to paise
@@ -253,14 +253,91 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
             successRate: 100,
             description: m.headline || "",
             languages: [],
-            yearsExperience: 0,
+            yearsExperience: m.years_of_experience || m.experience_years || m.years_experience || 0,
           })) : DUMMY_MENTORS;
 
           // Client-side filtering for fields not available in API
-          if (filters?.responseTime && filters.responseTime.length > 0) {
+          
+          // Filter by verified status
+          if (filters?.isVerified) {
+            // Assuming verified mentors have higher ratings or specific badge
+            mappedMentors = mappedMentors.filter((m: Mentor) => m.rating >= 4.5);
+          }
+
+          // Filter by price range
+          if (filters?.minPrice !== undefined || filters?.maxPrice !== undefined) {
+            const min = filters.minPrice || 0;
+            const max = filters.maxPrice || 2000;
+            mappedMentors = mappedMentors.filter((m: Mentor) => m.price >= min && m.price <= max);
+          }
+
+          // Filter by session type
+          if (filters?.sessionType && filters.sessionType.length > 0) {
+            // Since dummy data doesn't have session type, we'll keep all for now
+            // In real implementation, filter by: filters.sessionType.includes(m.sessionType)
+          }
+
+          // Filter by packages
+          if (filters?.packages && filters.packages.length > 0) {
+            // Filter mentors whose expertise matches selected packages
             mappedMentors = mappedMentors.filter((m: Mentor) =>
-              filters.responseTime.some((rt: string) => m.responseTime.includes(rt) || rt === "< 24 Hours")
+              filters.packages.some((pkg: string) => 
+                m.expertise.some((exp: string) => 
+                  exp.toLowerCase().includes(pkg.toLowerCase()) ||
+                  pkg.toLowerCase().includes(exp.toLowerCase())
+                )
+              )
             );
+          }
+
+          // Filter by experience level
+          if (filters?.experienceLevel && filters.experienceLevel.length > 0) {
+            mappedMentors = mappedMentors.filter((m: Mentor) => {
+              return filters.experienceLevel.some((level: string) => {
+                if (level.includes("0-2")) return m.yearsExperience >= 0 && m.yearsExperience <= 2;
+                if (level.includes("3-5")) return m.yearsExperience >= 3 && m.yearsExperience <= 5;
+                if (level.includes("6-10")) return m.yearsExperience >= 6 && m.yearsExperience <= 10;
+                if (level.includes("10+")) return m.yearsExperience > 10;
+                return true;
+              });
+            });
+          }
+
+          // Filter by mentor ratings
+          if (filters?.mentorRatings && filters.mentorRatings.length > 0) {
+            mappedMentors = mappedMentors.filter((m: Mentor) => {
+              return filters.mentorRatings.some((rating: string) => {
+                if (rating.includes("4.5")) return m.rating >= 4.5;
+                if (rating.includes("4.0")) return m.rating >= 4.0;
+                if (rating.includes("3.5")) return m.rating >= 3.5;
+                return true; // "Any Rating"
+              });
+            });
+          }
+
+          // Filter by availability
+          if (filters?.availability && filters.availability.length > 0) {
+            mappedMentors = mappedMentors.filter((m: Mentor) => {
+              // Filter by available mentors for immediate availability
+              if (filters.availability.includes("Available Today")) {
+                return m.available;
+              }
+              return true; // For other availability options, show all
+            });
+          }
+
+          // Filter by response time
+          if (filters?.responseTime && filters.responseTime.length > 0) {
+            mappedMentors = mappedMentors.filter((m: Mentor) => {
+              const responseHours = parseInt(m.responseTime);
+              return filters.responseTime.some((rt: string) => {
+                if (rt.includes("< 1 Hour")) return responseHours < 1;
+                if (rt.includes("< 24 Hours")) return responseHours <= 24;
+                if (rt.includes("Within 3 Days")) return responseHours <= 72;
+                if (rt.includes("Within a Week")) return responseHours <= 168;
+                return true;
+              });
+            });
           }
 
           // Sort mentors
@@ -270,6 +347,13 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
             mappedMentors.sort((a: Mentor, b: Mentor) => b.price - a.price);
           } else if (filters?.sortBy === "rating") {
             mappedMentors.sort((a: Mentor, b: Mentor) => b.rating - a.rating);
+          } else if (filters?.sortBy === "experience") {
+            mappedMentors.sort((a: Mentor, b: Mentor) => b.yearsExperience - a.yearsExperience);
+          } else if (filters?.sortBy === "response-time") {
+            mappedMentors.sort((a: Mentor, b: Mentor) => parseInt(a.responseTime) - parseInt(b.responseTime));
+          } else if (filters?.sortBy === "newest-mentors") {
+            // For newest mentors, reverse the array (assuming later items are newer)
+            mappedMentors.reverse();
           }
 
           setMentors(mappedMentors);
@@ -292,9 +376,9 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
 
   if (loading) {
     return (
-      <section className="py-12 font-[Mulish] bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
-          <p>Loading mentors...</p>
+      <section className="py-8 lg:py-12 font-[Mulish]">
+        <div className="w-full text-center">
+          <p className="text-sm lg:text-base text-gray-600">Loading mentors...</p>
         </div>
       </section>
     );
@@ -302,9 +386,9 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
 
   if (mentors.length === 0) {
     return (
-      <section className="py-12 font-[Mulish] bg-gray-50">
-        <div className="container mx-auto px-4 text-center">
-          <p>No mentors found matching your criteria.</p>
+      <section className="py-8 lg:py-12 font-[Mulish]">
+        <div className="w-full text-center">
+          <p className="text-sm lg:text-base text-gray-600">No mentors found matching your criteria.</p>
         </div>
       </section>
     );
@@ -321,99 +405,102 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
           {mentors.map((mentor) => (
             <Card
               key={mentor.id}
-              className={`relative rounded-xl p-6 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 overflow-hidden bg-white ${
-                mentor.available ? 'border-2 border-green-500' : 'border border-[#C7C7C7]'
+              className={`relative rounded-xl p-5 lg:p-6 flex flex-col hover:shadow-lg shadow-[#9F9D9D40] transition-all duration-300 bg-white ${
+                mentor.available ? 'border-[3px] border-[#28a745]' : 'border border-white'
               }`}
+              style={{ overflow: 'visible' }}
             >
               {/* Card content wrapper: flex-col + flex-1 for inner content */}
-              <div className="flex flex-col flex-1">
+              <div className="flex flex-col flex-1 overflow-hidden">
                 {/* Banner */}
-                <div className="absolute top-0 left-0 w-full h-20 bg-[#C4E1FF] rounded-t-xl z-0" />
+                <div className="absolute top-0 left-0 w-full h-16 lg:h-20 bg-[#C4E1FF] rounded-t-xl z-0" />
 
                 {/* Avatar + Info */}
-                <div className="flex gap-4 items-start relative z-10 mt-14 py-2">
-                  <div className="relative -mt-6">
-                    <Avatar className={`w-20 h-20 border-2 shadow-md ${
-                      mentor.available ? 'border-green-500' : 'border-white'
+                <div className="flex gap-3 lg:gap-4 items-start relative z-10 mt-10 lg:mt-12 py-2">
+                  <div className="relative -mt-4 lg:-mt-6">
+                    <Avatar className={`w-16 h-16 lg:w-20 lg:h-20 border-[3px] shadow-md ${
+                      mentor.available ? 'border-[#28a745]' : 'border-white'
                     }`}>
                       <AvatarImage src={mentor.image} alt={mentor.name} />
                     </Avatar>
-                    <div className="absolute w-[70px] h-[23px] -bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-sm flex items-center space-x-2 justify-center shadow">
-                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />{" "}
-                      <span className="text-black">{mentor.rating.toFixed(1)}</span>
+                    <div className="absolute w-[60px] lg:w-[70px] h-[20px] lg:h-[23px] -bottom-2 lg:-bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-xs lg:text-sm flex items-center space-x-1 lg:space-x-2 justify-center shadow">
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <span className="text-black font-semibold">{mentor.rating.toFixed(1)}</span>
                     </div>
                   </div>
 
-                  <div className="flex-1 flex flex-col mt-1 text-black">
+                  <div className="flex-1 flex flex-col mt-0 lg:mt-1 text-black">
                     <div className="flex items-center gap-1">
-                      <h3 className="text-lg font-bold">{mentor.name}</h3>
+                      <h3 className="text-base lg:text-lg font-bold leading-tight">{mentor.name}</h3>
                     </div>
-                    <p className="text-sm font-semibold">{mentor.title}</p>
-                    <p className="text-sm font-bold text-blue-600">{mentor.company}</p>
+                    <p className="text-xs lg:text-sm font-semibold mt-0.5">{mentor.title}</p>
+                    <p className="text-xs lg:text-sm font-bold text-blue-600 mt-0.5">{mentor.company}</p>
                   </div>
                 </div>
 
                 {/* Location / Experience / Favorite */}
-                <div className="mt-4 flex gap-4 font-semibold text-[12px] text-black items-center">
-                  <div className="flex items-center">
-                    <MapPin className="text-sm h-4" /> {mentor.location}
+                <div className="mt-3 lg:mt-4 flex gap-2 lg:gap-3 font-semibold text-[11px] lg:text-xs text-black items-center">
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 lg:h-4 w-3 lg:w-4" />
+                    <span className="line-clamp-1">{mentor.location}</span>
                   </div>
-                  <div className="flex items-center">
-                    <Users className="text-sm h-4 w-4" /> {mentor.yearsExperience} yrs experience
+                  <div className="flex items-center gap-1">
+                    <Users className="h-3 lg:h-4 w-3 lg:w-4" />
+                    <span>{mentor.yearsExperience} yrs</span>
                   </div>
-                  <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-10">
-                    <Heart className="text-sm h-4 text-black " />
+                  <button className="ml-auto text-gray-400 hover:text-red-500 transition-colors relative -top-8 lg:-top-10">
+                    <Heart className="h-4 w-4 text-black" />
                   </button>
                 </div>
 
-                <p className="mt-4 text-sm text-black font-[500] flex-1 line-clamp-3">{mentor.description}</p>
+                <p className="mt-3 lg:mt-4 text-xs lg:text-sm text-black font-medium flex-1 line-clamp-3 leading-relaxed">{mentor.description}</p>
 
                 {/* Stats */}
-                <div className="mt-6 flex justify-center gap-4 text-gray-700 w-full font-[Mulish]">
+                <div className="mt-4 lg:mt-6 flex justify-between text-gray-700 w-full font-[Mulish]">
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Response Time</span>
+                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Response Time</span>
                     <div className="flex items-center gap-1 mt-1">
-                      <Clock className="w-4 h-4 text-red-500" />
-                      <span className="text-[13px] font-[800]">&lt; {mentor.responseTime} hrs</span>
+                      <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-red-500" />
+                      <span className="text-xs lg:text-sm font-bold">&lt; {mentor.responseTime} hrs</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Total Mentees</span>
+                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Total Mentees</span>
                     <div className="flex items-center gap-1 mt-1">
-                      <Users className="w-4 h-4 text-blue-500" />
-                      <span className="text-[13px] font-[800]">{mentor.mentees}</span>
+                      <Users className="w-3 h-3 lg:w-4 lg:h-4 text-blue-500" />
+                      <span className="text-xs lg:text-sm font-bold">{mentor.mentees}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[13px] text-center whitespace-nowrap">Success Rate</span>
+                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Success Rate</span>
                     <div className="flex items-center gap-1 mt-1">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span className="text-[13px] font-[800]">{mentor.successRate}%</span>
+                      <CheckCircle className="w-3 h-3 lg:w-4 lg:h-4 text-green-500" />
+                      <span className="text-xs lg:text-sm font-bold">{mentor.successRate}%</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Expertise / Languages */}
-                <div className="mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
+                <div className="mt-4 lg:mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
                   {mentor.expertise.slice(0, 3).map((skill) => (
-                    <span key={skill} className="px-4 py-1 bg-[#edf7ff] text-[12px] rounded-full font-semibold">
+                    <span key={skill} className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[11px] lg:text-xs rounded-full font-semibold">
                       {skill}
                     </span>
                   ))}
                   {mentor.expertise.length > 3 && (
-                    <span className="px-4 py-1 bg-[#edf7ff] text-[12px] rounded-full font-semibold">
+                    <span className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[11px] lg:text-xs rounded-full font-semibold">
                       +{mentor.expertise.length - 3}
                     </span>
                   )}
                 </div>
                 {mentor.languages && mentor.languages.length > 0 && (
-                  <div className="mt-3 group cursor-pointer inline-block font-[500]">
-                    <div className="relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-[#e9eef3] text-xs rounded-full transition-all duration-300 ease-in-out">
-                      <span className="flex items-center gap-1 transition-all duration-300 group-hover:opacity-0 group-hover:scale-90 whitespace-nowrap">
-                        <Globe className="w-3 h-3 text-blue-400" />
+                  <div className="mt-2 lg:mt-3 inline-block font-medium">
+                    <div className="group relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-[#e9eef3] text-[11px] lg:text-xs rounded-full cursor-pointer transition-all duration-300 ease-in-out hover:min-w-max">
+                      <Globe className="w-3 h-3 text-blue-400 transition-opacity duration-300 group-hover:opacity-0 group-hover:w-0" />
+                      <span className="whitespace-nowrap transition-opacity duration-300 group-hover:opacity-0 group-hover:absolute group-hover:invisible">
                         Languages
                       </span>
-                      <span className="absolute flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                      <span className="absolute opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-hover:relative whitespace-nowrap">
                         {mentor.languages.join(", ")}
                       </span>
                     </div>
@@ -421,19 +508,19 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 )}
 
                 {/* Buttons */}
-                <div className="mt-8 flex items-start gap-4">
-                  <div className="flex flex-col pt-7">
-                    <span className="text-sm font-semibold">Starting from</span>
-                    <span className="py-2">
-                      <span className="text-lg font-bold text-[#0073CF]">₹{mentor.price}</span>
-                      <span className="text-lg font-bold text-black">/Session</span>
+                <div className="mt-6 lg:mt-8 flex items-start gap-3 lg:gap-4">
+                  <div className="flex flex-col pt-4 lg:pt-6">
+                    <span className="text-xs lg:text-sm font-semibold text-gray-600">Starting from</span>
+                    <span className="mt-1">
+                      <span className="text-base lg:text-lg font-bold text-[#0073CF]">₹{mentor.price}</span>
+                      <span className="text-sm lg:text-base font-bold text-black">/Session</span>
                     </span>
                   </div>
                   <div className="flex flex-col gap-2 flex-1">
-                    <Button variant="outline" size="sm" className="w-full border-black hover:border-[#ffffff] rounded-full hover:bg-[#edf7ff]">
+                    <Button variant="outline" size="sm" className="w-full border-black hover:border-[#0073CF] rounded-full hover:bg-[#edf7ff] text-xs lg:text-sm font-semibold transition-all">
                       <Link href={`/mentors/${mentor.id}`}>View Profile</Link>
                     </Button>
-                    <Button size="sm" className="w-full bg-[#0073cf] text-white hover:bg-[#003c6c] rounded-full">
+                    <Button size="sm" className="w-full bg-[#0073cf] text-white hover:bg-[#003c6c] rounded-full text-xs lg:text-sm font-semibold transition-all">
                       Quick Book
                     </Button>
                   </div>
