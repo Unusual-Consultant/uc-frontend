@@ -337,7 +337,7 @@ export default function AIResumeAnalyzer() {
             <Button
               onClick={analyzeResume}
               disabled={isLoading || (!selectedResumeFile && !jobDescription.trim())}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
