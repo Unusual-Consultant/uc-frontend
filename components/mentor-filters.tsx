@@ -506,7 +506,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -556,7 +556,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={level} className="text-mb font-semibold cursor-pointer">
+              <label htmlFor={level} className="text-md font-semibold cursor-pointer">
                 {level}
               </label>
             </div>
