@@ -48,17 +48,17 @@ export default function SignupPage() {
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
@@ -68,17 +68,17 @@ export default function SignupPage() {
       <div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-right w-full">
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
