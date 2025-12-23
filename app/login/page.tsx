@@ -47,18 +47,18 @@ export default function LoginPage() {
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[150px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left">
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
         </div>
       </div>
       <div className="absolute top-[425px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-right">
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
-          <img src="/image.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
+          <img src="/image1.png" alt="Scrolling profiles" className="h-[245px]" />
         </div>
       </div>
 

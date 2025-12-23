@@ -328,7 +328,7 @@ export function HeroSection() {
                 <Button
                   onClick={handleSearch}
                   size="lg"
-                  className="px-[2rem] py-[1rem] text-[1.125rem] font-medium bg-[#0073CF] text-white hover:bg-[#003C6C] rounded-full transition-all"
+                  className="px-[3rem] py-[1rem] text-[1rem] font-medium bg-[#0073CF] text-white hover:bg-[#003C6C] rounded-full transition-all"
                 >
                   Search
                 </Button>
@@ -483,7 +483,7 @@ export function HeroSection() {
                               {mentor.skills.map((skill: string) => (
                                 <span
                                   key={skill}
-                                  className="w-[110px] h-[23px] rounded-[17.46px] bg-[#D1EAFF66] text-black text-xs font-medium flex items-center justify-center px-[4.36px] py-[5.67px]"
+                                  className=" h-[23px] rounded-[17.46px] bg-[#D1EAFF66] text-black text-xs font-medium flex items-center justify-center px-4 py-[5.67px]"
                                 >
                                   {skill}
                                 </span>
@@ -505,7 +505,7 @@ export function HeroSection() {
                                 <Button
                                   size="sm"
                                   disabled={!mentor.available}
-                                  className="w-[120px] h-[38px] rounded-[30px] bg-[#0073CF] text-white text-[14px] font-[600] flex items-center justify-center gap-2 hover:bg-[#005fa3] disabled:opacity-50 transition-all duration-200"
+                                  className="w-[120px] h-[38px] rounded-[30px] bg-[#0073cf] text-white text-[14px] font-[600] flex items-center justify-center gap-2 hover:bg-[#003c6c] disabled:opacity-50 transition-all duration-200"
                                 >
                                   {mentor.available ? "Quick Book" : "Unavailable"}
                                 </Button>

@@ -14,7 +14,7 @@ export function Footer() {
            <div className="flex items-center space-x-4">
   <div className="flex-shrink-0 w-20 h-20 rounded-full bg-white cursor-pointer hover:bg-gray-400 transition-all flex items-center justify-center overflow-hidden">
     <Image
-      src="/UC_icon.jpg"
+      src="/UCLogo-main.png"
       alt="Unusual Consultant Logo"
       width={80}
       height={80}
