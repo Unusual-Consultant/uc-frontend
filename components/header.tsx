@@ -60,55 +60,15 @@ export function Header() {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-6 xl:space-x-10">
-          {quickLinks.map((link) => {
-            if (link.name === "Resume Builder") {
-              return (
-                <DropdownMenu key={link.name}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="text-md font-semibold text-black hover:text-[#0073CF] flex items-center gap-1 transition-colors">
-                      Resume Builder
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-auto p-2 mt-2 rounded-xl shadow-[4px_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-xl bg-white/30 border border-white/30 flex flex-col gap-1">
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/career-toolkit/resume-builder" 
-                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
-                      >
-                        Templates
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/resume-tools" 
-                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
-                      >
-                        Resume Tools
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link 
-                        href="/career-toolkit/ai-resume-analyzer" 
-                        className="w-[120px] h-[32px] flex items-center justify-center rounded-[6px] text-[16px] font-semibold text-black font-['Mulish'] hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer"
-                      >
-                        Analyzer
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )
-            }
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-md font-semibold text-black hover:text-[#0073CF] transition-colors"
-              >
-                {link.name}
-              </Link>
-            )
-          })}
+          {quickLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-md font-semibold text-black hover:text-[#0073CF] transition-colors"
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
 
         {/* User / Login */}
@@ -184,47 +144,15 @@ export function Header() {
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <nav className="flex flex-col space-y-4">
 
-              {quickLinks.map((link) => {
-                if (link.name === "Resume Builder") {
-                  return (
-                    <div key="resume-builder" className="flex flex-col space-y-2">
-                      <span className="font-medium text-gray-900">Resume Builder</span>
-
-                      {/* ✅ Updated mobile hover style */}
-                      <Link 
-                        href="/templates"
-                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
-                      >
-                        Templates
-                      </Link>
-
-                      <Link 
-                        href="/resume-tools"
-                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
-                      >
-                        Resume Tools
-                      </Link>
-
-                      <Link 
-                        href="/resume-analyzer"
-                        className="pl-4 text-sm text-gray-700 rounded-md hover:bg-[#F0F8FF] hover:text-black transition-colors cursor-pointer h-[32px] flex items-center"
-                      >
-                        Analyzer
-                      </Link>
-                    </div>
-                  )
-                }
-
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className="text-sm font-medium transition-colors hover:text-blue-600"
-                  >
-                    {link.name}
-                  </Link>
-                )
-              })}
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="text-sm font-medium transition-colors hover:text-blue-600"
+                >
+                  {link.name}
+                </Link>
+              ))}
 
               {isAuthenticated && user ? (
                 <div className="pt-4 border-t">
