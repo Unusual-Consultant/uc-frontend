@@ -24,18 +24,19 @@ interface AnalysisResponse {
   resume_length: number
   job_description_length: number
   resume_text: string
+  provider: string
 }
 
 interface UsageResponse {
   gemini_requests: number
-  openai_requests: number
+  openai_requests: number  // Now contains Groq usage
   gemini_limit: number
-  openai_limit: number
+  openai_limit: number     // Now contains Groq limit (30)
 }
 
 export default function AIResumeAnalyzer() {
   // State management
-  const [totalUses, setTotalUses] = useState(15) // Gemini limit
+  const [totalUses, setTotalUses] = useState(15) // Gemini (15) + Groq (30)
   const [usesRemaining, setUsesRemaining] = useState(15)
   const [analysisTriggered, setAnalysisTriggered] = useState(false)
   const [jobDescription, setJobDescription] = useState("")
@@ -66,8 +67,15 @@ export default function AIResumeAnalyzer() {
       const response = await fetch(`${API_BASE_URL}/resume-analysis/usage`)
       if (!response.ok) throw new Error('Failed to fetch usage stats')
       const data: UsageResponse = await response.json()
-      setUsesRemaining(data.gemini_limit - data.gemini_requests)
-      setTotalUses(data.gemini_limit)
+      
+      // Calculate combined usage from Gemini (primary) + Groq (fallback)
+      const geminiRemaining = data.gemini_limit - data.gemini_requests
+      const groqRemaining = data.openai_limit - data.openai_requests
+      const totalRemaining = geminiRemaining + groqRemaining
+      const totalLimit = data.gemini_limit + data.openai_limit
+      
+      setUsesRemaining(totalRemaining)
+      setTotalUses(totalLimit)
     } catch (error) {
       console.error('Error fetching usage stats:', error)
     }
@@ -358,13 +366,14 @@ export default function AIResumeAnalyzer() {
           missingKeywords={analysisResults.missing_keywords}
           aiInsights={analysisResults.ai_insights}
           matchScore={analysisResults.match_score}
+          provider={analysisResults.provider}
         />
       )}
 
 
 
       {/* Suggested Mentors */}
-      <SuggestedMentorsPage />
+      <SuggestedMentorsPage skills={[]} />
     </div>
   )
 }

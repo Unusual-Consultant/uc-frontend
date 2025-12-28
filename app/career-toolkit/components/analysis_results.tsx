@@ -9,6 +9,7 @@ interface AnalysisResultsProps {
   missingKeywords: string[]
   aiInsights: string[]
   matchScore: number
+  provider: string
 }
 
 export default function AnalysisResults({
@@ -17,6 +18,7 @@ export default function AnalysisResults({
   missingKeywords,
   aiInsights,
   matchScore,
+  provider,
 }: AnalysisResultsProps) {
   // highlight keywords
   const highlightText = (text: string) => {
@@ -25,9 +27,9 @@ export default function AnalysisResults({
   }
 
   return (
-    <div className="w-full flex flex-col items-center space-y-6">
+    <div className="w-full max-w-[1240px] flex flex-col items-center space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between w-full max-w-5xl px-2">
+      <div className="flex items-center justify-between w-full max-w-[1240px] px-2">
         <div className="flex items-center gap-3">
           <Image src="/light-bulb.png" alt="analysis" width={35} height={35} />
           <div>
@@ -65,18 +67,25 @@ export default function AnalysisResults({
       </div>
 
       {/* Main White Box */}
-      <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
+      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
         <CardContent className="p-8 space-y-8">
-          {/* Your Resume */}
+          {/* Matched Keywords Section */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Image src="/green_tick.png" alt="Your Resume" width={22} height={22} />
-              <h2 className="text-[20px] font-semibold text-gray-900">Your Resume</h2>
+              <Image src="/green_tick.png" alt="Matched Keywords" width={22} height={22} />
+              <h2 className="text-[20px] font-semibold text-gray-900">Matched Keywords</h2>
             </div>
-            <div
-              className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-gray-700 text-[15px] leading-relaxed whitespace-pre-wrap font-[Inter]"
-              dangerouslySetInnerHTML={{ __html: highlightText(resumeText.replace(/\n/g, "<br>")) }}
-            />
+            <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
+              {highlightWords.length > 0 ? (
+                highlightWords.map((kw) => (
+                  <span key={kw} className="bg-[#D1FAE5] text-[#065F46] px-3 py-1 rounded-full text-[16px]">
+                    {kw}
+                  </span>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No keywords matched</p>
+              )}
+            </div>
           </div>
 
           {/* Missing Keywords */}
@@ -108,6 +117,13 @@ export default function AnalysisResults({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* AI Model Used - Display at the end */}
+          <div className="pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-500 text-center">
+              Analyzed by <span className="font-semibold text-[#0073CF] capitalize">{provider === "gemini" ? "Google Gemini" : provider === "groq" ? "Groq AI" : provider}</span> AI
+            </p>
           </div>
         </CardContent>
       </Card>
