@@ -18,6 +18,7 @@ import {
 import { Switch } from "@/components/ui/switch"; // ✅ Add ShadCN switch
 import Link from "next/link";
 import { SuggestedMentorsPage } from "../components/suggested_mentors";
+import ToolkitActionButton from "../components/toolkit-action-button";
 import { API_BASE_URL } from "@/lib/api";
 
 interface ResumeTemplate {
@@ -213,7 +214,7 @@ export default function AIResumeTemplateBuilder() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="w-full h-[42px] justify-between rounded-xl border border-gray-300 text-[13px] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            className="w-full h-[2.625rem] justify-between rounded-xl border border-gray-300 text-[0.8125rem] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
           >
             {selected}
             <ChevronDown className="w-4 h-4 opacity-70" />
@@ -228,7 +229,7 @@ export default function AIResumeTemplateBuilder() {
               key={opt}
               onClick={() => onSelect(opt)}
               className={cn(
-                "flex justify-between items-center px-3 py-2 rounded-md text-[13px] cursor-pointer transition-colors",
+                "flex justify-between items-center px-3 py-2 rounded-md text-[0.8125rem] cursor-pointer transition-colors",
                 "hover:bg-blue-50 hover:text-blue-700"
               )}
             >
@@ -245,12 +246,12 @@ export default function AIResumeTemplateBuilder() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-[1240px] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
+      <div className="w-full max-w-[77.5rem] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
+          <h1 className="text-[3.25rem] font-semibold text-gray-900 leading-tight">
             <span className="text-[#0073CF]">AI Resume Template</span> Builder
           </h1>
-          <p className="text-black text-[20px] md:text-[22px] whitespace-nowrap">
+          <p className="text-black text-xl md:text-[1.375rem] whitespace-nowrap">
             Generate and customize professional resume templates
           </p>
         </div>
@@ -270,7 +271,7 @@ export default function AIResumeTemplateBuilder() {
       </div>
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl mx-auto">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl mx-auto">
         <CardContent className="p-8 space-y-8">
           {/* Filters Grid */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 items-end">
@@ -307,7 +308,7 @@ export default function AIResumeTemplateBuilder() {
           ${includePhoto ? "translate-x-4" : "translate-x-0"} items-center justify-center`}
                   >
                     <span
-                      className={`text-[11px] font-bold select-none transition-all duration-150
+                      className={`text-[0.6875rem] font-bold select-none transition-all duration-150
             ${includePhoto ? "text-green-400" : "text-gray-400"}`}
                     >
                       {includePhoto ? "✓" : "×"}
@@ -331,23 +332,15 @@ export default function AIResumeTemplateBuilder() {
 
           {/* Generate Templates Button */}
           <div className="flex justify-end">
-            <Button
+            <ToolkitActionButton
               onClick={handleGenerate}
-              disabled={isLoading || usesRemaining <= 0}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952] text-white rounded-full px-8 py-3 text-[16px] font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={usesRemaining <= 0}
+              isLoading={isLoading}
+              loadingText="Generating..."
+              icon={<Wand2 className="w-5 h-5" />}
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="w-5 h-5" />
-                  Generate Templates
-                </>
-              )}
-            </Button>
+              Generate Templates
+            </ToolkitActionButton>
           </div>
         </CardContent>
       </Card>
@@ -355,7 +348,7 @@ export default function AIResumeTemplateBuilder() {
       {/* ===== Templates Section ===== */}
       {showTemplates && templates.length > 0 && (
         <>
-          <Card className="w-full max-w-[1240px] bg-[#E8F2FD] rounded-[12px] border border-[#C5D9F2] shadow-sm p-8 mt-8">
+          <Card className="w-full max-w-[77.5rem] bg-[#E8F2FD] rounded-xl border border-[#C5D9F2] shadow-sm p-8 mt-8">
             <CardContent>
               <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
                 <BookOpenText className="w-6 h-6" />
@@ -503,26 +496,26 @@ function TemplateCard({ template }: { template: ResumeTemplate }) {
   return (
     <div
       ref={cardRef}
-      className="relative flex flex-col items-center bg-white rounded-[24px] shadow-[0_0_15px_#C4E1FF] w-[330px] h-[450px] p-[15px_18px] transition-transform hover:scale-[1.02]"
+      className="relative flex flex-col items-center bg-white rounded-3xl shadow-[0_0_15px_#C4E1FF] w-[20.625rem] h-[28.125rem] p-[0.9375rem_1.125rem] transition-transform hover:scale-[1.02]"
     >
-      <div className="relative w-full h-[380px] overflow-hidden rounded-[18px] bg-gray-100 border border-gray-200">
+      <div className="relative w-full h-[23.75rem] overflow-hidden rounded-2xl bg-gray-100 border border-gray-200">
         {pdfUrl ? (
           <iframe
             src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-            className="w-full h-full rounded-[18px] border-0"
+            className="w-full h-full rounded-2xl border-0"
             title={template.name || `Template ${template.id}`}
             style={{ minHeight: '380px' }}
             loading="lazy"
           />
         ) : template.pdf_path ? (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-[18px]">
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-2xl">
             <div className="text-center">
               <div className="text-gray-400 text-sm mb-1">Loading preview...</div>
               <div className="text-gray-300 text-xs">PDF will appear shortly</div>
             </div>
           </div>
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-[18px]">
+          <div className="w-full h-full flex items-center justify-center bg-gray-200 rounded-2xl">
             <div className="text-center">
               <div className="text-gray-400 text-sm mb-1">PDF not available</div>
               <div className="text-gray-300 text-xs">No preview to display</div>

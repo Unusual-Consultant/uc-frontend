@@ -137,12 +137,11 @@ export default function LoginForm({ userType }: LoginFormProps) {
   };
 
   return (
-    <div className="w-full max-w-[450px] space-y-6 rounded-[30px]">
+    <div className="w-full max-w-form-sm space-y-6 rounded-[30px]">
       {/* Toggle Password / OTP */}
       <Tabs value={loginMethod} onValueChange={setLoginMethod} className="w-full">
         <TabsList
-          className="relative grid grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-6 overflow-hidden"
-          style={{ height: "48px" }}   // ← SAME HEIGHT AS MENTOR / MENTEE
+          className="relative grid grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-6 overflow-hidden h-btn"
         >
           <div
             className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
@@ -193,7 +192,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
           <div className="w-full flex flex-col gap-2">
             <Label
               htmlFor={`${userType}-email`}
-              className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
+              className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
             >
               Email or Phone Number
             </Label>
@@ -203,7 +202,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               placeholder="Enter your email or phone number"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
-              className="w-[93%] mx-auto h-[50px] px-8 py-3 rounded-[30px] border border-black text-black font-medium bg-transparent placeholder:text-black"
+              className="w-[93%] mx-auto h-input px-8 py-3 rounded-[30px] border border-black text-black font-medium bg-transparent placeholder:text-black"
             />
             {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
@@ -211,7 +210,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
           <div className="w-full flex flex-col gap-2">
             <Label
               htmlFor={`${userType}-password`}
-              className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
+              className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
             >
               Password
             </Label>
@@ -221,13 +220,13 @@ export default function LoginForm({ userType }: LoginFormProps) {
               placeholder="Enter your password"
               value={formData.password}
               onChange={(e) => handleInputChange("password", e.target.value)}
-              className="w-[93%] mx-auto h-[50px] px-8 py-3 rounded-[30px] border border-black text-gray-800 bg-transparent placeholder:text-black"
+              className="w-[93%] mx-auto h-input px-8 py-3 rounded-[30px] border border-black text-gray-800 bg-transparent placeholder:text-black"
             />
             {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
 
           <Button
-            className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-[50px] text-[16px] font-semibold block"
+            className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-input text-fluid-md font-semibold block"
             onClick={handleLogin}
             disabled={isLoading}
           >
@@ -241,7 +240,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               <div className="w-full flex flex-col gap-2">
                 <Label
                   htmlFor={`${userType}-otp-contact`}
-                  className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
+                  className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
                 >
                   Email or Phone Number
                 </Label>
@@ -254,13 +253,13 @@ export default function LoginForm({ userType }: LoginFormProps) {
                     setOtpContact(e.target.value);
                     if (errors.otpContact) setErrors({ ...errors, otpContact: undefined });
                   }}
-                  className="w-[97%] mx-auto h-[50px] px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium bg-transparent placeholder:text-black"
+                  className="w-[97%] mx-auto h-input px-4 py-3 rounded-[30px] border border-black text-gray-800 font-medium bg-transparent placeholder:text-black"
                 />
                 {errors.otpContact && <p className="text-red-500 text-sm">{errors.otpContact}</p>}
               </div>
 
               <Button
-                className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-[50px] text-[16px] font-semibold block"
+                className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-input text-fluid-md font-semibold block"
                 onClick={handleSendOtp}
               >
                 Send OTP
@@ -284,7 +283,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               <div className="w-full flex flex-col gap-2">
                 <Label
                   htmlFor={`${userType}-otp-code`}
-                  className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left"
+                  className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
                 >
                   Enter OTP
                 </Label>
@@ -304,7 +303,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               </div>
 
               <Button
-                className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-[50px] text-[16px] font-semibold block"
+                className="w-[93%] mx-auto bg-[#0073CF] hover:bg-[#0066B3] text-white rounded-[30px] h-input text-fluid-md font-semibold block"
                 onClick={handleVerifyOtp}
               >
                 Verify & Login

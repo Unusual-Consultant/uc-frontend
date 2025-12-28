@@ -196,7 +196,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     <div className="space-y-8 font-['Mulish']">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[24px] font-[700] flex items-center gap-2">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <Filter className="h-6 w-6 text-black" />
           Filters & Sort
         </h2>
@@ -211,7 +211,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Verified Mentors Row */}
       <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-7 bg-white shadow-sm w-full">
         {/* Text */}
-        <span className="text-[16px] font-[600] font-[Mulish] text-black">
+        <span className="text-base font-semibold font-[Mulish] text-black">
           Verified Mentors only
         </span>
 
@@ -247,7 +247,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Sort By */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 14H2M8 10H2M6 6H2M12 18H2M19 20V4M19 20L22 17M19 20L16 17M19 4L22 7M19 4L16 7" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -297,7 +297,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Price Range */}
       <Card className="border border-[#C7C7C7] w-full rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2 mb-4">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
             <p>₹</p> Set Price Range
           </CardTitle>
         </CardHeader>
@@ -404,7 +404,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Industry */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -463,7 +463,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Session Type */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Clock className="h-5 w-5 text-black" />
             Session Type
           </CardTitle>
@@ -506,7 +506,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -567,7 +567,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Packages */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Briefcase className="h-5 w-5 text-black" />
             Packages
           </CardTitle>
@@ -611,7 +611,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Mentor Rating */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Star className="h-5 w-5 text-black" />
             Mentor Rating
           </CardTitle>
@@ -655,7 +655,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Availability */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             {/* Availability Icon */}
             <Clock className="h-5 w-5 text-black" />
             Availability
@@ -703,7 +703,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       {/* Response Time */}
       <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[22px] mb-2 font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Timer className="h-5 w-5 text-black" />
             Response Time
           </CardTitle>
