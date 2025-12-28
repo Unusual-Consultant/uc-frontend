@@ -63,7 +63,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
     if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email is invalid";
-    
+
     if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
 
     if (activeTab === "PW") {
@@ -95,7 +95,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || firstName; // Use first name as last name if not provided
-      
+
       const response = await fetch(api.auth.signup.otp(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -144,7 +144,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
-      
+
       const response = await fetch(api.auth.signup.verifyOtp(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -212,7 +212,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
       const nameParts = formData.fullName.trim().split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || firstName; // Use first name as last name if not provided
-      
+
       const requestBody = {
         first_name: firstName,
         last_name: lastName,
@@ -221,9 +221,9 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         password: formData.password,
         role: userType,
       };
-      
+
       console.log('Signup Request:', requestBody);
-      
+
       const response = await fetch(api.auth.signup.password(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -271,12 +271,12 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
   };
 
   return (
-    <div className="w-full max-w-[450px] space-y-4">
+    <div className="w-full max-w-form-sm space-y-4">
       {errors.general && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">{errors.general}</div>}
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "OTP" | "PW")}>
         <TabsList
-          className="relative mx-auto grid max-w-[371px] w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-[48px] overflow-hidden"
+          className="relative mx-auto grid max-w-tab-sm w-full grid-cols-2 rounded-[30px] bg-transparent border border-black p-1 mb-4 h-btn overflow-hidden"
         >
           {/* Sliding Blue Background */}
           <div
@@ -288,14 +288,14 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
 
           <TabsTrigger
             value="OTP"
-            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-fluid-sm transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
           >
             <User className="h-4 w-4" /> <span>Sign up with OTP</span>
           </TabsTrigger>
 
           <TabsTrigger
             value="PW"
-            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-[14px] transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
+            className="relative z-10 flex items-center justify-center h-full gap-2 rounded-[30px] text-fluid-sm transition-colors duration-300 data-[state=active]:bg-transparent data-[state=active]:text-white data-[state=inactive]:text-black"
           >
             <GraduationCap className="h-4 w-4" /> <span>Create Password</span>
           </TabsTrigger>
@@ -305,34 +305,34 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         <TabsContent value="OTP" className="space-y-4">
           <div className="space-y-4">
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Full Name
               </Label>
-              <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Phone Number
               </Label>
-              <Input placeholder="Enter yourPhone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Phone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Email
               </Label>
-              <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
             </div>
           </div>
 
           <div className="space-y-3">
-            <p className="text-[14px] text-black-700 font-medium">Send OTP to:</p>
+            <p className="text-fluid-sm text-black-700 font-medium">Send OTP to:</p>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+              <label className="flex items-center gap-2 text-fluid-sm cursor-pointer">
                 <input
                   type="radio"
                   name="otp"
@@ -342,7 +342,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
                 />
                 Phone number
               </label>
-              <label className="flex items-center gap-2 text-[14px] cursor-pointer">
+              <label className="flex items-center gap-2 text-fluid-sm cursor-pointer">
                 <input
                   type="radio"
                   name="otp"
@@ -360,11 +360,11 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
                 placeholder="Enter OTP"
                 value={formData.otp}
                 onChange={(e) => handleInputChange("otp", e.target.value)}
-                className="flex-1 rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black h-[50px]"
+                className="flex-1 rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black h-input"
                 disabled={!otpSent}
               />
               <Button
-                className="px-6 h-[50px] rounded-[30px] bg-white border border-black text-black hover:bg-gray-50"
+                className="px-6 h-input rounded-[30px] bg-white border border-black text-black hover:bg-gray-50"
                 onClick={handleSendOTP}
                 disabled={isLoading || otpSent}
               >
@@ -375,7 +375,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
 
             {/* Verify OTP Button */}
             <Button
-              className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-gray-400 hover:bg-gray-500 text-white block disabled:opacity-50"
+              className="w-[93%] mx-auto h-input rounded-[30px] bg-gray-400 hover:bg-gray-500 text-white block disabled:opacity-50"
               onClick={handleVerifyOTP}
               disabled={isLoading || !otpSent}
             >
@@ -383,7 +383,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </Button>
 
             {/* Sign in link */}
-            <p className="text-[14px] text-black-700 text-center">
+            <p className="text-fluid-sm text-black-700 text-center">
               Already have an account?{" "}
               <a href={`/login?type=${userType}`} className="text-[#0073CF] font-semibold hover:underline">
                 Sign in
@@ -395,35 +395,35 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         <TabsContent value="PW" className="space-y-4">
           <div className="space-y-4">
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Full Name
               </Label>
-              <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Phone Number
               </Label>
-              <Input placeholder="Enter your Phone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Phone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Email
               </Label>
-              <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-[50px] rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
+              <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
               {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Create Password
               </Label>
               <div className="relative w-[93%] mx-auto">
-                <Input type={showPassword ? "text" : "password"} placeholder="Create a new Password" value={formData.password} onChange={(e) => handleInputChange("password", e.target.value)} className="w-full h-[50px] rounded-[30px] border px-8 py-3 pr-10 border-black text-black font-medium bg-transparent placeholder:text-black" />
+                <Input type={showPassword ? "text" : "password"} placeholder="Create a new Password" value={formData.password} onChange={(e) => handleInputChange("password", e.target.value)} className="w-full h-input rounded-[30px] border px-8 py-3 pr-10 border-black text-black font-medium bg-transparent placeholder:text-black" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -432,11 +432,11 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-[17px] leading-[24px] tracking-[0px] text-left">
+              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Confirm Password
               </Label>
               <div className="relative w-[93%] mx-auto">
-                <Input type={showConfirmPassword ? "text" : "password"} placeholder="Re-enter your Password" value={formData.confirmPassword} onChange={(e) => handleInputChange("confirmPassword", e.target.value)} className="w-full h-[50px] rounded-[30px] border px-8 py-3 pr-10 border-black text-black font-medium bg-transparent placeholder:text-black" />
+                <Input type={showConfirmPassword ? "text" : "password"} placeholder="Re-enter your Password" value={formData.confirmPassword} onChange={(e) => handleInputChange("confirmPassword", e.target.value)} className="w-full h-input rounded-[30px] border px-8 py-3 pr-10 border-black text-black font-medium bg-transparent placeholder:text-black" />
                 <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2">
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -445,11 +445,11 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
           </div>
 
-          <Button className="w-[93%] mx-auto h-[50px] rounded-[30px] bg-[#0073CF] text-white block" onClick={handlePasswordSignup} disabled={isLoading}>
+          <Button className="w-[93%] mx-auto h-input rounded-[30px] bg-[#0073CF] text-white block" onClick={handlePasswordSignup} disabled={isLoading}>
             {isLoading ? "Creating Account..." : "Continue"}
           </Button>
 
-          <p className="text-[13px] text-black-500 text-center">
+          <p className="text-fluid-xs text-black-500 text-center">
             Already have an account?{" "}
             <a href={`/login?type=${userType}`} className="text-[#0073CF] underline">Sign In</a>
           </p>

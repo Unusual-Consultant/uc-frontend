@@ -10,6 +10,7 @@ import { FileText, Loader2, UploadCloud, X } from "lucide-react"
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
 import UploadBox from "../components/uploadbox"
 import AnalysisResults from "../components/analysis_results"
+import ToolkitActionButton from "../components/toolkit-action-button"
 import { API_BASE_URL } from "@/lib/api"
 
 // API Configuration - using environment variable from lib/api.ts
@@ -184,12 +185,12 @@ export default function AIResumeAnalyzer() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== HEADER BOX ===== */}
-      <div className="w-full max-w-[1240px] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
+      <div className="w-full max-w-[77.5rem] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
+          <h1 className="text-[3.25rem] font-semibold text-gray-900 leading-tight">
             <span className="text-[#0073CF]">AI Resume</span> Analyzer
           </h1>
-          <p className="text-black text-[20px] md:text-[22px] whitespace-nowrap">
+          <p className="text-black text-xl md:text-[1.375rem] whitespace-nowrap">
             Get instant feedback and a match score for your resume
           </p>
         </div>
@@ -206,13 +207,13 @@ export default function AIResumeAnalyzer() {
       </div>
 
       {/* ===== UPLOAD SECTION ===== */}
-      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
         <CardContent className="p-8 space-y-6">
           {/* Resume + Job Description Section */}
           <div className="flex flex-col lg:flex-row gap-4">
 
             {/* ===== Resume Upload ===== */}
-            <div className="flex-[0.9] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[350px]">
+            <div className="flex-[0.9] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[21.875rem]">
               <div className="flex items-center gap-2 mb-2">
                 <Image
                   src="/upload_Resume_icon.png"
@@ -262,7 +263,7 @@ export default function AIResumeAnalyzer() {
             </div>
 
             {/* ===== Job Description ===== */}
-            <div className="flex-[1.5] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[350px]">
+            <div className="flex-[1.5] flex flex-col space-y-4 border border-[#C7C7C7] rounded-2xl bg-[#F8F9FB] p-5 shadow-[0_4px_8px_#00000020] h-[21.875rem]">
               <div className="flex items-center gap-2 mb-2">
                 <Image
                   src="/job_desc_icon.png"
@@ -286,7 +287,7 @@ export default function AIResumeAnalyzer() {
                     maxLength={5000}
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
-                    className="w-full h-[180px] p-3 border border-gray-300 rounded-lg resize-none text-sm bg-white"
+                    className="w-full h-[11.25rem] p-3 border border-gray-300 rounded-lg resize-none text-sm bg-white"
                   ></textarea>
                   <span className="absolute bottom-2 right-3 text-xs text-gray-500">
                     {jobDescription.length}/5000
@@ -342,18 +343,15 @@ export default function AIResumeAnalyzer() {
 
           {/* Analyze Button */}
           <div className="flex justify-end pt-6">
-            <Button
+            <ToolkitActionButton
               onClick={analyzeResume}
-              disabled={isLoading || (!selectedResumeFile && !jobDescription.trim())}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!selectedResumeFile && !jobDescription.trim()}
+              isLoading={isLoading}
+              loadingText="Analyzing..."
+              icon={<FileText className="w-5 h-5" />}
             >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <FileText className="w-5 h-5" />
-              )}
-              {isLoading ? "Analyzing..." : "Analyze Resume"}
-            </Button>
+              Analyze Resume
+            </ToolkitActionButton>
           </div>
         </CardContent>
       </Card>
