@@ -429,7 +429,7 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                       }`}>
                       <AvatarImage src={mentor.image} alt={mentor.name} />
                     </Avatar>
-                    <div className="absolute w-[60px] lg:w-[70px] h-[20px] lg:h-[23px] -bottom-2 lg:-bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-xs lg:text-sm flex items-center space-x-1 lg:space-x-2 justify-center shadow">
+                    <div className="absolute w-[3.75rem] lg:w-[4.375rem] h-5 lg:h-[1.4375rem] -bottom-2 lg:-bottom-3 left-1/2 transform -translate-x-1/2 bg-white border border-gray-300 px-2 py-0.5 rounded-full text-xs lg:text-sm flex items-center space-x-1 lg:space-x-2 justify-center shadow">
                       <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
                       <span className="text-black font-semibold">{mentor.rating.toFixed(1)}</span>
                     </div>
@@ -445,7 +445,7 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 </div>
 
                 {/* Location / Experience / Favorite */}
-                <div className="mt-3 lg:mt-4 flex gap-10 lg:gap-10 font-semibold text-[11px] lg:text-xs text-black items-center">
+                <div className="mt-3 lg:mt-4 flex gap-10 lg:gap-10 font-semibold text-[0.6875rem] lg:text-xs text-black items-center">
                   <div className="flex items-center gap-2">
                     <svg width="10" height="14" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9.33333 4.66667C9.33333 4.05383 9.21263 3.447 8.97811 2.88081C8.74358 2.31462 8.39984 1.80017 7.9665 1.36683C7.53316 0.933495 7.01871 0.589751 6.45252 0.355229C5.88634 0.120707 5.2795 0 4.66667 0C4.05383 0 3.447 0.120707 2.88081 0.355229C2.31462 0.589751 1.80018 0.933495 1.36683 1.36683C0.933495 1.80017 0.589751 2.31462 0.355229 2.88081C0.120707 3.447 -9.13196e-09 4.05383 0 4.66667C0 5.59133 0.272667 6.45133 0.736667 7.17667H0.731333L4.66667 13.3333L8.602 7.17667H8.59733C9.07795 6.42774 9.33341 5.55655 9.33333 4.66667ZM4.66667 6.66667C4.13623 6.66667 3.62753 6.45595 3.25245 6.08088C2.87738 5.70581 2.66667 5.1971 2.66667 4.66667C2.66667 4.13623 2.87738 3.62753 3.25245 3.25245C3.62753 2.87738 4.13623 2.66667 4.66667 2.66667C5.1971 2.66667 5.70581 2.87738 6.08088 3.25245C6.45595 3.62753 6.66667 4.13623 6.66667 4.66667C6.66667 5.1971 6.45595 5.70581 6.08088 6.08088C5.70581 6.45595 5.1971 6.66667 4.66667 6.66667Z" fill="black" />
@@ -470,25 +470,25 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 {/* Stats */}
                 <div className="mt-4 lg:mt-6 flex justify-between text-gray-700 w-full font-[Mulish]">
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Response Time</span>
+                    <span className="font-semibold text-black text-[0.6875rem] lg:text-xs text-center whitespace-nowrap">Response Time</span>
                     <div className="flex items-center gap-1 mt-1">
                       <Clock className="w-3 h-3 lg:w-4 lg:h-4 text-red-500" />
                       <span className="text-xs lg:text-sm font-bold">&lt; {mentor.responseTime} hrs</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Total Mentees</span>
+                    <span className="font-semibold text-black text-[0.6875rem] lg:text-xs text-center whitespace-nowrap">Total Mentees</span>
                     <div className="flex font-bold items-center gap-1 mt-1">
                       <Users className="w-3 h-3 lg:w-4 lg:h-4 text-blue-500" />
                       <span className="text-xs lg:text-sm font-bold">{mentor.mentees}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <span className="font-semibold text-black text-[11px] lg:text-xs text-center whitespace-nowrap">Success Rate</span>
+                    <span className="font-semibold text-black text-[0.6875rem] lg:text-xs text-center whitespace-nowrap">Success Rate</span>
                     <div className="flex items-center gap-1 mt-1">
                       <svg width="17" height="11" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M16.7106 0.519957C16.6255 0.315036 16.4626 0.152192 16.2577 0.0670911C16.1569 0.0241184 16.0486 0.00132504 15.939 0H11.7458C11.5234 0 11.3101 0.0883566 11.1528 0.245632C10.9955 0.402908 10.9072 0.616219 10.9072 0.83864C10.9072 1.06106 10.9955 1.27437 11.1528 1.43165C11.3101 1.58892 11.5234 1.67728 11.7458 1.67728H13.9179L9.2299 6.36528L6.47078 3.59777C6.39281 3.51916 6.30006 3.45677 6.19786 3.41419C6.09567 3.37162 5.98605 3.3497 5.87534 3.3497C5.76463 3.3497 5.65502 3.37162 5.55282 3.41419C5.45062 3.45677 5.35787 3.51916 5.27991 3.59777L0.248068 8.62961C0.169464 8.70757 0.107074 8.80032 0.0644972 8.90252C0.0219206 9.00471 0 9.11433 0 9.22504C0 9.33575 0.0219206 9.44536 0.0644972 9.54756C0.107074 9.64976 0.169464 9.74251 0.248068 9.82047C0.326031 9.89908 0.418785 9.96147 0.520981 10.004C0.623177 10.0466 0.732792 10.0685 0.843503 10.0685C0.954213 10.0685 1.06383 10.0466 1.16602 10.004C1.26822 9.96147 1.36097 9.89908 1.43894 9.82047L5.87534 5.37568L8.63447 8.14319C8.71243 8.2218 8.80518 8.28419 8.90738 8.32677C9.00958 8.36934 9.11919 8.39126 9.2299 8.39126C9.34061 8.39126 9.45023 8.36934 9.55242 8.32677C9.65462 8.28419 9.74737 8.2218 9.82534 8.14319L15.1004 2.85976V5.03184C15.1004 5.25426 15.1887 5.46757 15.346 5.62485C15.5033 5.78212 15.7166 5.87048 15.939 5.87048C16.1614 5.87048 16.3748 5.78212 16.532 5.62485C16.6893 5.46757 16.7777 5.25426 16.7777 5.03184V0.83864C16.7763 0.729049 16.7535 0.62078 16.7106 0.519957Z" fill="#16A34A"/>
-</svg>
+                        <path d="M16.7106 0.519957C16.6255 0.315036 16.4626 0.152192 16.2577 0.0670911C16.1569 0.0241184 16.0486 0.00132504 15.939 0H11.7458C11.5234 0 11.3101 0.0883566 11.1528 0.245632C10.9955 0.402908 10.9072 0.616219 10.9072 0.83864C10.9072 1.06106 10.9955 1.27437 11.1528 1.43165C11.3101 1.58892 11.5234 1.67728 11.7458 1.67728H13.9179L9.2299 6.36528L6.47078 3.59777C6.39281 3.51916 6.30006 3.45677 6.19786 3.41419C6.09567 3.37162 5.98605 3.3497 5.87534 3.3497C5.76463 3.3497 5.65502 3.37162 5.55282 3.41419C5.45062 3.45677 5.35787 3.51916 5.27991 3.59777L0.248068 8.62961C0.169464 8.70757 0.107074 8.80032 0.0644972 8.90252C0.0219206 9.00471 0 9.11433 0 9.22504C0 9.33575 0.0219206 9.44536 0.0644972 9.54756C0.107074 9.64976 0.169464 9.74251 0.248068 9.82047C0.326031 9.89908 0.418785 9.96147 0.520981 10.004C0.623177 10.0466 0.732792 10.0685 0.843503 10.0685C0.954213 10.0685 1.06383 10.0466 1.16602 10.004C1.26822 9.96147 1.36097 9.89908 1.43894 9.82047L5.87534 5.37568L8.63447 8.14319C8.71243 8.2218 8.80518 8.28419 8.90738 8.32677C9.00958 8.36934 9.11919 8.39126 9.2299 8.39126C9.34061 8.39126 9.45023 8.36934 9.55242 8.32677C9.65462 8.28419 9.74737 8.2218 9.82534 8.14319L15.1004 2.85976V5.03184C15.1004 5.25426 15.1887 5.46757 15.346 5.62485C15.5033 5.78212 15.7166 5.87048 15.939 5.87048C16.1614 5.87048 16.3748 5.78212 16.532 5.62485C16.6893 5.46757 16.7777 5.25426 16.7777 5.03184V0.83864C16.7763 0.729049 16.7535 0.62078 16.7106 0.519957Z" fill="#16A34A" />
+                      </svg>
 
                       <span className="text-xs lg:text-sm font-bold">{mentor.successRate}%</span>
                     </div>
@@ -498,19 +498,19 @@ export default function MentorCards({ showFilters, filters }: { showFilters: boo
                 {/* Expertise / Languages */}
                 <div className="mt-4 lg:mt-6 flex flex-wrap gap-2 text-black font-[Mulish]">
                   {mentor.expertise.slice(0, 3).map((skill) => (
-                    <span key={skill} className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[11px] lg:text-xs rounded-full font-semibold">
+                    <span key={skill} className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[0.6875rem] lg:text-xs rounded-full font-semibold">
                       {skill}
                     </span>
                   ))}
                   {mentor.expertise.length > 3 && (
-                    <span className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[11px] lg:text-xs rounded-full font-semibold">
+                    <span className="px-3 lg:px-4 py-1 bg-[#edf7ff] text-[0.6875rem] lg:text-xs rounded-full font-semibold">
                       +{mentor.expertise.length - 3}
                     </span>
                   )}
                 </div>
                 {mentor.languages && mentor.languages.length > 0 && (
                   <div className="mt-2 lg:mt-3 inline-block font-medium">
-                    <div className="group relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-[#e9eef3] text-[11px] lg:text-xs rounded-full cursor-pointer transition-all duration-300 ease-in-out hover:min-w-max">
+                    <div className="group relative inline-flex items-center justify-center gap-1 px-3 py-1 bg-[#e9eef3] text-[0.6875rem] lg:text-xs rounded-full cursor-pointer transition-all duration-300 ease-in-out hover:min-w-max">
                       <Globe className="w-3 h-3 text-blue-400 transition-opacity duration-300 group-hover:opacity-0 group-hover:w-0" />
                       <span className="whitespace-nowrap transition-opacity duration-300 group-hover:opacity-0 group-hover:absolute group-hover:invisible">
                         Languages

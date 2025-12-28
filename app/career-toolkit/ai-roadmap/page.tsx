@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { SuggestedMentorsPage } from "../components/suggested_mentors";
 import { CompanyAlignedMentors } from "../components/company-mentors";
+import ToolkitActionButton from "../components/toolkit-action-button";
 import { API_BASE_URL } from "@/lib/api";
 
 interface RoadmapStep {
@@ -183,16 +184,16 @@ export default function AIRoadmap() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-[1240px] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
+      <div className="w-full max-w-[77.5rem] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
 
         {/* Title */}
-        <h1 className="text-[40px] md:text-[52px] font-semibold text-gray-900 leading-tight">
+        <h1 className="text-[2.5rem] md:text-[3.25rem] font-semibold text-gray-900 leading-tight">
           <span className="text-[#0073CF]">AI Career Roadmap</span> Generator
         </h1>
 
         {/* Subheading + Button row */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-2 space-y-3 md:space-y-0">
-          <p className="text-black text-[18px] md:text-[20px]">
+          <p className="text-black text-lg md:text-xl">
             Get a personalized step-by-step plan to achieve your career goals
           </p>
 
@@ -217,11 +218,11 @@ export default function AIRoadmap() {
 
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
 
         <CardContent className="p-8 space-y-8">
           {/* ===== Dropdown Section ===== */}
-          <div className="grid text-[20px] md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+          <div className="grid text-xl md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             <Dropdown
               label="Experience Level"
               className="w-full max-w-[350px]"
@@ -236,13 +237,13 @@ export default function AIRoadmap() {
               selected={selectedEducation}
               onSelect={setSelectedEducation}
             />
-            <div className="flex flex-col space-y-2 lg:col-span-2 w-full max-w-[720px]">
-              <Label className="text-black font-medium text-[20px]">
+            <div className="flex flex-col space-y-2 lg:col-span-2 w-full max-w-[45rem]">
+              <Label className="text-black font-medium text-xl">
                 Desired Role <span className="text-black">(optional)</span>
               </Label>
               <Input
                 placeholder="e.g. Product Manager, Data Scientist..."
-                className="rounded-xl border border-gray-300 w-full text-[20px]"
+                className="rounded-xl border border-gray-300 w-full text-xl"
                 value={desiredRole}
                 onChange={(e) => setDesiredRole(e.target.value)}
               />
@@ -254,7 +255,7 @@ export default function AIRoadmap() {
           <div className="grid md:grid-cols-2 gap-6">
             {/* Key Skills */}
             <div className="flex flex-col space-y-3">
-              <Label className="text-black font-medium text-[20px]">
+              <Label className="text-black font-medium text-xl">
                 Key Skills
               </Label>
               {/* Input for adding custom skills */}
@@ -328,7 +329,7 @@ export default function AIRoadmap() {
 
             {/* Familiar Tools */}
             <div className="flex flex-col space-y-3">
-              <Label className="text-black font-medium text-[20px]">
+              <Label className="text-black font-medium text-xl">
                 Familiar Tools
               </Label>
               {/* Input for adding custom tools */}
@@ -422,7 +423,7 @@ export default function AIRoadmap() {
 
               {/* Target Company Input */}
               <div className="flex flex-col space-y-1 w-full md:w-[350px] ">
-                <Label className="text-black font-medium text-[20px]">Target Company(Optional)</Label>
+                <Label className="text-black font-medium text-xl">Target Company(Optional)</Label>
                 <Input
                   placeholder="e.g. Microsoft"
                   className="rounded-xl border border-gray-300 w-full"
@@ -433,29 +434,27 @@ export default function AIRoadmap() {
             </div>
 
 
-            <Button
+            <ToolkitActionButton
               onClick={generateRoadmap}
-              disabled={isLoading}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#003C6C] shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952] text-white rounded-full px-8 py-3 text-lg font-semibold transition w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={false}
+              isLoading={isLoading}
+              loadingText="Generating..."
+              icon={<Route />}
+              className="w-full md:w-auto"
             >
-              {isLoading ? "Generating..." : (
-                <>
-                  <Route />
-                  Generate Roadmap
-                </>
-              )}
-            </Button>
+              Generate Roadmap
+            </ToolkitActionButton>
           </div>
         </CardContent>
       </Card>
 
       {/* ===== Roadmap Section ===== */}
       {showRoadmap && (
-        <Card className="w-full max-w-[1240px] rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
+        <Card className="w-full max-w-[77.5rem] rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
           <CardContent className="p-8 text-gray-500 text-lg ">
 
             {/* ===== Roadmap Summary Heading ===== */}
-            <h2 className="text-[24px] font-bold text-[#003C6C] mb-4">Roadmap Summary</h2>
+            <h2 className="text-2xl font-bold text-[#003C6C] mb-4">Roadmap Summary</h2>
 
             {/* ===== Gray box for Summary (keeps results inside) ===== */}
             <div className="bg-gray-100 rounded-xl p-6 mb-8 text-black text-base leading-relaxed border border-[#C7C7C7]">
@@ -465,7 +464,7 @@ export default function AIRoadmap() {
             </div>
 
             {/* ===== Step-by-Step Journey Heading ===== */}
-            <h2 className="text-[24px] font-bold text-[#003C6C] mb-4">Step-by-step Journey</h2>
+            <h2 className="text-2xl font-bold text-[#003C6C] mb-4">Step-by-step Journey</h2>
 
             {/* ===== Gray box for Steps ===== */}
             <div className="bg-gray-100 rounded-xl p-6 relative overflow-hidden min-h-[1100px] border border-[#C7C7C7]">
@@ -523,7 +522,7 @@ function StepArrowBox({
   duration: string;
 }) {
   return (
-    <div className="relative w-[799px] h-[220px] rounded-2xl overflow-hidden">
+    <div className="relative w-[49.9375rem] h-[13.75rem] rounded-2xl overflow-hidden">
       {/* SVG Arrow Shape with Rounded Corners */}
       <svg
         width="799"
@@ -602,13 +601,13 @@ function Dropdown({
 }) {
   return (
     <div className={`flex flex-col space-y-2 ${className}`}>
-      <Label className="text-black font-medium text-[20px]">{label}</Label>
+      <Label className="text-black font-medium text-xl">{label}</Label>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="w-full h-[42px] justify-between rounded-xl border border-gray-300 text-[13px] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            className="w-full h-[2.625rem] justify-between rounded-xl border border-gray-300 text-[0.8125rem] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
           >
             {selected}
             <ChevronDown className="w-4 h-4 opacity-70" />

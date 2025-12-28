@@ -75,7 +75,7 @@ export default function MentorsPage() {
     setFilters(newFilters);
     // Update URL with filter parameters
     const url = new URL(window.location.href);
-    
+
     // Add/update filter params
     if (newFilters.minPrice > 0 || newFilters.maxPrice < 2000) {
       url.searchParams.set("minPrice", newFilters.minPrice);
@@ -145,7 +145,7 @@ export default function MentorsPage() {
   return (
     <div className="min-h-screen bg-gray-50 font-[Mulish]">
       {/* ✅ Constrained content wrapper */}
-      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1400px]">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[87.5rem]">
         {/* ✅ Mentor Banner */}
         <div className="relative w-full flex justify-center mb-8 lg:mb-10">
           <Image
@@ -220,7 +220,7 @@ export default function MentorsPage() {
           <div className={`transition-all duration-300 flex flex-col lg:flex-row gap-6 lg:gap-8`}>
             {/* Filters Sidebar */}
             {showFilters && (
-              <div className="hidden lg:block w-[320px] shrink-0">
+              <div className="hidden lg:block w-80 shrink-0">
                 <MentorFilters onFiltersChange={handleFiltersChange} />
               </div>
             )}

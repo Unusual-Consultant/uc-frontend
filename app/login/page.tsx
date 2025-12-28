@@ -64,15 +64,15 @@ export default function LoginPage() {
 
       {/* 🔹 Mirror Glaze Rectangle with Login Card Inside */}
       <div
-        className=" bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-16 py-8 z-10"
+        className="bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex items-center justify-center px-8 sm:px-16 py-6 sm:py-8 z-10"
       >
         {/* Login Card */}
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-form-sm">
           <div className="text-center mb-6">
-            <h1 className="font-mulish font-extrabold text-[26px] leading-[140%] tracking-[0px]">
+            <h1 className="font-mulish font-extrabold text-fluid-h2 leading-[140%] tracking-[0px]">
               Welcome Back!
             </h1>
-            <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
+            <p className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-500">
               Choose your account type to continue
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
             onValueChange={setActiveTab}
             className="w-full flex flex-col items-center"
           >
-            <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden" style={{ width: "289px", height: "48px", minWidth: "84px", maxWidth: "480px" }}>
+            <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden w-full max-w-tab-md h-btn">
               {/* Sliding Blue Background */}
               <div
                 className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
@@ -122,8 +122,8 @@ export default function LoginPage() {
             {/* Mentee Tab */}
             <TabsContent value="mentee" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-bold text-[20px] py-2">Sign in as Mentee</h3>
-                <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
+                <h3 className="font-bold text-fluid-h3 py-2">Sign in as Mentee</h3>
+                <p className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-500">
                   Access your learning dashboard and connect with mentors
                 </p>
               </div>
@@ -133,7 +133,7 @@ export default function LoginPage() {
               <div className="text-center">
                 <Link
                   href="/forgot-password"
-                  className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-600 hover:underline"
+                  className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-600 hover:underline"
                 >
                   Forgot your password?
                 </Link>
@@ -144,7 +144,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-input"
                   onClick={() => handleSocialLogin("google", "mentee")}
                   aria-label="Continue with Google"
                 >
@@ -153,7 +153,7 @@ export default function LoginPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-input"
                   onClick={() => handleSocialLogin("linkedin", "mentee")}
                 >
                   <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -165,8 +165,8 @@ export default function LoginPage() {
             {/* Mentor Tab */}
             <TabsContent value="mentor" className="space-y-6">
               <div className="text-center">
-                <h3 className="font-bold text-[20px] py-2">Sign in as Mentor</h3>
-                <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-500">
+                <h3 className="font-bold text-fluid-h3 py-2">Sign in as Mentor</h3>
+                <p className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-500">
                   Access your mentor dashboard and manage your sessions
                 </p>
               </div>
@@ -176,7 +176,7 @@ export default function LoginPage() {
               <div className="text-center">
                 <Link
                   href="/forgot-password"
-                  className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-600 hover:underline"
+                  className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-600 hover:underline"
                 >
                   Forgot your password?
                 </Link>
@@ -187,7 +187,7 @@ export default function LoginPage() {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-input"
                   onClick={() => handleSocialLogin("google", "mentor")}
                   aria-label="Continue with Google"
                 >
@@ -196,7 +196,7 @@ export default function LoginPage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-[50px]"
+                  className="w-[93%] mx-auto flex items-center justify-center gap-2 rounded-[30px] border border-black h-input"
                   onClick={() => handleSocialLogin("linkedin", "mentor")}
                 >
                   <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -207,7 +207,7 @@ export default function LoginPage() {
           </Tabs>
 
           <div className="text-center mt-6">
-            <p className="font-mulish font-semibold text-[15px] leading-[140%] tracking-[0px] text-black-700">
+            <p className="font-mulish font-semibold text-fluid-lg leading-[140%] tracking-[0px] text-black-700">
               Don’t have an account?{" "}
               <Link
                 href={`/signup?type=${activeTab}`}
