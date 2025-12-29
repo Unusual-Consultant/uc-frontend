@@ -27,14 +27,14 @@ export default function AnalysisResults({
   }
 
   return (
-    <div className="w-full max-w-[1240px] flex flex-col items-center space-y-8">
+    <div className="w-full max-w-[77.5rem] flex flex-col items-center space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between w-full max-w-[1240px] px-2">
+      <div className="flex items-center justify-between w-full max-w-[77.5rem] px-2">
         <div className="flex items-center gap-3">
           <Image src="/light-bulb.png" alt="analysis" width={35} height={35} />
           <div>
-            <h1 className="text-[#003C6C] text-[28px] font-bold">Analysis Results</h1>
-            <p className="text-gray-700 text-[15px]">See your resume&apos;s match score and AI suggestions</p>
+            <h1 className="text-[#003C6C] text-[1.75rem] font-bold">Analysis Results</h1>
+            <p className="text-gray-700 text-[0.9375rem]">See your resume&apos;s match score and AI suggestions</p>
           </div>
         </div>
 
@@ -67,18 +67,18 @@ export default function AnalysisResults({
       </div>
 
       {/* Main White Box */}
-      <Card className="w-full max-w-[1240px] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
         <CardContent className="p-8 space-y-8">
           {/* Matched Keywords Section */}
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Image src="/green_tick.png" alt="Matched Keywords" width={22} height={22} />
-              <h2 className="text-[20px] font-semibold text-gray-900">Matched Keywords</h2>
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">Matched Keywords</h2>
             </div>
             <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
               {highlightWords.length > 0 ? (
                 highlightWords.map((kw) => (
-                  <span key={kw} className="bg-[#D1FAE5] text-[#065F46] px-3 py-1 rounded-full text-[16px]">
+                  <span key={kw} className="bg-[#D1FAE5] text-[#065F46] px-3 py-1 rounded-full text-[1rem]">
                     {kw}
                   </span>
                 ))
@@ -92,11 +92,11 @@ export default function AnalysisResults({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Image src="/missingkeyword.png" alt="Missing Keywords" width={22} height={22} />
-              <h2 className="text-[20px] font-semibold text-gray-900">Missing Keywords</h2>
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">Missing Keywords</h2>
             </div>
             <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
               {missingKeywords.map((kw) => (
-                <span key={kw} className="bg-[#FEE2E2] text-[#A02A2A] px-3 py-1 rounded-full text-[16px]">
+                <span key={kw} className="bg-[#FEE2E2] text-[#A02A2A] px-3 py-1 rounded-full text-[1rem]">
                   {kw}
                 </span>
               ))}
@@ -107,9 +107,9 @@ export default function AnalysisResults({
           <div>
             <div className="flex items-center gap-2">
               <Image src="/bi_stars.png" alt="sparkle" width={24} height={24} />
-              <h2 className="text-[20px] font-semibold text-gray-900">AI Powered Insights from Smart Buddy</h2>
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">AI Powered Insights from Smart Buddy</h2>
             </div>
-            <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-[16px] text-gray-700 leading-relaxed space-y-2">
+            <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-[1rem] text-gray-700 leading-relaxed space-y-2">
               {aiInsights.map((insight, idx) => (
                 <div key={idx} className="flex items-start gap-2">
                   <Image src="/lightbulb-circle.png" alt="spark" width={21} height={21} />

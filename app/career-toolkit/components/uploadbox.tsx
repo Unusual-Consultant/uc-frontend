@@ -37,7 +37,7 @@ export default function UploadBox({
         onDragOver={handleDrag}
         onDrop={handleDrop || handleDrag}
         className={cn(
-          "flex flex-col items-center justify-center border-2 border-dashed rounded-xl bg-white p-5 text-center space-y-2 cursor-pointer transition w-full h-[180px]",
+          "flex flex-col items-center justify-center border-2 border-dashed rounded-xl bg-white p-5 text-center space-y-2 cursor-pointer transition w-full h-[11.25rem]",
           dragActive ? "border-blue-400 bg-blue-50" : "border-gray-400"
         )}
       >
@@ -48,7 +48,7 @@ export default function UploadBox({
         <Button
           onClick={openFileDialog}
           type="button"
-          className="rounded-full bg-[#F8F9FB] hover:bg-[#EDEDED] text-black border border-[#C7C7C7] px-4 py-1 text-xs shadow-sm transition h-[25px]"
+          className="rounded-full bg-[#F8F9FB] hover:bg-[#EDEDED] text-black border border-[#C7C7C7] px-4 py-1 text-xs shadow-sm transition h-[1.5625rem]"
         >
           Browse Files
         </Button>
@@ -60,7 +60,7 @@ export default function UploadBox({
       </div>
 
       {/* Info Text */}
-      <div className="text-[13px] font-medium break-words overflow-hidden">
+      <div className="text-[0.8125rem] font-medium break-words overflow-hidden">
         <p>
           Supported Formats:{" "}
           <span className="text-[#0073CF]">{infoText.formats}</span>

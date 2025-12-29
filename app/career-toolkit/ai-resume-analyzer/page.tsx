@@ -37,8 +37,8 @@ interface UsageResponse {
 
 export default function AIResumeAnalyzer() {
   // State management
-  const [totalUses, setTotalUses] = useState(15) // Gemini (15) + Groq (30)
-  const [usesRemaining, setUsesRemaining] = useState(15)
+  const [totalUses, setTotalUses] = useState(5) // Gemini (3) + Groq (2)
+  const [usesRemaining, setUsesRemaining] = useState(5)
   const [analysisTriggered, setAnalysisTriggered] = useState(false)
   const [jobDescription, setJobDescription] = useState("")
   const [dragActive, setDragActive] = useState(false)
@@ -198,7 +198,7 @@ export default function AIResumeAnalyzer() {
         <Button
           onClick={fetchUsageStats}
           className={cn(
-            "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-20px] right-8 md:top-auto md:right-auto"
+            "bg-[#0073CF] hover:bg-[#005FA3] text-white rounded-full px-6 py-3 shadow-md transition-all flex items-center gap-2 absolute md:static top-[-1.25rem] right-8 md:top-auto md:right-auto"
           )}
         >
           <Image src="/sparkle-filled.png" alt="sparkle" width={20} height={20} className="object-contain" />
