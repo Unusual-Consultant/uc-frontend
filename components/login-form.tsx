@@ -192,7 +192,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
           <div className="w-full flex flex-col gap-2">
             <Label
               htmlFor={`${userType}-email`}
-              className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
+              className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
             >
               Email or Phone Number
             </Label>
@@ -210,7 +210,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
           <div className="w-full flex flex-col gap-2">
             <Label
               htmlFor={`${userType}-password`}
-              className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
+              className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
             >
               Password
             </Label>
@@ -240,7 +240,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               <div className="w-full flex flex-col gap-2">
                 <Label
                   htmlFor={`${userType}-otp-contact`}
-                  className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
+                  className="w-[97%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
                 >
                   Email or Phone Number
                 </Label>
@@ -283,7 +283,7 @@ export default function LoginForm({ userType }: LoginFormProps) {
               <div className="w-full flex flex-col gap-2">
                 <Label
                   htmlFor={`${userType}-otp-code`}
-                  className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
+                  className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left"
                 >
                   Enter OTP
                 </Label>
