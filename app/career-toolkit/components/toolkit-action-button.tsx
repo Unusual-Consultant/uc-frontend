@@ -49,7 +49,7 @@ export default function ToolkitActionButton({
                 // Colors
                 "bg-[#0070E0] hover:bg-[#003C6C]",
                 // 3D shadow effect
-                "shadow-[0_7px_0_#0C5CAC] hover:shadow-[0_7px_0_#002952]",
+                "shadow-[0_0.4375rem_0_#0C5CAC] hover:shadow-[0_0.4375rem_0_#002952]",
                 // Typography
                 "text-white text-base font-semibold",
                 // Shape
