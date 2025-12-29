@@ -69,23 +69,16 @@ export default function AnalysisResults({
       {/* Main White Box */}
       <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
         <CardContent className="p-8 space-y-8">
-          {/* Matched Keywords Section */}
+          {/* Your Resume */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Image src="/green_tick.png" alt="Matched Keywords" width={22} height={22} />
-              <h2 className="text-[1.25rem] font-semibold text-gray-900">Matched Keywords</h2>
+              <Image src="/green_tick.png" alt="Your Resume" width={22} height={22} />
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">Your Resume</h2>
             </div>
-            <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
-              {highlightWords.length > 0 ? (
-                highlightWords.map((kw) => (
-                  <span key={kw} className="bg-[#D1FAE5] text-[#065F46] px-3 py-1 rounded-full text-[1rem]">
-                    {kw}
-                  </span>
-                ))
-              ) : (
-                <p className="text-gray-500 text-sm">No keywords matched</p>
-              )}
-            </div>
+            <div
+              className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-gray-700 text-[0.9375rem] leading-relaxed whitespace-pre-wrap font-[Inter]"
+              dangerouslySetInnerHTML={{ __html: highlightText(resumeText.replace(/\n/g, "<br>")) }}
+            />
           </div>
 
           {/* Missing Keywords */}
