@@ -29,36 +29,36 @@ export default function SignupPage() {
   };
 
   const handleSocialSignup = (
-  provider: string,
-  userType: "mentee" | "mentor"
-) => {
-  // Save who is signing up before redirect
-  localStorage.setItem("userType", userType);
+    provider: string,
+    userType: "mentee" | "mentor"
+  ) => {
+    // Save who is signing up before redirect
+    localStorage.setItem("userType", userType);
 
-  if (provider === "google") {
-    // Use the API object for consistency
-    window.location.href = api.auth.google.login(userType);
-    return;
-  }
-  handleSignup(userType);
-};
+    if (provider === "google") {
+      // Use the API object for consistency
+      window.location.href = api.auth.google.login(userType);
+      return;
+    }
+    handleSignup(userType);
+  };
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-white px-4 overflow-hidden pb-24">
       {/* 🔹 Background Infinite Scroll Rows */}
       <div className="absolute top-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-left w-full">
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
@@ -68,17 +68,17 @@ export default function SignupPage() {
       <div className="absolute bottom-[230px] left-0 w-full overflow-hidden">
         <div className="flex animate-scroll-right w-full">
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
           <img
-            src="/image.png"
+            src="/image1.png"
             alt="Scrolling profiles"
             className="h-[245px] flex-shrink-0"
           />
@@ -86,13 +86,13 @@ export default function SignupPage() {
       </div>
 
       {/* 🔹 Frosted Glass Signup Box */}
-      <div className="bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex flex-col items-center px-16 py-8 z-10">
+      <div className="bg-gradient-to-b from-[#D1EAFF66] to-[#D1EAFF1A] backdrop-blur-[75px] rounded-[30px] shadow-[4px_8px_20px_rgba(159,157,157,0.25)] flex flex-col items-center px-8 sm:px-16 py-6 sm:py-8 z-10">
         {/* Header + Tabs */}
-        <h1 className="font-mulish font-extrabold text-[22px] mb-2">
+        <h1 className="font-mulish font-extrabold text-fluid-h5 mb-2">
           {activeTab === "mentee" ? "Mentee Onboarding" : "Mentor Onboarding"}
         </h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full flex flex-col items-center">
-          <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden" style={{ width: "289px", height: "48px", minWidth: "84px", maxWidth: "480px" }}>
+          <TabsList className="relative grid grid-cols-2 rounded-[30px] bg-gray-100 p-1 mb-4 overflow-hidden w-full max-w-tab-md h-btn">
             {/* Sliding Blue Background */}
             <div
               className="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-[#0073CF] rounded-[26px] transition-transform duration-300 ease-out pointer-events-none"
@@ -100,7 +100,7 @@ export default function SignupPage() {
                 transform: activeTab === "mentor" ? "translateX(calc(100% + 4px))" : "translateX(0)",
               }}
             />
-            
+
             <TabsTrigger
               value="mentee"
               className="relative z-10 flex items-center gap-2 rounded-[30px]
@@ -134,10 +134,10 @@ export default function SignupPage() {
             value="mentee"
             className="space-y-4 flex flex-col items-center"
           >
-            <p className="text-[23px] font-semibold">
+            <p className="text-fluid-h4 font-semibold">
               Get Started in 30 seconds
             </p>
-            <p className="text-[15px] text-black-500 font-medium">
+            <p className="text-fluid-lg text-black-500 font-medium">
               Join thousands of professionals growing their careers
             </p>
             <div className="flex items-center justify-center gap-3 mt-6">
@@ -145,21 +145,20 @@ export default function SignupPage() {
                 <div
                   key={step}
                   className={`w-3 h-3 rounded-full transition-all duration-300
-            ${
-              currentStep === step
-                ? "bg-[#0073CF] scale-110"
-                : "border border-[#0073CF] bg-transparent"
-            }`}
+            ${currentStep === step
+                      ? "bg-[#0073CF] scale-110"
+                      : "border border-[#0073CF] bg-transparent"
+                    }`}
                 />
               ))}
             </div>
-            <p className="text-[15px] text-black-500">Step 1 of 3</p>
+            <p className="text-fluid-lg text-black-500">Step 1 of 3</p>
 
             {/* Social Buttons */}
-            <div className="space-y-3 w-[418px]">
+            <div className="space-y-3 w-full max-w-form-md">
               <Button
                 variant="outline"
-                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-input flex items-center justify-center gap-2 rounded-[30px] border border-black"
                 onClick={() => handleSocialSignup("google", "mentee")}
                 aria-label="Continue with Google"
               >
@@ -168,7 +167,7 @@ export default function SignupPage() {
               </Button>
               <Button
                 variant="outline"
-                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-input flex items-center justify-center gap-2 rounded-[30px] border border-black"
                 onClick={() => handleSocialSignup("linkedin", "mentee")}
               >
                 <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -176,14 +175,14 @@ export default function SignupPage() {
               </Button>
             </div>
 
-            <p className="text-[15px] py-2 text-black-500">
+            <p className="text-fluid-lg py-2 text-black-500">
               Recommended for fast signup
             </p>
 
             {/* OR Divider */}
-            <div className="flex items-center w-full max-w-[400px]">
+            <div className="flex items-center w-full max-w-form-lg">
               <div className="flex-grow h-px bg-gray-400"></div>
-              <span className="px-2 text-black text-[14px] font-semibold">OR</span>
+              <span className="px-2 text-black text-fluid-sm font-semibold">OR</span>
               <div className="flex-grow h-px bg-gray-400"></div>
             </div>
 
@@ -196,10 +195,10 @@ export default function SignupPage() {
             value="mentor"
             className="space-y-4 flex flex-col items-center"
           >
-            <p className="text-[23px] font-semibold">
+            <p className="text-fluid-h4 font-semibold">
               Join as a Freelance Mentor
             </p>
-            <p className="text-[15px] text-black-500 font-medium">
+            <p className="text-fluid-lg text-black-500 font-medium">
               Share your expertise & earn money helping grow others
             </p>
             <div className="flex items-center justify-center gap-3 mt-6">
@@ -207,21 +206,20 @@ export default function SignupPage() {
                 <div
                   key={step}
                   className={`w-3 h-3 rounded-full transition-all duration-300
-            ${
-              currentStep === step
-                ? "bg-[#0073CF] scale-110"
-                : "border border-[#0073CF] bg-transparent"
-            }`}
+            ${currentStep === step
+                      ? "bg-[#0073CF] scale-110"
+                      : "border border-[#0073CF] bg-transparent"
+                    }`}
                 />
               ))}
             </div>
-            <p className="text-[15px] text-black-500">Step 1 of 5</p>
+            <p className="text-fluid-lg text-black-500">Step 1 of 5</p>
 
             {/* Social Buttons */}
-            <div className="space-y-3 w-[418px]">
+            <div className="space-y-3 w-full max-w-form-md">
               <Button
                 variant="outline"
-                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-input flex items-center justify-center gap-2 rounded-[30px] border border-black"
                 onClick={() => handleSocialSignup("google", "mentor")}
                 aria-label="Continue with Google"
               >
@@ -230,7 +228,7 @@ export default function SignupPage() {
               </Button>
               <Button
                 variant="outline"
-                className="relative w-[93%] mx-auto h-[50px] flex items-center justify-center gap-2 rounded-full border border-black"
+                className="relative w-[93%] mx-auto h-input flex items-center justify-center gap-2 rounded-[30px] border border-black"
                 onClick={() => handleSocialSignup("linkedin", "mentor")}
               >
                 <img src="/linkedin.png" alt="LinkedIn" className="h-5 w-5" />
@@ -238,14 +236,14 @@ export default function SignupPage() {
               </Button>
             </div>
 
-            <p className="text-[15px] py-2 text-black-500">
+            <p className="text-fluid-lg py-2 text-black-500">
               Recommended for fast signup
             </p>
 
             {/* OR Divider */}
-            <div className="flex items-center w-full max-w-[400px]">
+            <div className="flex items-center w-full max-w-form-lg">
               <div className="flex-grow h-px bg-gray-400"></div>
-              <span className="px-2 text-black text-[14px] font-semibold">OR</span>
+              <span className="px-2 text-black text-fluid-sm font-semibold">OR</span>
               <div className="flex-grow h-px bg-gray-400"></div>
             </div>
 

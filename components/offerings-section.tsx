@@ -11,37 +11,37 @@ const offerings = [
     title: "Expert Mentors",
     description: "Connect with industry leaders and experienced professionals for personalized guidance.",
     href: "/mentors",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/expert-mentors.png",
   },
   {
     title: "Templates",
     description: "Access professional templates for resumes, cover letters, and project documentation.",
     href: "/templates",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/templates.png",
   },
   {
     title: "Courses",
     description: "Enroll in comprehensive courses designed by industry experts to boost your skills.",
     href: "/courses",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/courses.png",
   },
   {
     title: "Resume Builder",
     description: "Create professional resumes with our AI-powered builder and get feedback from experts.",
     href: "/resume-builder",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/resume-builder.png",
   },
   {
     title: "Blogs",
     description: "Read insightful articles and industry trends from our community of experts.",
     href: "/blogs",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/blogs.png",
   },
   {
     title: "Roadmaps",
     description: "Follow structured learning paths and career roadmaps tailored to your goals.",
     href: "/roadmaps",
-    backgroundImage: "/placeholder.svg?height=300&width=400",
+    backgroundImage: "/offerings/roadmaps.png",
   },
 ]
 
@@ -74,7 +74,7 @@ export function OfferingsSection() {
           {offerings.map((offering) => (
             <Card
               key={offering.title}
-              className="group border-0 shadow-[0_20px_40px_#9F9D9D40] overflow-hidden flex flex-col h-full"
+              className="border-0 shadow-[0_20px_40px_#9F9D9D40] overflow-hidden flex flex-col h-full rounded-2xl"
             >
               <div className="relative h-48 overflow-hidden">
                 <img
@@ -93,44 +93,40 @@ export function OfferingsSection() {
                 </div>
 
                 {/* Explore Button */}
-                <Button
-                  asChild
-                  className="mt-6 relative w-full bg-[#0073CF] text-white rounded-full overflow-hidden h-11 flex items-center justify-center group px-5"
-                >
-                  <Link
-                    href={offering.href}
-                    className="relative w-full flex items-center justify-center transition-all duration-300"
+                <Link href={offering.href} className="mt-6">
+                  <Button
+                    className="relative w-full bg-[#0073CF] hover:bg-[#0073CF] text-white rounded-full overflow-hidden h-11 flex items-center justify-center group px-2"
                   >
-                    {/* Explore text */}
-                    <span className="z-10 relative text-center font-medium transition-all duration-300 group-hover:translate-x-[-80px]">
+                    {/* Button text */}
+                    <span className="z-10 relative text-center font-medium transition-all duration-300 group-hover:opacity-0">
                       Explore
                     </span>
 
                     {/* Arrow circle */}
-                    <span className="absolute right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center transition-all duration-300 group-hover:w-full group-hover:h-full group-hover:right-0 group-hover:rounded-none">
+                    <span className="absolute right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center transition-all duration-300 group-hover:w-[calc(100%-16px)] group-hover:right-2 group-hover:rounded-full">
                       <ArrowRight className="text-[#0073CF] h-4 w-4" />
                     </span>
-                  </Link>
-                </Button>
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
         </div>
 
         {/* View All Services */}
-        <div className="flex justify-end mt-12 items-center gap-3">
+        <div className="flex justify-end mt-12 items-center group">
           {/* White pill */}
           <Button
-            size="sm"
+            size="lg"
             asChild
-            className="bg-white text-black px-6 py-2 rounded-full shadow-md hover:bg-[#f2f2f2] transition-colors duration-300"
+            className="bg-white border border-2 text-lg text-black px-10 py-6 rounded-full hover:bg-[#fffffff] transition-colors duration-300"
           >
-            <Link href="/all-services">View All Services</Link>
+            <Link href="/all-services" className="text-black font-semibold">View all Services</Link>
           </Button>
 
           {/* Arrow in circle */}
-          <span className="w-10 h-10 bg-white rounded-full flex items-center justify-center flex items-center gap-2 group cursor-pointer">
-          <ArrowRight className="text-black h-5 w-5 transition-transform duration-300 group-hover:-rotate-45" />
+          <span className="w-12 h-12 bg-white border border-2 text-xl rounded-full flex items-center justify-center cursor-pointer">
+          <ArrowRight className="text-black h-8 w-8 text-xl transition-transform -rotate-45 duration-300 group-hover:rotate-0" />
           </span>
         </div>
       </div>

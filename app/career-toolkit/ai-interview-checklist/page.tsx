@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SuggestedMentorsPage } from "../components/suggested_mentors"
+import ToolkitActionButton from "../components/toolkit-action-button"
 import { API_BASE_URL } from "@/lib/api"
 
 // API Configuration - using environment variable from lib/api.ts
@@ -163,7 +164,7 @@ export default function AIInterviewChecklist() {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="w-full h-[42px] justify-between rounded-xl border border-gray-300 text-[13px] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+            className="w-full h-[2.625rem] justify-between rounded-xl border border-gray-300 text-[0.8125rem] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
           >
             {selected}
             <ChevronDown className="w-4 h-4 opacity-70" />
@@ -182,7 +183,7 @@ export default function AIInterviewChecklist() {
               key={opt}
               onClick={() => onSelect(opt)}
               className={cn(
-                "flex justify-between items-center px-3 py-2 rounded-md text-[13px] cursor-pointer transition-colors",
+                "flex justify-between items-center px-3 py-2 rounded-md text-[0.8125rem] cursor-pointer transition-colors",
                 "hover:bg-blue-50 hover:text-blue-700"
               )}
             >
@@ -282,14 +283,14 @@ export default function AIInterviewChecklist() {
   )
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
+    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-[6.25rem] py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-5xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
+      <div className="w-full max-w-[77.5rem] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col md:flex-row md:items-start md:justify-between shadow-[0_10px_0_#E3F2FF] relative">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-[52px] font-semibold text-gray-900 leading-tight">
+          <h1 className="text-[3.25rem] font-semibold text-gray-900 leading-tight">
             <span className="text-[#0073CF]">AI Interview</span> Checklist
           </h1>
-          <p className="text-black text-[20px] md:text-[22px] whitespace-nowrap">
+          <p className="text-black text-xl md:text-[1.375rem] whitespace-nowrap">
             Prepare for your next interview with Smart Buddy&apos;s personalized guide.
           </p>
         </div>
@@ -313,9 +314,9 @@ export default function AIInterviewChecklist() {
 
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
         <CardContent className="p-8 space-y-6">
-          <div className="grid text-[20px] md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid text-xl md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Dropdown
               label="Industry"
               options={industryOptions}
@@ -347,25 +348,22 @@ export default function AIInterviewChecklist() {
             </div>
           )}
           <div className="flex justify-end pt-4">
-            <Button
+            <ToolkitActionButton
               onClick={generateChecklist}
-              disabled={isLoading}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition text-[16px] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={false}
+              isLoading={isLoading}
+              loadingText="Generating..."
+              icon={<BookOpenText className="w-5 h-5" />}
             >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <BookOpenText className="w-5 h-5" />
-              )}
-              {isLoading ? "Generating..." : "Generate Guide"}
-            </Button>
+              Generate Guide
+            </ToolkitActionButton>
           </div>
         </CardContent>
       </Card>
 
       {/* ===== Results / Sections Box ===== */}
       {generated && checklistData && (
-        <Card className="w-full max-w-5xl shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
+        <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40,0_-4px_12px_#DADADA40] rounded-2xl">
           <CardContent className="p-8 space-y-5">
             <CardDropdown title="Role Overview" content={checklistData.role_overview} />
             <CardDropdown title="Background Input" content={checklistData.background_input} />

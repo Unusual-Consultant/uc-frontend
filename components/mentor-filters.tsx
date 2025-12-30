@@ -69,20 +69,15 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
   const industries = [
     "Technology",
+    "Product Management",
+    "Data Science",
     "Finance",
     "Marketing",
     "Design",
     "Healthcare",
+    "Sales",
     "Education",
     "Consulting",
-    "Sales",
-    "Operations",
-    "HR",
-    "Manufacturing",
-    "Retail",
-    "Media",
-    "Legal",
-    "Real Estate",
   ];
   const sessionTypes = ["1:1 Session", "Group Session"];
   const packageOptions = [
@@ -91,7 +86,11 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     "Mock Interview",
     "Career Guidance",
     "Portfolio Review",
+    "Technical Interview",
+    "System Design",
+    "Leadership Coaching",
   ];
+
   const experienceLevels = [
     "Entry Level (0-2 years)",
     "Mid Level (3-5 years)",
@@ -100,11 +99,13 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
   ];
 
   const ratingOptions = [
-    "4★ & Above",
-    "3★ & Above",
-    "2★ & Above",
-    "1★ & Above",
+    "4.5 Stars and above",
+    "4.0 Stars and above",
+    "3.5 Stars and above",
+    "Any Rating",
+
   ];
+
   const avalability = [
     "Available Today",
     "This week",
@@ -122,8 +123,10 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     { value: "relevance", label: "Relevance" },
     { value: "price-low", label: "Price: Low to High" },
     { value: "price-high", label: "Price: High to Low" },
-    { value: "rating", label: "Highest Rated" },
-    { value: "experience", label: "Most Experienced" },
+    { value: "experience", label: "Experience: High to Low" },
+    { value: "rating", label: "Rating: High to Low" },
+    { value: "response-time", label: "Response Time: Fastest First" },
+    { value: "newest-mentors", label: "Newest Mentors First" },
   ];
 
   const clearAllFilters = () => {
@@ -193,9 +196,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
     <div className="space-y-8 font-['Mulish']">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-[24px] font-[700] flex items-center gap-2">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           <Filter className="h-6 w-6 text-black" />
-          Filters
+          Filters & Sort
         </h2>
         {getActiveFiltersCount() > 0 && (
           <Button variant="ghost" size="sm" onClick={clearAllFilters}>
@@ -206,9 +209,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </div>
 
       {/* Verified Mentors Row */}
-      <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-5 bg-white shadow-sm w-full max-w-[400px]">
+      <div className="flex items-center justify-between border border-[#C7C7C7] rounded-xl px-5 py-7 bg-white shadow-sm w-full">
         {/* Text */}
-        <span className="text-[16px] font-[600] font-[Mulish] text-black">
+        <span className="text-base font-semibold font-[Mulish] text-black">
           Verified Mentors only
         </span>
 
@@ -242,10 +245,12 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </div>
 
       {/* Sort By */}
-      <Card className="border w-[311px]  border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
-            <SortDesc className="h-5 w-5 text-black" />
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 14H2M8 10H2M6 6H2M12 18H2M19 20V4M19 20L22 17M19 20L16 17M19 4L22 7M19 4L16 7" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
             Sort By
           </CardTitle>
         </CardHeader>
@@ -290,29 +295,42 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
 
       {/* Price Range */}
-      <Card className="border border-[#C7C7C7] w-[311px] h-[220px] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
-        <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
-            <DollarSign className="h-5 w-5 text-black" />
-            Set Price Range (per hour)
+      <Card className="border border-[#C7C7C7] w-full rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
+        <CardHeader className="pb-2 mb-4">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
+            <p>₹</p> Set Price Range
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-4">
           {/* Dual Range Slider */}
           <Slider
-  value={priceRange}
-  onValueChange={(val) => {
-    setPriceRange(val);
-    setMinPrice(val[0]);
-    setMaxPrice(val[1]);
-    notifyFilterChange();
-  }}
-  min={0}
-  max={2000}
-  step={100}
-  className="relative w-full [&_[role=slider]]:bg-white [&_[role=slider]]:border [&_[role=slider]]:border-gray-400 [&_[role=slider]]:w-4 [&_[role=slider]]:h-4 [&_[role=slider]]:rounded-full [&_[role=slider]]:shadow-md [&_[role=slider]]:hover:scale-110 [&_[role=slider]]:transition-transform"
-/>
+            value={priceRange}
+            onValueChange={(val) => {
+              setPriceRange(val);
+              setMinPrice(val[0]);
+              setMaxPrice(val[1]);
+              if (onFiltersChange) {
+                onFiltersChange({
+                  minPrice: val[0],
+                  maxPrice: val[1],
+                  isVerified,
+                  sortBy,
+                  sessionType,
+                  packages,
+                  mentorRatings,
+                  responseTime,
+                  selectedIndustries,
+                  experienceLevel,
+                  availability,
+                });
+              }
+            }}
+            min={0}
+            max={2000}
+            step={100}
+            className="relative w-full [&_[role=slider]]:shadow-md [&_[role=slider]]:hover:scale-110 [&_[role=slider]]:transition-transform"
+          />
 
 
           {/* Labels */}
@@ -326,25 +344,55 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
           <div className="flex items-center gap-3">
             <input
               type="number"
-              placeholder="Min ₹"
-              value={minPrice}
+              placeholder="Min Price"
+              value={minPrice === 0 ? '' : minPrice}
               onChange={(e) => {
-                const value = Number(e.target.value);
-                setMinPrice(value);
-                setPriceRange([Math.min(value, priceRange[1]), priceRange[1]]);
-                notifyFilterChange();
+                const value = e.target.value === '' ? 0 : Number(e.target.value);
+                const newMin = Math.min(value, maxPrice);
+                setMinPrice(newMin);
+                setPriceRange([newMin, maxPrice]);
+                if (onFiltersChange) {
+                  onFiltersChange({
+                    minPrice: newMin,
+                    maxPrice,
+                    isVerified,
+                    sortBy,
+                    sessionType,
+                    packages,
+                    mentorRatings,
+                    responseTime,
+                    selectedIndustries,
+                    experienceLevel,
+                    availability,
+                  });
+                }
               }}
               className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
             />
             <input
               type="number"
-              placeholder="Max ₹"
-              value={maxPrice}
+              placeholder="Max Price"
+              value={maxPrice === 2000 ? '' : maxPrice}
               onChange={(e) => {
-                const value = Number(e.target.value);
-                setMaxPrice(value);
-                setPriceRange([priceRange[0], Math.max(value, priceRange[0])]);
-                notifyFilterChange();
+                const value = e.target.value === '' ? 2000 : Number(e.target.value);
+                const newMax = Math.max(value, minPrice);
+                setMaxPrice(newMax);
+                setPriceRange([minPrice, newMax]);
+                if (onFiltersChange) {
+                  onFiltersChange({
+                    minPrice,
+                    maxPrice: newMax,
+                    isVerified,
+                    sortBy,
+                    sessionType,
+                    packages,
+                    mentorRatings,
+                    responseTime,
+                    selectedIndustries,
+                    experienceLevel,
+                    availability,
+                  });
+                }
               }}
               className="w-full border border-[#C7C7C7] rounded-md px-3 py-2 text-sm focus:border-[#87CEEB] focus:ring-[#87CEEB]/40 outline-none transition-all"
             />
@@ -354,9 +402,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
 
       {/* Industry */}
-      <Card className="border border-[#C7C7C7]">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-xl font-bold text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -404,7 +452,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={industry} className="text-sm cursor-pointer">
+              <label htmlFor={industry} className="text-md font-semibold cursor-pointer">
                 {industry}
               </label>
             </div>
@@ -413,9 +461,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </Card>
 
       {/* Session Type */}
-      <Card className="border border-[#C7C7C7] rounded-lg">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Clock className="h-5 w-5 text-black" />
             Session Type
           </CardTitle>
@@ -448,7 +496,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={type} className="text-sm cursor-pointer">
+              <label htmlFor={type} className="text-md font-semibold cursor-pointer">
                 {type}
               </label>
             </div>
@@ -456,9 +504,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
         </CardContent>
       </Card>
 
-      <Card className="border border-[#C7C7C7]">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -508,7 +556,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={level} className="text-sm cursor-pointer">
+              <label htmlFor={level} className="text-md font-semibold cursor-pointer">
                 {level}
               </label>
             </div>
@@ -517,9 +565,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </Card>
 
       {/* Packages */}
-      <Card className="border border-[#C7C7C7] rounded-lg">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Briefcase className="h-5 w-5 text-black" />
             Packages
           </CardTitle>
@@ -552,7 +600,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={pkg} className="text-sm cursor-pointer">
+              <label htmlFor={pkg} className="text-md font-semibold cursor-pointer">
                 {pkg}
               </label>
             </div>
@@ -561,9 +609,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </Card>
 
       {/* Mentor Rating */}
-      <Card className="border border-[#C7C7C7] rounded-lg">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Star className="h-5 w-5 text-black" />
             Mentor Rating
           </CardTitle>
@@ -596,7 +644,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={rating} className="text-sm cursor-pointer">
+              <label htmlFor={rating} className="text-md font-semibold cursor-pointer">
                 {rating}
               </label>
             </div>
@@ -605,9 +653,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
       </Card>
 
       {/* Availability */}
-      <Card className="border border-[#C7C7C7] rounded-lg">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             {/* Availability Icon */}
             <Clock className="h-5 w-5 text-black" />
             Availability
@@ -643,7 +691,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                 }}
 
               />
-              <label htmlFor={slot} className="text-sm cursor-pointer">
+              <label htmlFor={slot} className="text-md font-semibold cursor-pointer">
                 {slot}
               </label>
             </div>
@@ -653,9 +701,9 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
 
 
       {/* Response Time */}
-      <Card className="border border-[#C7C7C7] rounded-lg">
+      <Card className="border w-full border-[#C7C7C7] rounded-lg transition-all duration-300 hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)]">
         <CardHeader className="pb-2">
-          <CardTitle className="flex items-center gap-2 text-[20px] font-[700] text-black">
+          <CardTitle className="flex items-center gap-2 text-[1.375rem] mb-2 font-bold text-black">
             <Timer className="h-5 w-5 text-black" />
             Response Time
           </CardTitle>
@@ -688,7 +736,7 @@ export function MentorFilters({ onFiltersChange }: MentorFiltersProps) {
                   }
                 }}
               />
-              <label htmlFor={option} className="text-sm cursor-pointer">
+              <label htmlFor={option} className="text-md font-semibold cursor-pointer">
                 {option}
               </label>
             </div>

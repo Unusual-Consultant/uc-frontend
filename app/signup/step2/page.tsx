@@ -201,11 +201,12 @@ export default function SignupStep2() {
   }
 
   const handleLanguageToggle = (languageId: string | number) => {
-    setSelectedLanguages(prev =>
-      prev.includes(languageId)
-        ? prev.filter(id => id !== languageId)
-        : prev.length < 3 ? [...prev, languageId] : prev
-    )
+    setSelectedLanguages(prev => {
+      const normalizedId = typeof languageId === 'string' ? Number(languageId) : languageId
+      return prev.includes(normalizedId)
+        ? prev.filter(id => id !== normalizedId)
+        : prev.length < 3 ? [...prev, normalizedId] : prev
+    })
   }
 
   const handleContinue = async () => {
@@ -448,7 +449,10 @@ export default function SignupStep2() {
                 value=""
                 onChange={(e) => {
                   const langId = e.target.value
-                  if (langId && selectedLanguages.length < 3) handleLanguageToggle(langId)
+                  if (langId) {
+                    handleLanguageToggle(Number(langId))
+                    e.target.value = "" // Reset dropdown after selection
+                  }
                 }}
                 disabled={selectedLanguages.length >= 3}
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] text-sm"

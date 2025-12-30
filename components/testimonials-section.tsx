@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote } from "lucide-react"
 import { useState, useEffect } from "react"
+import { API_BASE_URL } from "@/lib/api"
 
 const mockTestimonials = [
   {
@@ -85,7 +86,7 @@ export function TestimonialsSection() {
 
   const fetchTestimonials = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/featured-testimonials/all?per_page=9`)
+      const response = await fetch(`${API_BASE_URL}/featured-testimonials/all?per_page=9`)
       if (!response.ok) throw new Error("Failed to fetch testimonials")
       const data = await response.json()
 
@@ -109,7 +110,7 @@ export function TestimonialsSection() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/statistics/platform`)
+      const response = await fetch(`${API_BASE_URL}/statistics/platform`)
       if (!response.ok) throw new Error("Failed to fetch statistics")
       const data = await response.json()
       setStatsData(data)

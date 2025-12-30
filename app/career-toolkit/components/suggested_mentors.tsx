@@ -8,6 +8,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { QuickBook } from "@/components/dashboard/quickbook"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import Image from "next/image"
+import { API_BASE_URL } from "@/lib/api"
 
 interface Mentor {
   id: string
@@ -44,7 +45,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
         return
       }
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/mentors/ai-recommended`, {
+        const response = await fetch(`${API_BASE_URL}/mentors/ai-recommended`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ skills: skills || [], desired_role: role || null, limit: 4 }),
@@ -123,25 +124,25 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
                 style={{
                   position: "relative",
                   borderRadius: "1rem",
-                  border: "3px solid transparent",
+                  border: "0.1875rem solid transparent",
                   background:
                     "linear-gradient(white, white) padding-box, linear-gradient(to right, #B8015A, #0171CD) border-box",
                   padding: "1rem",
                 }}
               >
                 {/* Match Pill */}
-                <div className="absolute top-6 right-4 text-[12px]">
+                <div className="absolute top-6 right-4 text-[0.75rem]">
                   <div
                     className="relative inline-block rounded-full"
                     style={{
                       background: "linear-gradient(to right, #B8015A, #0171CD)",
-                      padding: "1.5px",
+                      padding: "0.09375rem",
                       borderRadius: "9999px",
                       display: "inline-block",
                     }}
                   >
                     <div
-                      className="rounded-full flex items-center justify-center gap-1 px-3 py-[4px]  font-semibold text-center"
+                      className="rounded-full flex items-center justify-center gap-1 px-3 py-[0.25rem]  font-semibold text-center"
                       style={{
                         background: "linear-gradient(to right, #FDF1F7, #EDF6FE)",
                         borderRadius: "9999px",
@@ -152,7 +153,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
                         alt="sparkle"
                         width={14}
                         height={14}
-                        className="w-[14px] h-[14px]"
+                        className="w-[0.875rem] h-[0.875rem]"
                       />
                       {mentor.matchScore}% Match
                     </div>
@@ -182,7 +183,7 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
                         {mentor.tags.map((tag, i) => (
                           <span
                             key={i}
-                            className="px-1.5 py-0.5 bg-[#EDF7FF] text-black text=[10px] rounded-full"
+                            className="px-1.5 py-0.5 bg-[#EDF7FF] text-black text-[0.625rem] rounded-full"
                           >
                             {tag}
                           </span>
@@ -193,17 +194,17 @@ export function SuggestedMentorsPage({ skills, role }: SuggestedMentorsProps) {
                         <span className="text-black font-bold text-sm md:text-base">
                           ₹{mentor.price}/hr
                         </span>
-                        <div className="flex gap-2 text-[14px]">
+                        <div className="flex gap-2 text-[0.875rem]">
                           <Button
                             variant="outline"
-                            className="bg-white border border-black hover:bg-gray-100 rounded-full px-4 py-[2px]  h-auto min-h-0"
+                            className="bg-white border border-black hover:bg-gray-100 rounded-full px-4 py-[0.125rem]  h-auto min-h-0"
                           >
                             View Profile
                           </Button>
 
                           <Button
                             onClick={() => setSelectedMentor(mentor)}
-                            className="bg-[#0070E0] text-white rounded-full px-4 py-[6px]  h-auto min-h-0 flex items-center gap-1 hover:bg-blue-700"
+                            className="bg-[#0070E0] text-white rounded-full px-4 py-[0.375rem]  h-auto min-h-0 flex items-center gap-1 hover:bg-blue-700"
                           >
                             Quick Book
                           </Button>

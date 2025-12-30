@@ -16,12 +16,19 @@ import {
 import { useState } from "react";
 import { SuggestedMentorsPage } from "../components/suggested_mentors";
 import { CompanyAlignedMentors } from "../components/company-mentors";
+import ToolkitActionButton from "../components/toolkit-action-button";
+import { API_BASE_URL } from "@/lib/api";
+
+interface ResourceLink {
+  name: string;
+  url: string;
+}
 
 interface RoadmapStep {
   duration: string;
   title: string;
   description: string;
-  resources: string[];
+  resources: (string | ResourceLink)[];
 }
 
 
@@ -129,7 +136,7 @@ export default function AIRoadmap() {
     setShowRoadmap(false)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/career-roadmap/generate`, {
+      const response = await fetch(`${API_BASE_URL}/career-roadmap/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -150,6 +157,10 @@ export default function AIRoadmap() {
       }
 
       const data = await response.json()
+
+      // Debug: Log the received data
+      console.log('[DEBUG] Received roadmap data:', data)
+      console.log('[DEBUG] Steps:', data.steps)
 
       // Set the roadmap data
       setRoadmapData({
@@ -182,16 +193,16 @@ export default function AIRoadmap() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center px-6 py-10 space-y-8">
       {/* ===== Header Box ===== */}
-      <div className="w-full max-w-6xl bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
+      <div className="w-full max-w-[77.5rem] bg-[#EDF7FF] rounded-2xl p-8 flex flex-col shadow-[0_10px_0_#E3F2FF]">
 
         {/* Title */}
-        <h1 className="text-[40px] md:text-[52px] font-semibold text-gray-900 leading-tight">
+        <h1 className="text-[2.5rem] md:text-[3.25rem] font-semibold text-gray-900 leading-tight">
           <span className="text-[#0073CF]">AI Career Roadmap</span> Generator
         </h1>
 
         {/* Subheading + Button row */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mt-2 space-y-3 md:space-y-0">
-          <p className="text-black text-[18px] md:text-[20px]">
+          <p className="text-black text-lg md:text-xl">
             Get a personalized step-by-step plan to achieve your career goals
           </p>
 
@@ -216,187 +227,157 @@ export default function AIRoadmap() {
 
 
       {/* ===== Form Box ===== */}
-      <Card className="w-full max-w-6xl shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
+      <Card className="w-full max-w-[77.5rem] shadow-[0_4px_12px_#9F9D9D40] rounded-2xl">
 
-        <CardContent className="p-8 space-y-8">
+        <CardContent className="p-8">
           {/* ===== Dropdown Section ===== */}
-          <div className="grid text-[20px] md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+          <div className="mb-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             <Dropdown
               label="Experience Level"
-              className="w-full max-w-[350px]"
+              className="w-full"
               options={experience}
               selected={selectedExperience}
               onSelect={setSelectedExperience}
             />
             <Dropdown
               label="Highest Education"
-              className="w-full max-w-[350px]"
+              className="w-full"
               options={education}
               selected={selectedEducation}
               onSelect={setSelectedEducation}
             />
-            <div className="flex flex-col space-y-2 lg:col-span-2 w-full max-w-[720px]">
-              <Label className="text-black font-medium text-[20px]">
-                Desired Role <span className="text-black">(optional)</span>
-              </Label>
-              <Input
-                placeholder="e.g. Product Manager, Data Scientist..."
-                className="rounded-xl border border-gray-300 w-full text-[20px]"
+            <div className="flex flex-col lg:col-span-2 w-full max-w-[45rem]">
+              <label className="text-lg font-bold text-gray-900 mb-4 block">
+                Desired Role
+              </label>
+              <input
+                type="text"
+                placeholder="e.g., Product Manager, Data Scientist"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] focus:border-transparent text-base placeholder:text-gray-600"
                 value={desiredRole}
                 onChange={(e) => setDesiredRole(e.target.value)}
               />
             </div>
+            </div>
           </div>
 
-
           {/* ===== Key Skills & Tools ===== */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="mb-8">
+            <div className="grid md:grid-cols-2 gap-6">
             {/* Key Skills */}
-            <div className="flex flex-col space-y-3">
-              <Label className="text-black font-medium text-[20px]">
-                Key Skills
-              </Label>
+            <div className="flex flex-col">
+              <label className="text-lg font-bold text-gray-900 mb-4 block">
+                Key Skills (Select all that apply)
+              </label>
               {/* Input for adding custom skills */}
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Type and press Enter (e.g. React, Node.js, SQL...)"
-                  value={skillInput}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setSkillInput(val);
-                    if (val.trim().length > 50) {
-                      setSkillError("Can't enter more than 50 characters");
-                    } else if (selectedSkills.length >= 15) {
-                      setSkillError("Maximum 15 skills allowed");
-                    } else {
-                      setSkillError(null);
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, "skill")}
-                  className={`rounded-xl border w-full ${skillError ? "border-red-500 focus-visible:ring-red-500" : "border-gray-300"}`}
-                />
-                <Button
-                  onClick={() => handleAddItem("skill")}
-                  className="bg-[#0073CF] text-white px-6 rounded-xl hover:bg-[#005FA3]"
-                >
-                  Add
-                </Button>
-              </div>
+              <input
+                type="text"
+                placeholder="Enter your key skills"
+                value={skillInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSkillInput(val);
+                  if (val.trim().length > 50) {
+                    setSkillError("Can't enter more than 50 characters");
+                  } else if (selectedSkills.length >= 15) {
+                    setSkillError("Maximum 15 skills allowed");
+                  } else {
+                    setSkillError(null);
+                  }
+                }}
+                onKeyPress={(e) => handleKeyPress(e, "skill")}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] focus:border-transparent text-base placeholder:text-gray-600 mb-3"
+              />
               {skillError && (
-                <p className="text-xs text-red-600 mt-1">{skillError}</p>
+                <p className="text-xs text-red-600 mb-3">{skillError}</p>
               )}
-              {/* Suggested tags */}
-              <div className="flex flex-wrap gap-2 mb-2">
-                {skills.map((tag) => {
-                  const isSelected = selectedSkills.includes(tag);
-                  return (
-                    <span
-                      key={tag}
-                      onClick={() => toggleTag(tag, "skill")}
-                      className={`px-3 py-1 border rounded-full text-sm cursor-pointer transition ${isSelected
-                          ? "bg-[#0073CF] text-white border-[#0073CF]"
-                          : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
-                        }`}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
               {/* Selected skills with remove option */}
               {selectedSkills.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  <p className="text-sm text-gray-600 w-full">Your Skills:</p>
+                <div className="flex flex-wrap gap-2 mb-3">
                   {selectedSkills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-3 py-1 bg-[#0073CF] text-white rounded-full text-sm flex items-center gap-2"
+                      onClick={() => removeItem(skill, "skill")}
+                      className="inline-flex items-center px-3 py-1 bg-[#0073CF] text-white rounded-full text-xs cursor-pointer hover:bg-[#005fa3]"
                     >
-                      {skill}
-                      <button
-                        onClick={() => removeItem(skill, "skill")}
-                        className="ml-2 hover:bg-[#005FA3] rounded-full p-0.5"
-                      >
-                        ×
-                      </button>
+                      {skill} ×
                     </span>
                   ))}
                 </div>
               )}
+              {/* Suggested tags */}
+              <div className="flex flex-wrap gap-2">
+                {skills
+                  .filter(skill => !selectedSkills.includes(skill))
+                  .map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag, "skill")}
+                      className="px-4 py-2 rounded-full border border-gray-200 text-sm transition hover:border-[#0073CF] hover:bg-[#E6F3FC] text-gray-700"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+              </div>
             </div>
 
             {/* Familiar Tools */}
-            <div className="flex flex-col space-y-3">
-              <Label className="text-black font-medium text-[20px]">
-                Familiar Tools
-              </Label>
+            <div className="flex flex-col">
+              <label className="text-lg font-bold text-gray-900 mb-4 block">
+                Familiar Tools (Select all that apply)
+              </label>
               {/* Input for adding custom tools */}
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Type and press Enter (e.g. VS Code, GitHub, Figma...)"
-                  value={toolInput}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setToolInput(val);
-                    if (val.trim().length > 50) {
-                      setToolError("Can't enter more than 50 characters");
-                    } else if (selectedTools.length >= 15) {
-                      setToolError("Maximum 15 tools allowed");
-                    } else {
-                      setToolError(null);
-                    }
-                  }}
-                  onKeyPress={(e) => handleKeyPress(e, "tool")}
-                  className={`rounded-xl border w-full ${toolError ? "border-red-500 focus-visible:ring-red-500" : "border-gray-300"}`}
-                />
-                <Button
-                  onClick={() => handleAddItem("tool")}
-                  className="bg-[#0073CF] text-white px-6 rounded-xl hover:bg-[#005FA3]"
-                >
-                  Add
-                </Button>
-              </div>
+              <input
+                type="text"
+                placeholder="Enter tools you're familiar with"
+                value={toolInput}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setToolInput(val);
+                  if (val.trim().length > 50) {
+                    setToolError("Can't enter more than 50 characters");
+                  } else if (selectedTools.length >= 15) {
+                    setToolError("Maximum 15 tools allowed");
+                  } else {
+                    setToolError(null);
+                  }
+                }}
+                onKeyPress={(e) => handleKeyPress(e, "tool")}
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] focus:border-transparent text-base placeholder:text-gray-600 mb-3"
+              />
               {toolError && (
-                <p className="text-xs text-red-600 mt-1">{toolError}</p>
+                <p className="text-xs text-red-600 mb-3">{toolError}</p>
               )}
-              {/* Suggested tags */}
-              <div className="flex flex-wrap gap-2 mb-2">
-                {tools.map((tag) => {
-                  const isSelected = selectedTools.includes(tag);
-                  return (
-                    <span
-                      key={tag}
-                      onClick={() => toggleTag(tag, "tool")}
-                      className={`px-3 py-1 border rounded-full text-sm cursor-pointer transition ${isSelected
-                          ? "bg-[#0073CF] text-white border-[#0073CF]"
-                          : "border-[#C7C7C7] text-gray-800 hover:bg-gray-100"
-                        }`}
-                    >
-                      {tag}
-                    </span>
-                  );
-                })}
-              </div>
               {/* Selected tools with remove option */}
               {selectedTools.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  <p className="text-sm text-gray-600 w-full">Your Tools:</p>
+                <div className="flex flex-wrap gap-2 mb-3">
                   {selectedTools.map((tool) => (
                     <span
                       key={tool}
-                      className="px-3 py-1 bg-[#0073CF] text-white rounded-full text-sm flex items-center gap-2"
+                      onClick={() => removeItem(tool, "tool")}
+                      className="inline-flex items-center px-3 py-1 bg-[#0073CF] text-white rounded-full text-xs cursor-pointer hover:bg-[#005fa3]"
                     >
-                      {tool}
-                      <button
-                        onClick={() => removeItem(tool, "tool")}
-                        className="ml-2 hover:bg-[#005FA3] rounded-full p-0.5"
-                      >
-                        ×
-                      </button>
+                      {tool} ×
                     </span>
                   ))}
                 </div>
               )}
+              {/* Suggested tags */}
+              <div className="flex flex-wrap gap-2">
+                {tools
+                  .filter(tool => !selectedTools.includes(tool))
+                  .map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag, "tool")}
+                      className="px-4 py-2 rounded-full border border-gray-200 text-sm transition hover:border-[#0073CF] hover:bg-[#E6F3FC] text-gray-700"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+              </div>
+            </div>
             </div>
           </div>
 
@@ -408,53 +389,57 @@ export default function AIRoadmap() {
           )}
 
           {/* ===== Bottom Row ===== */}
-          <div className="flex flex-col md:flex-row justify-start items-center gap-6 pt-4 w-full ">
+          <div className="mb-0">
+            <div className="flex flex-col md:flex-row justify-start items-end gap-6 w-full">
             <div className="flex items-center gap-6 w-full">
               {/* Time Frame Dropdown */}
               <Dropdown
-                label="Tageted Time Frame"
+                label="Targeted Timeframe"
                 options={["6–12 months", "12–18 months"]}
                 selected={selectedTimeFrame}
                 onSelect={setSelectedTimeFrame}
-                className="w-full md:w-[350px] "
+                className="w-full md:w-[350px]"
               />
 
               {/* Target Company Input */}
-              <div className="flex flex-col space-y-1 w-full md:w-[350px] ">
-                <Label className="text-black font-medium text-[20px]">Target Company(Optional)</Label>
-                <Input
-                  placeholder="e.g. Microsoft"
-                  className="rounded-xl border border-gray-300 w-full"
+              <div className="flex flex-col w-full md:w-[350px]">
+                <label className="text-lg font-bold text-gray-900 mb-4 block">
+                  Target Company (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Google, Microsoft"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0073CF] focus:border-transparent text-base placeholder:text-gray-600"
                   value={targetCompany}
                   onChange={(e) => setTargetCompany(e.target.value)}
                 />
               </div>
             </div>
 
-
-            <Button
-              onClick={generateRoadmap}
-              disabled={isLoading}
-              className="flex items-center gap-2 bg-[#0070E0] hover:bg-[#005FC2] shadow-[0_4px_0_#0C5CAC] text-white rounded-full px-8 py-3 text-lg font-semibold transition w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Generating..." : (
-                <>
-                  <Route />
-                  Generate Roadmap
-                </>
-              )}
-            </Button>
+            <div className="flex justify-end">
+              <ToolkitActionButton
+                onClick={generateRoadmap}
+                disabled={false}
+                isLoading={isLoading}
+                loadingText="Generating..."
+                icon={<Route />}
+                className="w-full md:w-auto"
+              >
+                Generate Roadmap
+              </ToolkitActionButton>
+            </div>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* ===== Roadmap Section ===== */}
       {showRoadmap && (
-        <Card className="w-full max-w-6xl rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
+        <Card className="w-full max-w-[77.5rem] rounded-2xl shadow-[0_4px_12px_#9F9D9D40] bg-white mx-auto">
           <CardContent className="p-8 text-gray-500 text-lg ">
 
             {/* ===== Roadmap Summary Heading ===== */}
-            <h2 className="text-[24px] font-bold text-[#003C6C] mb-4">Roadmap Summary</h2>
+            <h2 className="text-2xl font-bold text-[#003C6C] mb-4">Roadmap Summary</h2>
 
             {/* ===== Gray box for Summary (keeps results inside) ===== */}
             <div className="bg-gray-100 rounded-xl p-6 mb-8 text-black text-base leading-relaxed border border-[#C7C7C7]">
@@ -464,7 +449,7 @@ export default function AIRoadmap() {
             </div>
 
             {/* ===== Step-by-Step Journey Heading ===== */}
-            <h2 className="text-[24px] font-bold text-[#003C6C] mb-4">Step-by-step Journey</h2>
+            <h2 className="text-2xl font-bold text-[#003C6C] mb-4">Step-by-step Journey</h2>
 
             {/* ===== Gray box for Steps ===== */}
             <div className="bg-gray-100 rounded-xl p-6 relative overflow-hidden min-h-[1100px] border border-[#C7C7C7]">
@@ -518,11 +503,11 @@ function StepArrowBox({
 }: {
   title: string;
   description: string;
-  resources: string[];
+  resources: (string | { name: string; url: string })[];
   duration: string;
 }) {
   return (
-    <div className="relative w-[799px] h-[220px] rounded-2xl overflow-hidden">
+    <div className="relative w-[49.9375rem] h-[13.75rem] rounded-2xl overflow-hidden">
       {/* SVG Arrow Shape with Rounded Corners */}
       <svg
         width="799"
@@ -545,7 +530,7 @@ function StepArrowBox({
       <div className="absolute inset-0 flex flex-col justify-center px-12 text-left text-black">
         {/* Duration — top-right corner */}
         <p className="absolute top-4 right-6 text-sm font-semibold text-[#0073CF] bg-[#E8F3FF] px-3 py-1 rounded-full shadow-sm">
-          ⏱ {duration}
+          {duration}
         </p>
 
         {/* Title & Description */}
@@ -566,18 +551,27 @@ function StepArrowBox({
             Key Resources:
           </p>
           <ul className="list-disc list-inside text-sm text-blue-600 space-y-1">
-            {resources.map((res, idx) => (
-              <li key={idx}>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline text-[#0073CF]"
-                >
-                  {res}
-                </a>
-              </li>
-            ))}
+            {resources && resources.length > 0 ? resources.map((res, idx) => {
+              // Handle both string and object resources
+              const isStructured = typeof res === 'object' && res !== null && 'name' in res && 'url' in res;
+              const resourceName = isStructured ? res.name : (typeof res === 'string' ? res : 'Resource');
+              const resourceUrl = isStructured ? res.url : '#';
+              
+              return (
+                <li key={idx}>
+                  <a
+                    href={resourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline text-[#0073CF]"
+                  >
+                    {resourceName}
+                  </a>
+                </li>
+              );
+            }) : (
+              <li>No resources available</li>
+            )}
           </ul>
         </div>
       </div>
@@ -600,32 +594,25 @@ function Dropdown({
   className?: string;
 }) {
   return (
-    <div className={`flex flex-col space-y-2 ${className}`}>
-      <Label className="text-black font-medium text-[20px]">{label}</Label>
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-full h-[42px] justify-between rounded-xl border border-gray-300 text-[13px] text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
-          >
-            {selected}
-            <ChevronDown className="w-4 h-4 opacity-70" />
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)] max-h-[180px] overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-lg">
-          {options.map((opt) => (
-            <DropdownMenuItem
-              key={opt}
-              className="text-sm text-gray-700 hover:bg-blue-50"
-              onClick={() => onSelect(opt)}
-            >
-              {opt}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div className={`flex flex-col ${className}`}>
+      <label className="text-lg font-bold text-gray-900 mb-4 block">{label}</label>
+      <select
+        value={selected}
+        onChange={(e) => onSelect(e.target.value)}
+        className="w-full p-3 pr-10 border border-[#C7C7C7] rounded-lg focus:ring-2 focus:ring-[#87CEEB]/40 focus:border-[#87CEEB] text-base text-gray-700 bg-white appearance-none cursor-pointer transition-all hover:border-[#87CEEB] hover:shadow-[0_2px_8px_rgba(135,206,235,0.4)] [&>option]:py-3 [&>option]:px-4 [&>option]:rounded-lg [&>option]:border-0"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'right 12px center',
+        }}
+      >
+        <option value={selected} className="py-3 px-4 rounded-lg">{selected}</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt} className="py-3 px-4 rounded-lg">
+            {opt}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
