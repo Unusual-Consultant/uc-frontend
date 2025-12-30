@@ -20,6 +20,7 @@ interface AnalysisResponse {
   match_score: number
   matched_keywords: string[]
   missing_keywords: string[]
+  spelling_mistakes: { [key: string]: string }
   ai_insights: string[]
   analysis_timestamp: string
   resume_length: number
@@ -68,13 +69,13 @@ export default function AIResumeAnalyzer() {
       const response = await fetch(`${API_BASE_URL}/resume-analysis/usage`)
       if (!response.ok) throw new Error('Failed to fetch usage stats')
       const data: UsageResponse = await response.json()
-      
+
       // Calculate combined usage from Gemini (primary) + Groq (fallback)
       const geminiRemaining = data.gemini_limit - data.gemini_requests
       const groqRemaining = data.openai_limit - data.openai_requests
       const totalRemaining = geminiRemaining + groqRemaining
       const totalLimit = data.gemini_limit + data.openai_limit
-      
+
       setUsesRemaining(totalRemaining)
       setTotalUses(totalLimit)
     } catch (error) {
@@ -362,6 +363,7 @@ export default function AIResumeAnalyzer() {
           resumeText={analysisResults.resume_text}
           highlightWords={analysisResults.matched_keywords}
           missingKeywords={analysisResults.missing_keywords}
+          spellingMistakes={analysisResults.spelling_mistakes}
           aiInsights={analysisResults.ai_insights}
           matchScore={analysisResults.match_score}
           provider={analysisResults.provider}

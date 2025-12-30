@@ -7,6 +7,7 @@ interface AnalysisResultsProps {
   resumeText: string
   highlightWords: string[]
   missingKeywords: string[]
+  spellingMistakes?: { [key: string]: string }
   aiInsights: string[]
   matchScore: number
   provider: string
@@ -16,14 +17,47 @@ export default function AnalysisResults({
   resumeText,
   highlightWords,
   missingKeywords,
+  spellingMistakes = {},
   aiInsights,
   matchScore,
   provider,
 }: AnalysisResultsProps) {
-  // highlight keywords
+  // highlight keywords and spelling mistakes
   const highlightText = (text: string) => {
-    const regex = new RegExp(`\\b(${highlightWords.join("|")})\\b`, "gi")
-    return text.replace(regex, (match) => `<span class="bg-green-200 font-semibold">${match}</span>`)
+    // Create map for fast lookup of types
+    const keywordSet = new Set(highlightWords.map(w => w.toLowerCase()));
+
+    // Create robust map for spelling corrections (lowercase mistake -> correction)
+    const spellingMap = new Map<string, string>();
+    Object.entries(spellingMistakes).forEach(([mistake, correction]) => {
+      spellingMap.set(mistake.toLowerCase(), correction);
+    });
+
+    // Debug logging to verify data
+    console.log("Spelling Mistakes Dict:", spellingMistakes);
+
+    // Combine all words to search
+    const allWords = [...highlightWords, ...Object.keys(spellingMistakes)].filter(Boolean);
+    if (allWords.length === 0) return text;
+
+    const regex = new RegExp(`\\b(${allWords.join("|")})\\b`, "gi");
+
+    return text.replace(regex, (match) => {
+      const lowerMatch = match.toLowerCase();
+
+      if (spellingMap.has(lowerMatch)) {
+        // Replace with correction and highlight red
+        const correction = spellingMap.get(lowerMatch);
+        // Ensure correction is used
+        return `<span class="bg-red-200 font-semibold text-red-800">${correction || match}</span>`;
+      }
+
+      if (keywordSet.has(lowerMatch)) {
+        return `<span class="bg-green-200 font-semibold">${match}</span>`;
+      }
+
+      return match;
+    });
   }
 
   return (
@@ -80,6 +114,23 @@ export default function AnalysisResults({
               dangerouslySetInnerHTML={{ __html: highlightText(resumeText.replace(/\n/g, "<br>")) }}
             />
           </div>
+
+          {/* Spelling Mistakes */}
+          {Object.keys(spellingMistakes).length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Image src="/missingkeyword.png" alt="Spelling Mistakes" width={22} height={22} />
+                <h2 className="text-[1.25rem] font-semibold text-gray-900">Spelling Mistakes ({Object.keys(spellingMistakes).length})</h2>
+              </div>
+              <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
+                {Object.entries(spellingMistakes).map(([mistake, correction], idx) => (
+                  <span key={idx} className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-[1rem] border border-red-200 font-medium">
+                    {idx + 1}. <span className="line-through opacity-70 mr-1">{mistake}</span> <span className="font-bold">→ {correction}</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Missing Keywords */}
           <div>
