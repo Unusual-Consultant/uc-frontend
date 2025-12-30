@@ -49,7 +49,7 @@ export default function AnalysisResults({
         // Replace with correction and highlight red
         const correction = spellingMap.get(lowerMatch);
         // Ensure correction is used
-        return `<span class="bg-red-200 font-semibold text-red-800">${correction || match}</span>`;
+        return `<span class="underline decoration-red-500 decoration-2">${correction || match}</span>`;
       }
 
       if (keywordSet.has(lowerMatch)) {
@@ -107,7 +107,7 @@ export default function AnalysisResults({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Image src="/green_tick.png" alt="Your Resume" width={22} height={22} />
-              <h2 className="text-[1.25rem] font-semibold text-gray-900">Your Resume</h2>
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">Your Resume </h2>
             </div>
             <div
               className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-gray-700 text-[0.9375rem] leading-relaxed whitespace-pre-wrap font-[Inter]"
