@@ -115,22 +115,27 @@ export default function AnalysisResults({
             />
           </div>
 
-          {/* Spelling Mistakes */}
-          {Object.keys(spellingMistakes).length > 0 && (
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Image src="/missingkeyword.png" alt="Spelling Mistakes" width={22} height={22} />
-                <h2 className="text-[1.25rem] font-semibold text-gray-900">Spelling Mistakes ({Object.keys(spellingMistakes).length})</h2>
-              </div>
-              <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
-                {Object.entries(spellingMistakes).map(([mistake, correction], idx) => (
+          {/* Spelling Mistakes - Always show section */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Image src="/missingkeyword.png" alt="Spelling Mistakes" width={22} height={22} />
+              <h2 className="text-[1.25rem] font-semibold text-gray-900">Spelling Mistakes ({Object.keys(spellingMistakes).length})</h2>
+            </div>
+            <div className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 flex flex-wrap gap-2">
+              {Object.keys(spellingMistakes).length > 0 ? (
+                Object.entries(spellingMistakes).map(([mistake, correction], idx) => (
                   <span key={idx} className="bg-red-50 text-red-700 px-3 py-1 rounded-full text-[1rem] border border-red-200 font-medium">
                     {idx + 1}. <span className="line-through opacity-70 mr-1">{mistake}</span> <span className="font-bold">→ {correction}</span>
                   </span>
-                ))}
-              </div>
+                ))
+              ) : (
+                <span className="text-green-600 flex items-center gap-2">
+                  <Image src="/green_tick.png" alt="check" width={18} height={18} />
+                  No spelling mistakes found!
+                </span>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Missing Keywords */}
           <div>
