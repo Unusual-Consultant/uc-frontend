@@ -110,7 +110,7 @@ export default function AnalysisResults({
               <h2 className="text-[1.25rem] font-semibold text-gray-900">Your Resume (Matched Keywords)</h2>
             </div>
             <div
-              className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-gray-700 text-[0.9375rem] leading-relaxed whitespace-pre-wrap font-[Inter]"
+              className="bg-[#F8F9FB] border border-gray-300 rounded-xl p-4 mt-2 text-gray-700 text-[0.9375rem] leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{ __html: highlightText(resumeText.replace(/\n/g, "<br>")) }}
             />
           </div>
