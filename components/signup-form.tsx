@@ -305,7 +305,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         <TabsContent value="OTP" className="space-y-4">
           <div className="space-y-4">
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Full Name
               </Label>
               <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -313,7 +313,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Phone Number
               </Label>
               <Input placeholder="Enter your Phone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -321,7 +321,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Email
               </Label>
               <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -395,7 +395,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
         <TabsContent value="PW" className="space-y-4">
           <div className="space-y-4">
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Full Name
               </Label>
               <Input placeholder="Enter your Full Name" value={formData.fullName} onChange={(e) => handleInputChange("fullName", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -403,7 +403,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Phone Number
               </Label>
               <Input placeholder="Enter your Phone Number" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -411,7 +411,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Email
               </Label>
               <Input placeholder="Enter your Email address" type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} className="w-[93%] mx-auto h-input rounded-[30px] border px-8 py-3 border-black text-black font-medium bg-transparent placeholder:text-black" />
@@ -419,7 +419,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Create Password
               </Label>
               <div className="relative w-[93%] mx-auto">
@@ -432,7 +432,7 @@ export default function SignupForm({ userType, onSuccess }: SignupFormProps) {
             </div>
 
             <div className="w-full flex flex-col gap-2">
-              <Label className="font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
+              <Label className="w-[93%] mx-auto font-mulish font-bold text-fluid-lg leading-[24px] tracking-[0px] text-left">
                 Confirm Password
               </Label>
               <div className="relative w-[93%] mx-auto">
